@@ -1,0 +1,31 @@
+{
+  "name": "demo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "labor-asset-building build",
+    "watch": "labor-asset-building watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "labor-asset-building": "file:.."
+  },
+  "labor": {
+    "js": [
+      {
+        "entry": null,
+        "output": null
+      }
+    ],
+    "css": [
+      {
+        "entry": "./webroot/css/src/backend/backend.sass",
+        "output": "webroot/css/backend.css"
+      }
+    ],
+    "webpackOverride": "./webpack.js"
+  }
+}
