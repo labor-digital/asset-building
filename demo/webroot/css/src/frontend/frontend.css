@@ -1,3 +1,11 @@
-@import "less/headline.less";
-@import "sass/image.scss";
-@import "sass/text.sass";
+/**
+General information:
+When used in a css file you have to define the loaders for the languages yourself
+ */
+/** Less */
+@import "~less-loader!./less/headline.less";
+
+/** Sass / Scss */
+@import "~sass-loader!./sass/image.scss";
+@import "~sass-loader!./sass/text.sass";
+

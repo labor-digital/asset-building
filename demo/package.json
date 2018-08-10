@@ -16,16 +16,39 @@
   "labor": {
     "js": [
       {
-        "entry": null,
-        "output": null
+        "entry": "webroot/js/src/application.js",
+        "output": "./webroot/js/bundle.js"
+      }
+    ],
+    "jsCompat": [
+      {
+        "rule": "(es6)\\.js$",
+        "fix": "win=>window"
       }
     ],
     "css": [
       {
         "entry": "./webroot/css/src/backend/backend.sass",
         "output": "webroot/css/backend.css"
+      },
+      {
+        "entry": "webroot/css/src/frontend/frontend.css",
+        "output": "./webroot/css/frontend.css"
       }
     ],
-    "webpackOverride": "./webpack.js"
+    "copy": [
+      {
+        "from": [
+          "assets/a/*",
+          "./assets/b/**/b2.png",
+          "./assets/**/asset.png"
+        ],
+        "to": "webroot/assets",
+        "ignore": ["*.jpg", "assets/a/c"]
+      }
+    ],
+    "plugins": [
+      "./demoPlugins/DemoPlugin.js"
+    ]
   }
 }

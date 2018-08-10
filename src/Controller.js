@@ -43,16 +43,32 @@ webpack(webpackConfig, (err, stats) => {
 		console.error('ERRORS OCCURED!');
 		if (err) {
 			console.error(err.stack || err);
-			if (err.details) {
-				console.error(err.details);
-			}
 			return;
 		}
-		stats.toJson().errors.forEach(v => console.log(' - ' + v));
-		return;
+	} else {
+		console.log('Compiling done.');
 	}
-	console.log('Compiling done.');
-});
 
-console.log(laborConfig);
-console.log('controller', process.argv);
+	// Render a readable output
+	var lines = stats.toString({
+		'hash': false,
+		'entrypoints': false,
+		'colors': true,
+		'moduleTrace': false,
+		'verbose': false,
+		'version': false,
+		'usedExports': false,
+		'modules': false,
+		'children': false,
+		'buildAt': false,
+		'assets': true,
+		'chunks': false,
+		'warnings': true,
+		'errorDetails': false,
+		'excludeAssets': /.map$/
+	}).split(/\n/);
+	lines.map(v => {
+		// Exclude everything that was not explicitly created by us
+		if(v.split('  ').pop() !== '') console.log(v);
+	});
+});

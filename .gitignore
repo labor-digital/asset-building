@@ -1,2 +1,8 @@
 node_modules
 .idea
+demo/webroot/css/*.css
+demo/webroot/css/*.map
+demo/webroot/assets/*
+!.keep
+demo/webroot/js/*.js
+demo/webroot/js/*.map
