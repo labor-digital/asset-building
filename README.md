@@ -18,7 +18,7 @@ This will build your sources in production environment and stop itself.
 
 `$ npm run watch`
 
-This will buily your sources in dev environment and keep doing so while it
+This will build your sources in dev environment and keep doing so while it
 watches the given entrypoints and their children for changes.
 
 ## Configuration

@@ -68,19 +68,15 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		webpackConfig.optimization.minimizer = [];
 
 	// Remove pseudo bundles created by extracted files and inject content into the output asset
-	var processed = [];
 	var processor = function (assetName, asset, assets) {
-		if (processed.indexOf(assetName) === -1) {
-			processed.push(assetName);
-			var realAssetname = './' + assetName.replace(/^\.+\//, '').replace(/\.pseudo\.css/, '');
-			assets.setAsset(realAssetname, asset.source());
-			assets.setAsset(assetName, null);
-		}
+		var realAssetname = './' + assetName.replace(/^\.+\//, '').replace(/\.pseudo\.css/, '');
+		assets.setAsset(realAssetname, asset.source());
+		assets.setAsset(assetName, null);
 		return new Promise(function (resolve) {
 			resolve(undefined);
 		});
 	};
-	webpackConfig.optimization.minimizer.push(new LastCallWebpackPlugin({
+	var plugin = new LastCallWebpackPlugin({
 		'assetProcessors': [
 			{
 				'regExp': /\.pseudo\.css/,
@@ -88,12 +84,13 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 				'processor': processor
 			},
 			{
-				'regExp': /\.pseudo\.css/,
+				'regExp': /\.pseudo\.css\.map/,
 				'phase': LastCallWebpackPlugin.PHASES.EMIT,
 				'processor': processor
 			}
 		]
-	}));
+	});
+	webpackConfig.optimization.minimizer.push(plugin);
 
 	// Register css minifier when in prod
 	if (context.isProd) webpackConfig.optimization.minimizer.push(new OptimizeCssAssetsPlugin({
@@ -256,10 +253,12 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 
 	// Add babel loader if required
 	if (useBabel) {
+		var presetEnv = require('babel-preset-env');
+		var presetEs3 = require('babel-preset-env');
 		jsLoaders.push({
 			'loader': 'babel-loader',
 			'options': callPluginMethod(context.plugins, 'filterBabelOptions', [{
-				'presets': ['env', 'es3']
+				'presets': [presetEnv, presetEs3]
 			}, context])
 		});
 	}
@@ -296,7 +295,7 @@ function buildJsCompatConfig(webpackConfig, jsCompatConfig, context) {
 			kill('Invalid or missing js compat "fix" at key: ' + k);
 
 		// Add imports loader if fix misses it
-		if(config.fix.indexOf('imports-loader?') !== 0) config.fix = 'imports-loader?' + config.fix;
+		if (config.fix.indexOf('imports-loader?') !== 0) config.fix = 'imports-loader?' + config.fix;
 
 		// Add new module
 		webpackConfig.module.rules.push({
@@ -346,7 +345,9 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		'watch': mode === 'watch',
 		'entry': {},
 		'devtool': 'source-map',
-		'optimization': {},
+		'optimization': {
+			'minimize': true
+		},
 		'output': {
 			'path': dir.current,
 			'filename': './[name]'
@@ -354,6 +355,9 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		'plugins': [],
 		'module': {
 			'rules': []
+		},
+		"resolve": {
+			"modules": ['node_modules', dir.nodeModules]
 		}
 	};
 

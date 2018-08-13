@@ -1,17 +1,19 @@
 {
   "name": "demo",
   "version": "1.0.0",
-  "description": "",
+  "description": "A demoproject to show how the buildprocess works",
   "main": "index.js",
   "scripts": {
     "build": "labor-asset-building build",
     "watch": "labor-asset-building watch"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "LABOR GmbH",
+  "license": "MIT",
   "devDependencies": {
-    "labor-asset-building": "file:.."
+    "labor-asset-building": "file:..",
+    "g8-framework": "file:../../g8-framework",
+    "blocks.js": "file:../../blocks.js"
   },
   "labor": {
     "js": [
@@ -44,11 +46,20 @@
           "./assets/**/asset.png"
         ],
         "to": "webroot/assets",
-        "ignore": ["*.jpg", "assets/a/c"]
+        "ignore": [
+          "*.jpg",
+          "assets/a/c"
+        ]
       }
     ],
     "plugins": [
-      "./demoPlugins/DemoPlugin.js"
+      "./demoPlugins/DemoPlugin.js",
+      "./node_modules/g8-framework/plugins/G8FrameworkPlugin.js",
+      "./node_modules/blocks.js/plugins/BlocksPlugin.js"
     ]
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "mustache": "^2.3.1"
   }
 }
