@@ -11,9 +11,7 @@
   "author": "LABOR GmbH",
   "license": "MIT",
   "devDependencies": {
-    "labor-asset-building": "file:..",
-    "g8-framework": "file:../../g8-framework",
-    "blocks.js": "file:../../blocks.js"
+    "labor-asset-building": "file:.."
   },
   "labor": {
     "js": [
@@ -53,13 +51,7 @@
       }
     ],
     "plugins": [
-      "./demoPlugins/DemoPlugin.js",
-      "./node_modules/g8-framework/plugins/G8FrameworkPlugin.js",
-      "./node_modules/blocks.js/plugins/BlocksPlugin.js"
+      "./demoPlugins/DemoPlugin.js"
     ]
-  },
-  "dependencies": {
-    "jquery": "^3.3.1",
-    "mustache": "^2.3.1"
   }
 }
