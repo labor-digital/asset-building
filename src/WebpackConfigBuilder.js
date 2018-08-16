@@ -3,7 +3,7 @@
  * For LABOR.digital
  */
 const path = require('path');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const LastCallWebpackPlugin = require('last-call-webpack-plugin');
 const webpack = require('webpack');
@@ -105,10 +105,11 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 			{
 				'loader': 'css-loader',
 				'options': {
+					'url': false,
 					'sourceMap': true
 				}
 			}, {
-				'loader': "sass-loader",
+				'loader': 'sass-loader',
 				'options': {
 					'sourceMap': true
 				}
@@ -122,6 +123,7 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 			{
 				'loader': 'css-loader',
 				'options': {
+					'url': false,
 					'sourceMap': true
 				}
 			}, {
@@ -137,7 +139,7 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		'use': [
 			MiniCssExtractPlugin.loader,
 			{
-				'loader': "css-loader",
+				'loader': 'css-loader?url=false',
 				'options': {
 					'sourceMap': true
 				}
@@ -216,30 +218,30 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 		'env': {'browser': true},
 		'ecmaFeatures': {'jsx': true},
 		'globals': [
-			"$:true", "$Self:true", "G8:true", "$globj:true", "breakpointIs:true", "dbg:true", "document:true",
-			"console:true", "window:true", "setTimeout:true", "setInterval:true", "clearTimeout:true",
-			"clearInterval:true", "define:true", "jQuery:true", "location:true", "makeDiv:true",
-			"module:true", "exports:true", "localStorage:true", "alert:true", "navigator:true", "screen:true",
-			"event:true", "DOMParser:true", "ActiveXObject:true", "Symbol:true", "prefixes:true",
-			"enableClasses:true", "Image:true", "require:true", "HTMLElement:true", "history:true"
+			'$:true', '$Self:true', 'G8:true', '$globj:true', 'breakpointIs:true', 'dbg:true', 'document:true',
+			'console:true', 'window:true', 'setTimeout:true', 'setInterval:true', 'clearTimeout:true',
+			'clearInterval:true', 'define:true', 'jQuery:true', 'location:true', 'makeDiv:true',
+			'module:true', 'exports:true', 'localStorage:true', 'alert:true', 'navigator:true', 'screen:true',
+			'event:true', 'DOMParser:true', 'ActiveXObject:true', 'Symbol:true', 'prefixes:true',
+			'enableClasses:true', 'Image:true', 'require:true', 'HTMLElement:true', 'history:true'
 		],
 		'rules': {
-			"comma-dangle": [2, "never"],
-			"no-undef": 2
+			'comma-dangle': [2, 'never'],
+			'no-undef': 2
 		}
 	};
 	// Production eslint options
 	if (context.isProd) {
 		eslintOptions.rules = {
-			"no-dupe-args": 2, "no-duplicate-case": 2, "no-template-curly-in-string": 2,
-			"no-unexpected-multiline": 2, "no-unsafe-finally": 2, "no-unsafe-negation": 2,
-			"comma-dangle": [2, "never"], "no-constant-condition": 2,
-			"no-control-regex": 2, "no-debugger": 2, "no-dupe-keys": 2, "no-empty-character-class": 2,
-			"no-ex-assign": 2, "no-extra-boolean-cast": 2, "no-extra-parens": 0, "no-extra-semi": 1,
-			"no-func-assign": 2, "no-inner-declarations": 1, "no-invalid-regexp": 2, "no-irregular-whitespace": 2,
-			"no-negated-in-lhs": 2, "no-obj-calls": 2, "no-regex-spaces": 2, "no-reserved-keys": 0,
-			"no-sparse-arrays": 2, "no-unreachable": 2, "use-isnan": 2, "valid-jsdoc": 0, "valid-typeof": 2,
-			"no-undef": 2
+			'no-dupe-args': 2, 'no-duplicate-case': 2, 'no-template-curly-in-string': 2,
+			'no-unexpected-multiline': 2, 'no-unsafe-finally': 2, 'no-unsafe-negation': 2,
+			'comma-dangle': [2, 'never'], 'no-constant-condition': 2,
+			'no-control-regex': 2, 'no-debugger': 2, 'no-dupe-keys': 2, 'no-empty-character-class': 2,
+			'no-ex-assign': 2, 'no-extra-boolean-cast': 2, 'no-extra-parens': 0, 'no-extra-semi': 1,
+			'no-func-assign': 2, 'no-inner-declarations': 1, 'no-invalid-regexp': 2, 'no-irregular-whitespace': 2,
+			'no-negated-in-lhs': 2, 'no-obj-calls': 2, 'no-regex-spaces': 2, 'no-reserved-keys': 0,
+			'no-sparse-arrays': 2, 'no-unreachable': 2, 'use-isnan': 2, 'valid-jsdoc': 0, 'valid-typeof': 2,
+			'no-undef': 2
 		};
 	}
 
@@ -253,12 +255,11 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 
 	// Add babel loader if required
 	if (useBabel) {
-		var presetEnv = require('babel-preset-env');
-		var presetEs3 = require('babel-preset-env');
 		jsLoaders.push({
 			'loader': 'babel-loader',
 			'options': callPluginMethod(context.plugins, 'filterBabelOptions', [{
-				'presets': [presetEnv, presetEs3]
+				'presets': [require('babel-preset-env'), require('babel-preset-es3')],
+				"plugins": [require('babel-plugin-transform-runtime')]
 			}, context])
 		});
 	}
@@ -326,7 +327,7 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 	// Instantiate plugins
 	var plugins = [];
 	pluginDefinitions.forEach(v => {
-		var plugin = require(v);
+		var plugin = require(path.resolve(dir.buildingNodeModules, v));
 		if (typeof plugin !== 'function') kill('The defined plugin: "' + v + '" is not a function!');
 		plugins.push(new plugin());
 	});
@@ -356,8 +357,11 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		'module': {
 			'rules': []
 		},
-		"resolve": {
-			"modules": ['node_modules', dir.nodeModules]
+		'resolve': {
+			'modules': ['node_modules', dir.nodeModules, dir.buildingNodeModules]
+		},
+		'resolveLoader': {
+			'modules': ['node_modules', dir.buildingNodeModules, dir.nodeModules]
 		}
 	};
 

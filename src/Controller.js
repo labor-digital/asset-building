@@ -18,7 +18,8 @@ if(typeof process.argv[2] === 'undefined'){
 var dir = {
 	'current': process.cwd() + path.sep,
 	'controller': __dirname + path.sep,
-	'nodeModules': process.cwd() + path.sep + 'node_modules' + path.sep
+	'nodeModules': process.cwd() + path.sep + 'node_modules' + path.sep,
+	'buildingNodeModules': path.resolve(__dirname, '../node_modules/') + path.sep
 };
 
 // Load package json
