@@ -7,7 +7,7 @@
     "labor-asset-building": "./src/Controller.js"
   },
   "scripts": {
-    "pre-myget": "%GitVersion% /output buildserver"
+    "pre-myget": "%GitVersion% /output buildserver && echo %PackageVersion% && npm version %PackageVersion% patch"
   },
   "author": "LABOR GmbH",
   "license": "MIT",
