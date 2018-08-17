@@ -7,7 +7,8 @@
     "labor-asset-building": "./src/Controller.js"
   },
   "scripts": {
-    "pre-myget": "npm version from-git --no-git-tag-version -f"
+    "pre-myget": "GitVersion /output buildserver",
+    "preinstall": "##myget[buildNumber '%GitVersion.Major%.%GitVersion.Minor%.%BuildCounter%']"
   },
   "author": "LABOR GmbH",
   "license": "MIT",
