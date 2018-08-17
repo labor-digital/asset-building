@@ -1,6 +1,6 @@
 {
   "name": "@labor/asset-building",
-  "version": "1.0.0",
+  "version": "%PackageVersion%",
   "description": "Our toolbox to build webassets with webpack",
   "main": "index.js",
   "bin": {
