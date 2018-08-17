@@ -1,13 +1,13 @@
 {
   "name": "@labor/asset-building",
-  "version": "1.2.3",
+  "version": "1.0.0",
   "description": "Our toolbox to build webassets with webpack",
   "main": "index.js",
   "bin": {
     "labor-asset-building": "./src/Controller.js"
   },
   "scripts": {
-    "pre-myget": "%GitVersion% /output buildserver && echo %PackageVersion% && npm version %PackageVersion% patch"
+    "pre-myget": "npm version from-git --no-git-tag-version"
   },
   "author": "LABOR GmbH",
   "license": "MIT",
