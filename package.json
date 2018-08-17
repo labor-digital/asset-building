@@ -8,7 +8,7 @@
   },
   "scripts": {
     "pre-myget": "GitVersion /output buildserver",
-    "preinstall": "##myget[buildNumber '%GitVersion.Major%.%GitVersion.Minor%.%BuildCounter%']"
+    "preinstall": "echo ##myget[buildNumber '%GitVersion.Major%.%GitVersion.Minor%.%BuildCounter%']"
   },
   "author": "LABOR GmbH",
   "license": "MIT",
