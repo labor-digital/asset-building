@@ -8,7 +8,7 @@
   },
   "scripts": {
     "pre-myget": "GitVersion /output buildserver",
-    "prepare": "npm version '%GitVersion.Major%.%GitVersion.Minor%.%BuildCounter%' --no-git-tag-version -f"
+    "prepare": "npm version %GitVersion.Major%.%GitVersion.Minor%.%BuildCounter% --no-git-tag-version -f"
   },
   "author": "LABOR GmbH",
   "license": "MIT",
