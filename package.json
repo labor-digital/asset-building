@@ -1,5 +1,5 @@
 {
-  "name": "@labor/labor-asset-building",
+  "name": "@labor/asset-building",
   "version": "1.0.0",
   "description": "Our toolbox to build webassets with webpack",
   "main": "index.js",
