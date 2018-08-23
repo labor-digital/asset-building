@@ -103,7 +103,7 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		'use': [
 			MiniCssExtractPlugin.loader,
 			{
-				'loader': 'css-loader',
+				'loader': 'css-loader?url=false&-url',
 				'options': {
 					'url': false,
 					'sourceMap': true
@@ -121,7 +121,7 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		'use': [
 			MiniCssExtractPlugin.loader,
 			{
-				'loader': 'css-loader',
+				'loader': 'css-loader?url=false&-url',
 				'options': {
 					'url': false,
 					'sourceMap': true
@@ -139,8 +139,9 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		'use': [
 			MiniCssExtractPlugin.loader,
 			{
-				'loader': 'css-loader?url=false',
+				'loader': 'css-loader?url=false&-url',
 				'options': {
+					'url': false,
 					'sourceMap': true
 				}
 			}
@@ -218,18 +219,19 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 		'env': {'browser': true},
 		'ecmaFeatures': {'jsx': true},
 		'globals': [
-			'$:true', '$Self:true', 'G8:true', '$globj:true', 'breakpointIs:true', 'dbg:true', 'document:true',
-			'console:true', 'window:true', 'setTimeout:true', 'setInterval:true', 'clearTimeout:true',
+			'document:true', 'console:true', 'window:true', 'setTimeout:true', 'setInterval:true', 'clearTimeout:true',
 			'clearInterval:true', 'define:true', 'jQuery:true', 'location:true', 'makeDiv:true',
 			'module:true', 'exports:true', 'localStorage:true', 'alert:true', 'navigator:true', 'screen:true',
 			'event:true', 'DOMParser:true', 'ActiveXObject:true', 'Symbol:true', 'prefixes:true',
-			'enableClasses:true', 'Image:true', 'require:true', 'HTMLElement:true', 'history:true'
+			'enableClasses:true', 'Image:true', 'require:true', 'HTMLElement:true', 'history:true', 'Int8Array:true'
 		],
 		'rules': {
 			'comma-dangle': [2, 'never'],
-			'no-undef': 2
+			'no-undef': 2,
+			'max-len': 'off'
 		}
 	};
+	
 	// Production eslint options
 	if (context.isProd) {
 		eslintOptions.rules = {
@@ -260,6 +262,7 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 		jsLoaders.push({
 			'loader': 'babel-loader',
 			'options': callPluginMethod(context.plugins, 'filterBabelOptions', [{
+				'compact': false,
 				'presets': [require('babel-preset-env'), require('babel-preset-es3')],
 				"plugins": [require('babel-plugin-transform-runtime')]
 			}, context])
