@@ -255,6 +255,8 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 
 	// Add babel loader if required
 	if (useBabel) {
+
+		// Add babel itself
 		jsLoaders.push({
 			'loader': 'babel-loader',
 			'options': callPluginMethod(context.plugins, 'filterBabelOptions', [{
@@ -280,7 +282,12 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 	// Add uglifier if required
 	if (context.isProd) {
 		webpackConfig.plugins.push(new UglifyJsPlugin({
-			'sourceMap': true
+			'sourceMap': true,
+			'extractComments': true,
+			'uglifyOptions': {
+				'ecma': 5,
+				'toplevel': true
+			}
 		}));
 	}
 }
