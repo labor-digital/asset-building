@@ -23,7 +23,7 @@ watches the given entrypoints and their children for changes.
 
 ## Configuration
 If you want to see an example configuration take a look at "demo/package.json" of this directory.
-To begin adding configuration add to your package.json a new node called: "labor".
+To begin adding configuration add to your package.json a new node called: `"labor"`.
 ```
 {
   "name": "your-app",
@@ -58,7 +58,7 @@ Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
       "output": "./webroot/js/bundle.js"
       ["babel": "false"]
     }
-  ],
+  ]
 }
 ```
 
@@ -88,8 +88,8 @@ As general rule => test and fix => loader in the other documentation.
     {
       "rule": "(my\.old\.file1\.min|my-other-file)+\.js$",
       "fix": "imports-loader?define=>false,require=>false"
-    },
-  ],
+    }
+  ]
 }
 ```
 
@@ -115,7 +115,7 @@ Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
       "entry": "webroot/css/src/frontend/frontend.css",
       "output": "./webroot/css/frontend.css"
     }
-  ],
+  ]
 }
 ```
 
