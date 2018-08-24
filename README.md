@@ -6,7 +6,17 @@ There are some adjustments to make if you want to migrate your old project but I
 As a general rule of thumb: All configuration is now done within your package.json file in a node called: "labor", but you can also extend this library using "plugin" to get access to the real webpack configuration if you like to do stuff manually.
 
 ## Installation
-wip
+* Use our private npm registry!
+* Install the npm dependency<br>
+`` npm install --save-dev @labor/asset-building ``
+* Add the following part to your package.json:
+```
+  "scripts": {
+    "build": "labor-asset-building build",
+    "watch": "labor-asset-building watch"
+  }
+```
+* Done! :-)
 
 ## Commands / Modes
 By default there are two modes available. You can run them from your cli

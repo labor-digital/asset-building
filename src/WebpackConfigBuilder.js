@@ -129,6 +129,7 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 			}, {
 				'loader': 'less-loader',
 				'options': {
+					'relativeUrls': false,
 					'sourceMap': true
 				}
 			}
