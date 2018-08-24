@@ -163,7 +163,8 @@ The list of defined plugins is an Array of relative pathes (from the package.jso
 ```
 "labor": {
     "plugins": [
-        "./demoPlugins/DemoPlugin.js"
+        "./demoPlugins/DemoPlugin.js",
+        "@labor/your-packge/plugins/MyPlugin"
     ]
 }
 ```
