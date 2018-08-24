@@ -7,7 +7,7 @@ As a general rule of thumb: All configuration is now done within your package.js
 
 ## Installation
 * Use our private npm registry!
-* Install the npm dependency<br>
+* Install the npm dependency
 `` npm install --save-dev @labor/asset-building ``
 * Add the following part to your package.json:
 ```

@@ -45,18 +45,23 @@ function callPluginMethod(plugins, method, args) {
  * @param context
  */
 function addPseudoJsEntryPoint(laborConfig, context) {
-	let tmpPath = path.relative(context.dir.current, path.resolve(require('os').tmpdir()) + path.sep) + path.sep;
-	let tmpInput = tmpPath + 'pseudo-js.js';
-	let tmpOutput = tmpPath + 'pseudo-bundle.js';
-	require('fs').writeFileSync(tmpInput, 'alert(\'hallo\');');
+	let tmpInput = './node_modules/@labor/tmp/tmp-js.js';
+	let tmpOutput = './node_modules/@labor/tmp/ignore-me.js';
+	let realFile = context.dir.nodeModules + '@labor/tmp/tmp-js.js';
+	let fs = require('fs');
+	if(!fs.existsSync(realFile)){
+		try {
+			fs.mkdirSync(context.dir.nodeModules + '@labor/tmp');
+		} catch (e) {
+		}
+		require('fs').writeFileSync(realFile, 'alert(\'hallo\');');
+	}
 	laborConfig.js = [
 		{
 			'entry': tmpInput,
-			'babel': false,
-			'output': tmpOutput,
-			'absolutePaths': true
+			'output': tmpOutput
 		}
-	]
+	];
 }
 
 /**
@@ -427,7 +432,7 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 			'modules': ['node_modules', dir.nodeModules, dir.buildingNodeModules]
 		},
 		'resolveLoader': {
-			'modules': ['node_modules', dir.buildingNodeModules, dir.nodeModules]
+			'modules': ['node_modules', dir.buildingNodeModules, dir.nodeModules, '/']
 		}
 	};
 
@@ -447,8 +452,8 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 	// Make sure we have stuff to watch
 	let hasCss = typeof laborConfig.css !== 'undefined' && Array.isArray(laborConfig.css) && laborConfig.css.length > 0;
 	let hasJs = typeof laborConfig.js !== 'undefined' && Array.isArray(laborConfig.js) && laborConfig.js.length > 0;
-	if (mode === 'watch' && !hasCss && !hasJs) {
-		console.log('Adding pseudo js file to make sure webpack keeps running...');
+	if (!hasCss && !hasJs) {
+		console.log('Adding pseudo js file to make sure webpack works without crashing...');
 		addPseudoJsEntryPoint(laborConfig, context);
 		hasJs = true;
 	}

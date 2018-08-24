@@ -67,7 +67,7 @@ webpack(webpackConfig, (err, stats) => {
 		'chunks': false,
 		'warnings': true,
 		'errorDetails': false,
-		'excludeAssets': /.map$/
+		'excludeAssets': /.map$|ignore-me.js$/
 	}).split(/\n/);
 	lines.map(v => {
 		// Exclude everything that was not explicitly created by us
