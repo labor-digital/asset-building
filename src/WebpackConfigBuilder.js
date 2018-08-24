@@ -39,6 +39,27 @@ function callPluginMethod(plugins, method, args) {
 }
 
 /**
+ * Adds a pseudo js file of no real entries where given, but our additional
+ * scripts require webpack to run. With this pseudofile webpack has a valid entrypoint to compile and everybody is happy.
+ * @param laborConfig
+ * @param context
+ */
+function addPseudoJsEntryPoint(laborConfig, context) {
+	let tmpPath = path.relative(context.dir.current, path.resolve(require('os').tmpdir()) + path.sep) + path.sep;
+	let tmpInput = tmpPath + 'pseudo-js.js';
+	let tmpOutput = tmpPath + 'pseudo-bundle.js';
+	require('fs').writeFileSync(tmpInput, 'alert(\'hallo\');');
+	laborConfig.js = [
+		{
+			'entry': tmpInput,
+			'babel': false,
+			'output': tmpOutput,
+			'absolutePaths': true
+		}
+	]
+}
+
+/**
  * This helper builds all css related configuration
  * @param webpackConfig
  * @param cssConfig
@@ -54,10 +75,15 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		if (typeof config.output !== 'string' || config.output.trim().length === 0)
 			kill('Invalid or missing css "output" at key: ' + k);
 
-		// Add entry
-		var relativeOut = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
-		webpackConfig.entry[relativeOut] =
-			'./' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
+		// Handle absolute paths
+		if (config['absolutePaths'] === true) {
+			webpackConfig.entry[config.output] = config.entry;
+		} else {
+			// Add entry normally
+			var relativeOut = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
+			webpackConfig.entry[relativeOut] =
+				'./' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
+		}
 	});
 
 	// Register extractor plugin
@@ -206,10 +232,16 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 		if (typeof config.output !== 'string' || config.output.trim().length === 0)
 			kill('Invalid or missing js "output" at key: ' + k);
 
-		// Add entry
-		var relativeOut = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
-		webpackConfig.entry[relativeOut] =
-			'./' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
+		// Handle absolute paths
+		if (config['absolutePaths'] === true) {
+			webpackConfig.entry[config.output] = config.entry;
+		} else {
+			// Add entry normally
+			var relativeOut = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
+			webpackConfig.entry[relativeOut] =
+				'./' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
+
+		}
 
 		// Check if we have to use babel
 		useBabel = useBabel || !(config.babel === false);
@@ -232,7 +264,7 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 			'max-len': 'off'
 		}
 	};
-	
+
 	// Production eslint options
 	if (context.isProd) {
 		eslintOptions.rules = {
@@ -331,14 +363,34 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 	pluginDefinitions.push(path.resolve(dir.controller, './plugins/DefaultPlugin.js'));
 	if (typeof laborConfig.plugins !== 'undefined' && Array.isArray(laborConfig.plugins)) {
 		laborConfig.plugins.forEach(v => {
-			pluginDefinitions.push(path.relative(dir.controller, path.resolve(dir.current, v)));
+			pluginDefinitions.push(v);
 		});
 	}
 
 	// Instantiate plugins
 	var plugins = [];
 	pluginDefinitions.forEach(v => {
-		var plugin = require(path.resolve(dir.buildingNodeModules, v));
+		let pluginPath = path.resolve(dir.buildingNodeModules, v);
+		let plugin = null;
+		try {
+			// Try with the building node modules
+			plugin = require(pluginPath);
+		} catch (e) {
+			try {
+				// Try with the projects node modules
+				pluginPath = path.resolve(dir.nodeModules, v);
+				plugin = require(pluginPath);
+			} catch (e) {
+				try {
+					// try relative from the current path
+					pluginPath = path.resolve(dir.current, v);
+					plugin = require(pluginPath);
+				} catch (e) {
+					kill('Invalid plugin path given! Missing plugin: "'+v+'"');
+				}
+			}
+
+		}
 		if (typeof plugin !== 'function') kill('The defined plugin: "' + v + '" is not a function!');
 		plugins.push(new plugin());
 	});
@@ -359,6 +411,9 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		'devtool': 'source-map',
 		'optimization': {
 			'minimize': true
+		},
+		'performance': {
+			'hints': false
 		},
 		'output': {
 			'path': dir.current,
@@ -389,15 +444,24 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 	// Filter laborConfig by plugin
 	laborConfig = callPluginMethod(plugins, 'filterLaborConfig', [laborConfig, context]);
 
+	// Make sure we have stuff to watch
+	let hasCss = typeof laborConfig.css !== 'undefined' && Array.isArray(laborConfig.css) && laborConfig.css.length > 0;
+	let hasJs = typeof laborConfig.js !== 'undefined' && Array.isArray(laborConfig.js) && laborConfig.js.length > 0;
+	if (mode === 'watch' && !hasCss && !hasJs) {
+		console.log('Adding pseudo js file to make sure webpack keeps running...');
+		addPseudoJsEntryPoint(laborConfig, context);
+		hasJs = true;
+	}
+
 	// Apply given configuration
 	// CSS
-	if (typeof laborConfig.css !== 'undefined' && Array.isArray(laborConfig.css) && laborConfig.css.length > 0)
+	if (hasCss)
 		buildCssConfig(webpackConfig, laborConfig.css, context);
 	// COPY
 	if (typeof laborConfig.copy !== 'undefined' && Array.isArray(laborConfig.copy) && laborConfig.copy.length > 0)
 		buildCopyConfig(webpackConfig, laborConfig.copy, context);
 	// JS
-	if (typeof laborConfig.js !== 'undefined' && Array.isArray(laborConfig.js) && laborConfig.js.length > 0)
+	if (hasJs)
 		buildJsConfig(webpackConfig, laborConfig.js, context);
 	// JS COMPAT (Imports loader)
 	if (typeof laborConfig.jsCompat !== 'undefined' && Array.isArray(laborConfig.jsCompat) && laborConfig.jsCompat.length > 0)
