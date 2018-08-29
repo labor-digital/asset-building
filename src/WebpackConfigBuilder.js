@@ -310,7 +310,8 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 	// Register js modules
 	webpackConfig.module.rules.push({
 		test: /\.js$/,
-		exclude: /(node_modules|bower_components)/,
+		// Prevent babel babel compiling itself
+		exclude: /(node_modules[\/\\]core-js|node_modules[\/\\]babel-)/,
 		use: jsLoaders
 	});
 
