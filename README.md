@@ -60,13 +60,22 @@ transpile it down to es3, so it is compatible to IE8 and higher. If your know yo
 If the "build" mode is used the scripts will be minified and linted using eslint.
 
 Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
+
+**On Node Modules:**
+By default all node_modules will be excluded from babel compiling. (Js Loader for .js files has an exclude on: "node_modules").
+But sometimes if you want to work with es6 components from other packages you need
+to allow transpiling of their files. (LABOR internal projects all depend on that!)
+So you may use "allowedModules" to allow specific node_modules which then will be included in your transpiling.
+The configuration will combine all "allowedModules" from all js sets into one regex. 
+The @labor scope is allowed for js handling by default. Added in 1.1.6
 ```
 "labor": {
   "js": [
     {
       "entry": "webroot/js/src/application.js",
       "output": "./webroot/js/bundle.js"
-      ["babel": "false"]
+      ["babel": "false"],
+      ["allowedModules": ["@allowedScope", "@scope/package", "package"]]
     }
   ]
 }

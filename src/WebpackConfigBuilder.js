@@ -228,6 +228,9 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 	// Check if babel should be used for any of our js configs
 	var useBabel = false;
 
+	// Store all node-modules which are allowed for babel compiling
+	let allowedModules = ['@labor'];
+
 	// Register entry points
 	jsConfig.forEach((config, k) => {
 		// Validate
@@ -236,6 +239,19 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 			kill('Invalid or missing js "entry" at key: ' + k);
 		if (typeof config.output !== 'string' || config.output.trim().length === 0)
 			kill('Invalid or missing js "output" at key: ' + k);
+
+		// Store allowed babel modules
+		if(typeof config.allowedModules !== 'undefined' && Array.isArray(config.allowedModules)){
+			config.allowedModules.forEach(v => {
+				if(allowedModules.indexOf(v) !== -1) return;
+				v = v
+					// Remove all slashes at the front and the back
+					.replace(/^[\\\/]|[\\\/]$/g, '')
+					// Make paths ready for regex
+					.replace(/[\\\/]/g, '[\\\\\\/]');
+				allowedModules.push(v);
+			});
+		}
 
 		// Handle absolute paths
 		if (config['absolutePaths'] === true) {
@@ -307,11 +323,15 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 		});
 	}
 
+	// Build exclude
+	let jsExclude = 'node_modules(?![\\/\\\\]' + allowedModules.join('[\\/\\\\]|[\\/\\\\]') + '[\\/\\\\])';
+	jsExclude = new RegExp(jsExclude);
+
 	// Register js modules
 	webpackConfig.module.rules.push({
 		test: /\.js$/,
 		// Prevent babel babel compiling itself
-		exclude: /(node_modules[\/\\]core-js|node_modules[\/\\]babel-)/,
+		exclude: jsExclude,
 		use: jsLoaders
 	});
 
