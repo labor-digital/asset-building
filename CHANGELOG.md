@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Different implementation of UglifyJsPlugin using webpackConfig.optimization.minimizer instead of webpackConfig.plugins for better results.
+
 ## [1.1.6] - 2018-08-30
 ### Added
 - Adds new js config option to specify allowed node_modules to be included in the babel compiling

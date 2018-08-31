@@ -343,14 +343,17 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 
 	// Add uglifier if required
 	if (context.isProd) {
-		webpackConfig.plugins.push(new UglifyJsPlugin({
-			'sourceMap': true,
-			'extractComments': true,
-			'uglifyOptions': {
-				'ecma': 5,
-				'toplevel': true
-			}
-		}));
+		webpackConfig.optimization.minimize = true;
+		webpackConfig.optimization.minimizer = [
+			new UglifyJsPlugin({
+				'sourceMap': true,
+				'extractComments': true,
+				'uglifyOptions': {
+					'ecma': 5,
+					'toplevel': true
+				}
+			})
+		];
 	}
 }
 
@@ -436,7 +439,7 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		'entry': {},
 		'devtool': 'source-map',
 		'optimization': {
-			'minimize': true
+			'minimize': false
 		},
 		'performance': {
 			'hints': false
