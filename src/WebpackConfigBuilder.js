@@ -5,7 +5,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const LastCallWebpackPlugin = require('last-call-webpack-plugin');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
@@ -20,25 +19,6 @@ function kill(msg) {
 }
 
 /**
- * Internal helper to loop over all plugin instances and call a requested method on them.
- * The given arguments should be an array. If the method returns a value args[0] will automatically
- * be reset to the result. With that it is possible to pass a value through all plugin instances to filter it.
- *
- * @param {Array} plugins
- * @param {string} method
- * @param {Array} args
- * @returns {null}
- */
-function callPluginMethod(plugins, method, args) {
-	plugins.forEach(plugin => {
-		if (typeof plugin[method] !== 'function') return;
-		var result = plugin[method].apply(plugin, args);
-		if (typeof result !== 'undefined') args[0] = result;
-	});
-	return typeof args[0] !== 'undefined' ? args[0] : null;
-}
-
-/**
  * Adds a pseudo js file of no real entries where given, but our additional
  * scripts require webpack to run. With this pseudofile webpack has a valid entrypoint to compile and everybody is happy.
  * @param laborConfig
@@ -49,7 +29,7 @@ function addPseudoJsEntryPoint(laborConfig, context) {
 	let tmpOutput = './node_modules/@labor/tmp/ignore-me.js';
 	let realFile = context.dir.nodeModules + '@labor/tmp/tmp-js.js';
 	let fs = require('fs');
-	if(!fs.existsSync(realFile)){
+	if (!fs.existsSync(realFile)) {
 		try {
 			fs.mkdirSync(context.dir.nodeModules + '@labor/tmp');
 		} catch (e) {
@@ -80,48 +60,17 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 		if (typeof config.output !== 'string' || config.output.trim().length === 0)
 			kill('Invalid or missing css "output" at key: ' + k);
 
-		// Handle absolute paths
-		if (config['absolutePaths'] === true) {
-			webpackConfig.entry[config.output] = config.entry;
-		} else {
-			// Add entry normally
-			var relativeOut = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
-			webpackConfig.entry[relativeOut] =
-				'./' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
-		}
+		let entryFile = './' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
+		let outputFile = path.relative(context.dir.current, path.resolve(context.dir.current, config.output + '.drop')).replace(/\\/g, '/');
+		webpackConfig.entry[outputFile] = entryFile;
 	});
 
 	// Register extractor plugin
-	webpackConfig.plugins.push(new MiniCssExtractPlugin({'filename': '[name].pseudo.css'}));
+	webpackConfig.plugins.push(new MiniCssExtractPlugin({'filename': '[name].css'}));
 
 	// Prepare optimizers
 	if (webpackConfig.optimization.minimizer === undefined)
 		webpackConfig.optimization.minimizer = [];
-
-	// Remove pseudo bundles created by extracted files and inject content into the output asset
-	var processor = function (assetName, asset, assets) {
-		var realAssetname = './' + assetName.replace(/^\.+\//, '').replace(/\.pseudo\.css/, '');
-		assets.setAsset(realAssetname, asset.source());
-		assets.setAsset(assetName, null);
-		return new Promise(function (resolve) {
-			resolve(undefined);
-		});
-	};
-	var plugin = new LastCallWebpackPlugin({
-		'assetProcessors': [
-			{
-				'regExp': /\.pseudo\.css/,
-				'phase': LastCallWebpackPlugin.PHASES.OPTIMIZE_CHUNK_ASSETS,
-				'processor': processor
-			},
-			{
-				'regExp': /\.pseudo\.css\.map/,
-				'phase': LastCallWebpackPlugin.PHASES.EMIT,
-				'processor': processor
-			}
-		]
-	});
-	webpackConfig.optimization.minimizer.push(plugin);
 
 	// Register css minifier when in prod
 	if (context.isProd) webpackConfig.optimization.minimizer.push(new OptimizeCssAssetsPlugin({
@@ -140,9 +89,11 @@ function buildCssConfig(webpackConfig, cssConfig, context) {
 					'sourceMap': true
 				}
 			}, {
-				'loader': 'sass-loader',
+				'loader': 'sass-loader?sourceMapRoot=foo',
 				'options': {
-					'sourceMap': true
+					'sourceMap': true,
+					'outputStyle': 'expanded',
+					'sourceMapContents': true
 				}
 			}
 		]
@@ -241,11 +192,11 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 			kill('Invalid or missing js "output" at key: ' + k);
 
 		// Store allowed babel modules
-		if(typeof config.allowedModules !== 'undefined' && Array.isArray(config.allowedModules)){
+		if (typeof config.allowedModules !== 'undefined' && Array.isArray(config.allowedModules)) {
 			config.allowedModules.forEach(v => {
-				if(allowedModules.indexOf(v) !== -1) return;
+				if (allowedModules.indexOf(v) !== -1) return;
 				v = v
-					// Remove all slashes at the front and the back
+				// Remove all slashes at the front and the back
 					.replace(/^[\\\/]|[\\\/]$/g, '')
 					// Make paths ready for regex
 					.replace(/[\\\/]/g, '[\\\\\\/]');
@@ -253,16 +204,9 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 			});
 		}
 
-		// Handle absolute paths
-		if (config['absolutePaths'] === true) {
-			webpackConfig.entry[config.output] = config.entry;
-		} else {
-			// Add entry normally
-			var relativeOut = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
-			webpackConfig.entry[relativeOut] =
-				'./' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
-
-		}
+		let entryFile = './' + path.relative(context.dir.current, path.resolve(context.dir.current, config.entry)).replace(/\\/g, '/');
+		let outputFile = path.relative(context.dir.current, path.resolve(context.dir.current, config.output)).replace(/\\/g, '/');
+		webpackConfig.entry[outputFile] = entryFile;
 
 		// Check if we have to use babel
 		useBabel = useBabel || !(config.babel === false);
@@ -305,7 +249,7 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 	var jsLoaders = [
 		{
 			'loader': 'eslint-loader',
-			'options': callPluginMethod(context.plugins, 'filterEslintOptions', [eslintOptions, context])
+			'options': context.callPluginMethod('filterEslintOptions', [eslintOptions, context])
 		}
 	];
 
@@ -315,7 +259,7 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 		// Add babel itself
 		jsLoaders.push({
 			'loader': 'babel-loader',
-			'options': callPluginMethod(context.plugins, 'filterBabelOptions', [{
+			'options': context.callPluginMethod('filterBabelOptions', [{
 				'compact': false,
 				'presets': [require('babel-preset-env'), require('babel-preset-es3')],
 				"plugins": [require('babel-plugin-transform-runtime')]
@@ -336,7 +280,7 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 	});
 
 	// Check if there are provided elements
-	var provided = callPluginMethod(context.plugins, 'getJsProvides', [{}, context]);
+	var provided = context.callPluginMethod('getJsProvides', [{}, context]);
 	if (provided !== {}) {
 		webpackConfig.plugins.push(new webpack.ProvidePlugin(provided))
 	}
@@ -383,7 +327,7 @@ function buildJsCompatConfig(webpackConfig, jsCompatConfig, context) {
  * @param dir
  * @param laborConfig
  * @param mode
- * @returns {null}
+ * @returns {*}
  */
 module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 
@@ -396,8 +340,35 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		});
 	}
 
+	// Prepare context
+	var context = {
+		'isProd': false,
+		'mode': mode,
+		'dir': dir,
+		'laborConfig': laborConfig,
+		'webpackConfig': null,
+		'plugins': []
+	};
+
+	/**
+	 * Internal helper to loop over all plugin instances and call a requested method on them.
+	 * The given arguments should be an array. If the method returns a value args[0] will automatically
+	 * be reset to the result. With that it is possible to pass a value through all plugin instances to filter it.
+	 *
+	 * @param {string} method
+	 * @param {Array} args
+	 * @returns {null}
+	 */
+	context.callPluginMethod = function(method, args) {
+		this.plugins.forEach(plugin => {
+			if (typeof plugin[method] !== 'function') return;
+			var result = plugin[method].apply(plugin, args);
+			if (typeof result !== 'undefined') args[0] = result;
+		});
+		return typeof args[0] !== 'undefined' ? args[0] : null;
+	};
+
 	// Instantiate plugins
-	var plugins = [];
 	pluginDefinitions.forEach(v => {
 		let pluginPath = path.resolve(dir.buildingNodeModules, v);
 		let plugin = null;
@@ -415,29 +386,29 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 					pluginPath = path.resolve(dir.current, v);
 					plugin = require(pluginPath);
 				} catch (e) {
-					kill('Invalid plugin path given! Missing plugin: "'+v+'"');
+					kill('Invalid plugin path given! Missing plugin: "' + v + '"');
 				}
 			}
 
 		}
 		if (typeof plugin !== 'function') kill('The defined plugin: "' + v + '" is not a function!');
-		plugins.push(new plugin());
+		context.plugins.push(new plugin());
 	});
 
 	// Validate mode
-	var validModes = callPluginMethod(plugins, 'getModes', [[]]);
+	var validModes = context.callPluginMethod('getModes', [[]]);
 	if (validModes.indexOf(mode) === -1)
 		kill('Invalid mode given: "' + mode + '", valid modes are: "' + validModes.join(', ') + '"!');
 
 	// Determine if this is production or not
-	var isProd = callPluginMethod(plugins, 'isProd', [false, mode]);
+	context.isProd = context.callPluginMethod('isProd', [false, mode]);
 
 	// Prepare config
 	var webpackConfig = {
-		'mode': isProd ? 'production' : 'development',
+		'mode': context.isProd ? 'production' : 'development',
 		'watch': mode === 'watch',
 		'entry': {},
-		'devtool': 'source-map',
+		'devtool': '',
 		'optimization': {
 			'minimize': false
 		},
@@ -459,19 +430,10 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 			'modules': ['node_modules', dir.buildingNodeModules, dir.nodeModules, '/']
 		}
 	};
-
-	// Prepare context
-	var context = {
-		'isProd': isProd,
-		'mode': mode,
-		'dir': dir,
-		'laborConfig': laborConfig,
-		'webpackConfig': webpackConfig,
-		'plugins': plugins
-	};
+	context.webpackConfig = webpackConfig;
 
 	// Filter laborConfig by plugin
-	laborConfig = callPluginMethod(plugins, 'filterLaborConfig', [laborConfig, context]);
+	laborConfig = context.callPluginMethod('filterLaborConfig', [laborConfig, context]);
 
 	// Make sure we have stuff to watch
 	let hasCss = typeof laborConfig.css !== 'undefined' && Array.isArray(laborConfig.css) && laborConfig.css.length > 0;
@@ -496,9 +458,39 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 	if (typeof laborConfig.jsCompat !== 'undefined' && Array.isArray(laborConfig.jsCompat) && laborConfig.jsCompat.length > 0)
 		buildJsCompatConfig(webpackConfig, laborConfig.jsCompat, context);
 
+	// Make sure webpack generates a source map even if in dev mode
+	webpackConfig.plugins.push(
+		new webpack.SourceMapDevToolPlugin({
+			filename: "[file].map"
+		}),
+	);
+
+	// Make sure the emitted css files don't interfere with each other
+	webpackConfig.plugins.push({
+		'apply': function (compiler) {
+			let realWrite = compiler.outputFileSystem.writeFile;
+			compiler.outputFileSystem.writeFile = function (path, data, callback) {
+				if (typeof path === 'string' && path.indexOf('.css') !== -1) {
+					// Drop ignored files
+					if (path.match(/\.drop$|\.drop\.map$/)) {
+						callback(null);
+						return;
+					}
+					// Rewrite drop css
+					if (path.indexOf('.drop.css') !== -1)
+						path = path.replace(/\.drop\.css/, '');
+					// Rewrite in data
+					data = data.toString();
+					data = data.replace(/\.drop\.css/g, '');
+				}
+				realWrite(path, data, callback);
+			}
+		}
+	});
+
 	// Call filters
-	webpackConfig = callPluginMethod(plugins, 'filter', [webpackConfig, context]);
+	context.callPluginMethod('filter', [webpackConfig, context]);
 
 	// Done
-	return webpackConfig;
+	return context;
 };

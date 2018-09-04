@@ -4,7 +4,7 @@
  * For LABOR.digital
  */
 var path = require('path');
-var fs = require('fs');
+const fs = require('fs');
 var webpack = require('webpack');
 var configBuilder = require('./WebpackConfigBuilder');
 
@@ -36,10 +36,10 @@ if(typeof packageJson.labor === 'undefined') {
 var laborConfig = packageJson.labor;
 
 // Build webpack config
-var webpackConfig = configBuilder(dir, laborConfig, process.argv[2]);
+var context = configBuilder(dir, laborConfig, process.argv[2]);
 
 // Start webpack
-webpack(webpackConfig, (err, stats) => {
+webpack(context.webpackConfig, (err, stats) => {
 	if (err || stats.hasErrors()) {
 		// Handle errors here
 		console.error('ERRORS OCCURED!');
@@ -47,15 +47,13 @@ webpack(webpackConfig, (err, stats) => {
 			console.error(err.stack || err);
 			return;
 		}
-	} else {
-		console.log('Compiling done.');
 	}
 
 	// Render a readable output
-	var lines = stats.toString({
+	var lines = stats.toJson({
 		'hash': false,
 		'entrypoints': false,
-		'colors': true,
+		'colors': false,
 		'moduleTrace': false,
 		'verbose': false,
 		'version': false,
@@ -67,10 +65,28 @@ webpack(webpackConfig, (err, stats) => {
 		'chunks': false,
 		'warnings': true,
 		'errorDetails': false,
-		'excludeAssets': /.map$|ignore-me.js$/
-	}).split(/\n/);
-	lines.map(v => {
-		// Exclude everything that was not explicitly created by us
-		if(v.split('  ').pop() !== '') console.log(v);
+		'excludeAssets': /ignore-me.js$/
+	});
+
+	// Call hooks
+	lines = context.callPluginMethod('compilingDone', [lines, context]);
+
+	// Render output
+	console.log('Compiling done:', new Date().toLocaleTimeString());
+	if(lines.time > 10000)
+		console.log('Time: ' + Math.round(lines.time / 100) / 10 + 's');
+	else
+		console.log('Time: ' + lines.time + 'ms');
+	function humanFileSize(size) {
+		var i = Math.floor( Math.log(size) / Math.log(1024) );
+		return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+	}
+	console.log('Asset'.padStart(70, ' ') + '  ' + 'Size'.padStart(10));
+	lines.assets.forEach(asset => {
+		if(asset.name.match(/\.css\.drop$|\.css\.drop\.map$/)) return;
+		if(asset.name.match(/\.drop\.css$/)) asset.name = asset.name.substr(0, asset.name.length-9);
+		else if(asset.name.match(/\.drop\.css\.map$/)) asset.name = asset.name.substr(0, asset.name.length-13) + '.map';
+		console.log('\x1b[32m' + path.resolve(asset.name).substr(-70).padStart(70, ' ') + '\x1b[0m  ' +
+			(humanFileSize(asset.size) + '').padStart(10));
 	});
 });

@@ -2,8 +2,23 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [1.1.7] - 2018-09-04
+### Added
+- Adds a new possible hook "compilingDone" which is called every time the controller's callback is executed
+- Adds a function wrapper to webpacks "writeFile" method to make sure compiled css files will not be overwritten by the useless .js file created by webpack
+
 ### Changed
 - Different implementation of UglifyJsPlugin using webpackConfig.optimization.minimizer instead of webpackConfig.plugins for better results.
+- ConfigBuilder now returns the context instance instead of the webpackConfig
+- Moves the "callPluginMethod" function to be a context method instead a function
+- Removes "last-call-webpack-plugin" from the list of dependencies
+- Changes the way how css files are built by dropping/rewriting files our new "writeFile" handler 
+- Changes the compiler output to contain less irrelevant information
+
+### Fixed
+- Fixed the creation of yourname.css.pseudo.css files 
+- Fixes an issue that caused the css sourcemaps to be empty
+- Fixes an issue where css sourcemaps could not be found because their path's where defined like yourname.css.pseudo.css.map instead of yourname.css.map.
 
 ## [1.1.6] - 2018-08-30
 ### Added
