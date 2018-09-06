@@ -3,40 +3,16 @@
  * Created by Martin Neundorfer on 09.08.2018.
  * For LABOR.digital
  */
-var path = require('path');
-const fs = require('fs');
-var webpack = require('webpack');
-var configBuilder = require('./WebpackConfigBuilder');
-
-// Check if mode was given mode
-if(typeof process.argv[2] === 'undefined'){
-	console.error('You did not transfer a mode parameter (e.g. build, watch) to the call!');
-	process.exit();
-}
+const path = require('path');
+const webpack = require('webpack');
+const Dir = require('./Entities/Dir');
+const ConfigBuilderBootstrap = require('./ConfigBuilder/ConfigBuilderBootstrap');
 
 // Prepare directory stroage
-var dir = {
-	'current': process.cwd() + path.sep,
-	'controller': __dirname + path.sep,
-	'nodeModules': process.cwd() + path.sep + 'node_modules' + path.sep,
-	'buildingNodeModules': path.resolve(__dirname, '../node_modules/') + path.sep
-};
-
-// Load package json
-var packageJsonPath = dir.current + 'package.json';
-if (!fs.existsSync(packageJsonPath)) {
-	console.error('Could not find package.json at: "' + packageJsonPath + '"');
-	process.exit();
-}
-var packageJson = JSON.parse(fs.readFileSync(packageJsonPath).toString('utf-8'));
-if(typeof packageJson.labor === 'undefined') {
-	console.error('There is no "labor" node in your package.json at: "' + packageJsonPath + '"');
-	process.exit();
-}
-var laborConfig = packageJson.labor;
+let dir = new Dir(process.cwd(), __dirname);
 
 // Build webpack config
-var context = configBuilder(dir, laborConfig, process.argv[2]);
+let context = ConfigBuilderBootstrap.generateConfigFor(dir);
 
 // Start webpack
 webpack(context.webpackConfig, (err, stats) => {

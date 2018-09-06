@@ -9,15 +9,7 @@ const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-
-/**
- * Internal helper to show an error and stop the process
- * @param msg
- */
-function kill(msg) {
-	console.error(msg);
-	process.exit();
-}
+const kill = require('../Helpers/kill');
 
 /**
  * Adds a pseudo js file of no real entries where given, but our additional
@@ -339,89 +331,13 @@ function buildJsCompatConfig(webpackConfig, jsCompatConfig, context) {
 
 /**
  * Builds a valid webpack config based of the labor configuration syntax
- * @param dir
- * @param laborConfig
- * @param mode
+ * @param {module.ConfigBuilderContext} context
  * @returns {*}
  */
-module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
-
-	// Gather plugin list
-	var pluginDefinitions = [];
-	pluginDefinitions.push(path.resolve(dir.controller, './plugins/DefaultPlugin.js'));
-	if (typeof laborConfig.plugins !== 'undefined' && Array.isArray(laborConfig.plugins)) {
-		laborConfig.plugins.forEach(v => {
-			pluginDefinitions.push(v);
-		});
-	}
-
-	// Prepare context
-	var context = {
-		'isProd': false,
-		'mode': mode,
-		'dir': dir,
-		'laborConfig': laborConfig,
-		'webpackConfig': null,
-		'plugins': []
-	};
-
-	/**
-	 * Internal helper to loop over all plugin instances and call a requested method on them.
-	 * The given arguments should be an array. If the method returns a value args[0] will automatically
-	 * be reset to the result. With that it is possible to pass a value through all plugin instances to filter it.
-	 *
-	 * @param {string} method
-	 * @param {Array} args
-	 * @returns {null}
-	 */
-	context.callPluginMethod = function (method, args) {
-		this.plugins.forEach(plugin => {
-			if (typeof plugin[method] !== 'function') return;
-			var result = plugin[method].apply(plugin, args);
-			if (typeof result !== 'undefined') args[0] = result;
-		});
-		return typeof args[0] !== 'undefined' ? args[0] : null;
-	};
-
-	// Instantiate plugins
-	pluginDefinitions.forEach(v => {
-		let pluginPath = path.resolve(dir.buildingNodeModules, v);
-		let plugin = null;
-		try {
-			// Try with the building node modules
-			plugin = require(pluginPath);
-		} catch (e) {
-			try {
-				// Try with the projects node modules
-				pluginPath = path.resolve(dir.nodeModules, v);
-				plugin = require(pluginPath);
-			} catch (e) {
-				try {
-					// try relative from the current path
-					pluginPath = path.resolve(dir.current, v);
-					plugin = require(pluginPath);
-				} catch (e) {
-					kill('Invalid plugin path given! Missing plugin: "' + v + '"');
-				}
-			}
-
-		}
-		if (typeof plugin !== 'function') kill('The defined plugin: "' + v + '" is not a function!');
-		context.plugins.push(new plugin());
-	});
-
-	// Validate mode
-	var validModes = context.callPluginMethod('getModes', [[]]);
-	if (validModes.indexOf(mode) === -1)
-		kill('Invalid mode given: "' + mode + '", valid modes are: "' + validModes.join(', ') + '"!');
-
-	// Determine if this is production or not
-	context.isProd = context.callPluginMethod('isProd', [false, mode]);
+module.exports = function (context) {
 
 	// Prepare config
-	var webpackConfig = {
-		'mode': context.isProd ? 'production' : 'development',
-		'watch': mode === 'watch',
+	context.webpackConfig = Object.assign(context.webpackConfig, {
 		'entry': {},
 		'devtool': '',
 		'optimization': {
@@ -433,55 +349,41 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 		'output': {
 			'path': dir.current,
 			'filename': './[name]'
-		},
-		'plugins': [],
-		'module': {
-			'rules': []
-		},
-		'resolve': {
-			'modules': ['node_modules', dir.nodeModules, dir.buildingNodeModules]
-		},
-		'resolveLoader': {
-			'modules': ['node_modules', dir.buildingNodeModules, dir.nodeModules, '/']
 		}
-	};
-	context.webpackConfig = webpackConfig;
-
-	// Filter laborConfig by plugin
-	laborConfig = context.callPluginMethod('filterLaborConfig', [laborConfig, context]);
+	});
 
 	// Make sure we have stuff to watch
-	let hasCss = typeof laborConfig.css !== 'undefined' && Array.isArray(laborConfig.css) && laborConfig.css.length > 0;
-	let hasJs = typeof laborConfig.js !== 'undefined' && Array.isArray(laborConfig.js) && laborConfig.js.length > 0;
+	let hasCss = typeof context.laborConfig.css !== 'undefined' && Array.isArray(context.laborConfig.css) && context.laborConfig.css.length > 0;
+	let hasJs = typeof context.laborConfig.js !== 'undefined' && Array.isArray(context.laborConfig.js) && context.laborConfig.js.length > 0;
 	if (!hasCss && !hasJs) {
 		console.log('Adding pseudo js file to make sure webpack works without crashing...');
-		addPseudoJsEntryPoint(laborConfig, context);
+		addPseudoJsEntryPoint(context.laborConfig, context);
 		hasJs = true;
 	}
 
 	// Apply given configuration
 	// CSS
 	if (hasCss)
-		buildCssConfig(webpackConfig, laborConfig.css, context);
+		buildCssConfig(context.webpackConfig, context.laborConfig.css, context);
 	// COPY
-	if (typeof laborConfig.copy !== 'undefined' && Array.isArray(laborConfig.copy) && laborConfig.copy.length > 0)
-		buildCopyConfig(webpackConfig, laborConfig.copy, context);
+	if (typeof context.laborConfig.copy !== 'undefined' && Array.isArray(context.laborConfig.copy) && context.laborConfig.copy.length > 0)
+		buildCopyConfig(context.webpackConfig, context.laborConfig.copy, context);
 	// JS
 	if (hasJs)
-		buildJsConfig(webpackConfig, laborConfig.js, context);
+		buildJsConfig(context.webpackConfig, context.laborConfig.js, context);
 	// JS COMPAT (Imports loader)
-	if (typeof laborConfig.jsCompat !== 'undefined' && Array.isArray(laborConfig.jsCompat) && laborConfig.jsCompat.length > 0)
-		buildJsCompatConfig(webpackConfig, laborConfig.jsCompat, context);
+	if (typeof context.laborConfig.jsCompat !== 'undefined' && Array.isArray(context.laborConfig.jsCompat) && context.laborConfig.jsCompat.length > 0)
+		buildJsCompatConfig(context.webpackConfig, context.laborConfig.jsCompat, context);
 
 	// Make sure webpack generates a source map even if in dev mode
-	webpackConfig.plugins.push(
+	context.webpackConfig.plugins.push(
 		new webpack.SourceMapDevToolPlugin({
 			filename: "[file].map"
 		}),
 	);
 
 	// Make sure the emitted css files don't interfere with each other
-	webpackConfig.plugins.push({
+	context.webpackConfig.plugins.push({
 		'apply': function (compiler) {
 			let realWrite = compiler.outputFileSystem.writeFile;
 			compiler.outputFileSystem.writeFile = function (path, data, callback) {
@@ -502,9 +404,6 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 			}
 		}
 	});
-
-	// Call filters
-	context.callPluginMethod('filter', [webpackConfig, context]);
 
 	// Done
 	return context;
