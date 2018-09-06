@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [1.1.8] - 2018-09-06
+### Added
+- Adds occured errors to the new compiler output
+- Adds mini information as last line to new compiler output (keep your terminal tiny and see changes)
+- Adds support for "copy" configuration to define your "from" rules as a node module. "@labor/myModule/something/*.js" will autoresolve to the node_modules directory
+
 ## [1.1.7] - 2018-09-04
 ### Added
 - Adds a new possible hook "compilingDone" which is called every time the controller's callback is executed

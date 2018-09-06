@@ -2,6 +2,7 @@
  * Created by Martin Neundorfer on 09.08.2018.
  * For LABOR.digital
  */
+const fs = require('fs');
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
@@ -28,13 +29,12 @@ function addPseudoJsEntryPoint(laborConfig, context) {
 	let tmpInput = './node_modules/@labor/tmp/tmp-js.js';
 	let tmpOutput = './node_modules/@labor/tmp/ignore-me.js';
 	let realFile = context.dir.nodeModules + '@labor/tmp/tmp-js.js';
-	let fs = require('fs');
 	if (!fs.existsSync(realFile)) {
 		try {
 			fs.mkdirSync(context.dir.nodeModules + '@labor/tmp');
 		} catch (e) {
 		}
-		require('fs').writeFileSync(realFile, 'alert(\'hallo\');');
+		fs.writeFileSync(realFile, 'alert(\'hallo\');');
 	}
 	laborConfig.js = [
 		{
@@ -160,6 +160,21 @@ function buildCopyConfig(webpackConfig, copyConfig, context) {
 				copyConfig.push(newConfig);
 			});
 			config.from = thisValue;
+		}
+	});
+
+	// Make sure we can resolve node modules
+	copyConfig.forEach(config => {
+		// Remove all glob related stuff from the path
+		let fromDirectory = path.dirname(config.from.replace(/\*.*?$/, ''));
+		let fromPrefix = '';
+		if (fromDirectory.length > 0 && !fs.existsSync(fromDirectory)) {
+			for (let directory of [context.dir.nodeModules, context.dir.buildingNodeModules, context.dir.current]) {
+				fromPrefix = directory;
+				if(fs.existsSync(fromPrefix + fromDirectory)) break;
+				fromPrefix = '';
+			}
+			config.from = fromPrefix + config.from;
 		}
 	});
 
@@ -359,7 +374,7 @@ module.exports = function WebpackConfigBuilder(dir, laborConfig, mode) {
 	 * @param {Array} args
 	 * @returns {null}
 	 */
-	context.callPluginMethod = function(method, args) {
+	context.callPluginMethod = function (method, args) {
 		this.plugins.forEach(plugin => {
 			if (typeof plugin[method] !== 'function') return;
 			var result = plugin[method].apply(plugin, args);

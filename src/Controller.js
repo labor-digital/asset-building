@@ -41,9 +41,9 @@ var context = configBuilder(dir, laborConfig, process.argv[2]);
 // Start webpack
 webpack(context.webpackConfig, (err, stats) => {
 	if (err || stats.hasErrors()) {
-		// Handle errors here
-		console.error('ERRORS OCCURED!');
 		if (err) {
+			// Handle errors here
+			console.error('ERRORS OCCURED!');
 			console.error(err.stack || err);
 			return;
 		}
@@ -72,11 +72,10 @@ webpack(context.webpackConfig, (err, stats) => {
 	lines = context.callPluginMethod('compilingDone', [lines, context]);
 
 	// Render output
-	console.log('Compiling done:', new Date().toLocaleTimeString());
-	if(lines.time > 10000)
-		console.log('Time: ' + Math.round(lines.time / 100) / 10 + 's');
-	else
-		console.log('Time: ' + lines.time + 'ms');
+	let time = lines.time > 10000 ? Math.round(lines.time / 100) / 10 + 's' : lines.time + 'ms';
+	console.log('');
+	console.log('COMPILING DONE:', new Date().toLocaleTimeString(), '| Time:', time);
+	console.log('==================================================================================');
 	function humanFileSize(size) {
 		var i = Math.floor( Math.log(size) / Math.log(1024) );
 		return ( size / Math.pow(1024, i) ).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
@@ -89,4 +88,23 @@ webpack(context.webpackConfig, (err, stats) => {
 		console.log('\x1b[32m' + path.resolve(asset.name).substr(-70).padStart(70, ' ') + '\x1b[0m  ' +
 			(humanFileSize(asset.size) + '').padStart(10));
 	});
+
+	let state = '\x1b[32mOK\x1b[0m';
+	// Render errors
+	if(lines.errors.length > 0){
+		state = '\x1b[31mERROR\x1b[0m';
+		console.log('');
+		console.error('ERRORS OCCURED:');
+		console.error('==================================================================================');
+		let c = 0;
+		lines.errors.forEach(error => {
+			console.error('\x1b[31mERROR ' + (c++) +':\x1b[0m');
+			error.split(/\r?\n/).forEach(l => {
+				console.error('\x1b[31m' + l +'\x1b[0m');
+			});
+			console.log('');
+		});
+	}
+	console.log('..................................................................................');
+	console.log(new Date().toLocaleTimeString(), '| Time:', time, '|', state);
 });
