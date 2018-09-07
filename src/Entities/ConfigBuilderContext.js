@@ -6,6 +6,12 @@ module.exports = class ConfigBuilderContext {
 	constructor(laborConfig, dir, mode) {
 
 		/**
+		 * The version numberof the current config builder
+		 * @type {number}
+		 */
+		this.builderVersion = 1;
+
+		/**
 		 * True if this build should be executed as webpack's "production" mode
 		 * @type {boolean}
 		 */
@@ -54,6 +60,12 @@ module.exports = class ConfigBuilderContext {
 		 * @type {module.Dir}
 		 */
 		this.dir = dir;
+
+		/**
+		 * The callback for the webpack compiler
+		 * @type {function}
+		 */
+		this.callback = () => {};
 	}
 
 	/**

@@ -10,6 +10,7 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const kill = require('../Helpers/kill');
+const EsLintConfig_1 = require('../EsLintConfig/EsLintConfig_1');
 
 /**
  * Adds a pseudo js file of no real entries where given, but our additional
@@ -220,37 +221,7 @@ function buildJsConfig(webpackConfig, jsConfig, context) {
 	});
 
 	// Default eslint options
-	var eslintOptions = {
-		'env': {'browser': true},
-		'ecmaFeatures': {'jsx': true},
-		'globals': [
-			'document:true', 'console:true', 'window:true', 'setTimeout:true', 'setInterval:true', 'clearTimeout:true',
-			'clearInterval:true', 'define:true', 'jQuery:true', 'location:true', 'makeDiv:true',
-			'module:true', 'exports:true', 'localStorage:true', 'alert:true', 'navigator:true', 'screen:true',
-			'event:true', 'DOMParser:true', 'ActiveXObject:true', 'Symbol:true', 'prefixes:true',
-			'enableClasses:true', 'Image:true', 'require:true', 'HTMLElement:true', 'history:true', 'Int8Array:true'
-		],
-		'rules': {
-			'comma-dangle': [2, 'never'],
-			'no-undef': 2,
-			'max-len': 'off'
-		}
-	};
-
-	// Production eslint options
-	if (context.isProd) {
-		eslintOptions.rules = {
-			'no-dupe-args': 2, 'no-duplicate-case': 2, 'no-template-curly-in-string': 2,
-			'no-unexpected-multiline': 2, 'no-unsafe-finally': 2, 'no-unsafe-negation': 2,
-			'comma-dangle': [2, 'never'], 'no-constant-condition': 2,
-			'no-control-regex': 2, 'no-debugger': 2, 'no-dupe-keys': 2, 'no-empty-character-class': 2,
-			'no-ex-assign': 2, 'no-extra-boolean-cast': 2, 'no-extra-parens': 0, 'no-extra-semi': 1,
-			'no-func-assign': 2, 'no-inner-declarations': 1, 'no-invalid-regexp': 2, 'no-irregular-whitespace': 2,
-			'no-negated-in-lhs': 2, 'no-obj-calls': 2, 'no-regex-spaces': 2, 'no-reserved-keys': 0,
-			'no-sparse-arrays': 2, 'no-unreachable': 2, 'use-isnan': 2, 'valid-jsdoc': 0, 'valid-typeof': 2,
-			'no-undef': 2
-		};
-	}
+	var eslintOptions = new EsLintConfig_1(context.isProd);
 
 	// Define default loaders
 	var jsLoaders = [
@@ -334,7 +305,7 @@ function buildJsCompatConfig(webpackConfig, jsCompatConfig, context) {
  * @param {module.ConfigBuilderContext} context
  * @returns {*}
  */
-module.exports = function (context) {
+module.exports = function WebpackConfigBuilder_1 (context) {
 
 	// Prepare config
 	context.webpackConfig = Object.assign(context.webpackConfig, {
@@ -347,7 +318,7 @@ module.exports = function (context) {
 			'hints': false
 		},
 		'output': {
-			'path': dir.current,
+			'path': context.dir.current,
 			'filename': './[name]'
 		}
 	});
@@ -404,6 +375,9 @@ module.exports = function (context) {
 			}
 		}
 	});
+
+	// Call filters
+	context.callPluginMethod('filter', [context.webpackConfig, context]);
 
 	// Done
 	return context;
