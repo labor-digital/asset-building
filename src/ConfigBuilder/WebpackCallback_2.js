@@ -60,10 +60,12 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 		let ignoredChunks = 0;
 		let ignoredSize = 0;
 		child.assets.forEach(asset => {
-			// Ignore non main chunks and maps
-			let useAsset = !asset.name.match(/\.map$/) &&
-				(typeof asset.chunks[0] === 'string' && asset.chunks[0].indexOf('main') === 0);
-			if(typeof asset.chunks[0] === 'number') useAsset = false;
+			// console.log(' - > ', asset.name, asset.chunks, asset.chunkNames);
+			const isMap = asset.name.match(/\.map$/);
+			const chunkIsMain = typeof asset.chunks[0] === 'string' && asset.chunks[0].indexOf('main') === 0;
+			const chunkNameIsMain = typeof asset.chunkNames[0] === 'string' && asset.chunkNames[0].indexOf('main') === 0
+			const useAsset = !isMap && (chunkIsMain || chunkNameIsMain);
+
 			if (!useAsset) {
 				ignoredChunks++;
 				ignoredSize += asset.size;
@@ -124,15 +126,4 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 	if (numberOfWarnings !== 0 && numberOfErrors !== 0) state += ' | ';
 	if (numberOfErrors > 0) state += colorRed(numberOfErrors + ' error' + (numberOfErrors === 1 ? '' : 's'));
 	console.log(new Date().toLocaleTimeString(), '| Time:', times.join(', '), ' |', state);
-
-	process.exit();
-	console.error(colorRed('ERRORS OCCURED:'));
-	console.error(getLine());
-
-	console.log(stats.toString({
-		'colors': true,
-		'assets': true,
-		'warnings': true,
-		'errorDetails': false,
-	}));
 };

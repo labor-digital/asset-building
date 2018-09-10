@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.0.0] - 2018-09-10
+### Added
+- Adds new and advanced version 2 config builder 
+- Adds documentation for version 2 config builder
+- Adds entity classes for better autocompletion 
+- Adds custom webpack plugins / loaders for version 2
+
+### Changed
+- Breaks up version 1 config builder into multiple smaller parts
+- Makes esLint config more readable
+- Major refactoring of code into smaller chunks 
 
 ## [1.1.8] - 2018-09-06
 ### Added

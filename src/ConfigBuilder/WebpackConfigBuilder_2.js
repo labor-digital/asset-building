@@ -13,6 +13,7 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WebpackPromiseShimPlugin = require('../WebpackPlugins/WebpackPromiseShimPlugin');
 const WebpackFixBrokenChunkPlugin = require('../WebpackPlugins/WebpackFixBrokenChunkPlugin');
+const buildCopyConfig = require('./Parts/buildCopyConfig');
 
 /**
  * @param {module.ConfigBuilderContext} context
@@ -28,12 +29,14 @@ module.exports = function WebpackConfigBuilder_2(context) {
 	for (let i = 0; i < laborConfig.apps.length; i++) {
 		// Create local instance for the current app
 		context.webpackConfig = JSON.parse(rawWebpackConfig);
+		context.currentApp = i;
 		let app = laborConfig.apps[i];
 
 		// Add the relative entry point
 		if (typeof app.entry !== 'string' || app.entry.trim() === '')
 			kill('Your app: "' + i + '" misses an "entry" point node!');
 		context.webpackConfig.entry = '.' + path.sep + path.relative(context.dir.current, path.resolve(context.dir.current, app.entry));
+		const inputDirectory = path.dirname(app.entry);
 
 		// Add output definition
 		if (typeof app.output !== 'string' || app.output.trim() === '')
@@ -44,7 +47,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		outputDirectory = path.dirname(outputDirectory);
 		context.webpackConfig = Object.assign({'output': {}}, context.webpackConfig);
 		context.webpackConfig.output.path = outputDirectory;
-		context.webpackConfig.output.filename = 'js/' + outputFile;
+		context.webpackConfig.output.filename = outputFile;
 		context.webpackConfig.output.chunkFilename = 'js/' + outputFileWithoutExtension + '-[id].[hash].js';
 
 		// Add public path if given
@@ -86,14 +89,17 @@ module.exports = function WebpackConfigBuilder_2(context) {
 			]
 		});
 
-		// Eslint loader && Require related
+		// Eslint loader && Require related && Import Wildcard
 		context.webpackConfig.module.rules.push({
 			'test': /\.js$/,
 			'enforce': 'pre',
 			'exclude': new RegExp(jsExclude),
 			'use': [
 				{
-					'loader': path.resolve(context.dir.controller, './WebpackLoaders/RequireRelatedLoader.js')
+					'loader': path.resolve(context.dir.controller, './WebpackLoaders/ImportWildcardLoader.js'),
+				},
+				{
+					'loader': path.resolve(context.dir.controller, './WebpackLoaders/AutoImportRelatedLoader.js'),
 				},
 				{
 					'loader': 'eslint-loader',
@@ -105,16 +111,16 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Html loader
 		context.webpackConfig.module.rules.push({
-			test: /\.html$/,
-			use: [{
+			'test': /\.html$/,
+			'use': [{
 				loader: 'html-loader'
 			}],
 		});
 
 		// Css loader
 		context.webpackConfig.module.rules.push({
-			test: /\.css$/,
-			use: [
+			'test': /\.css$/,
+			'use': [
 				{
 					'loader': MiniCssExtractPlugin.loader,
 					'options': {
@@ -132,8 +138,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Sass loader
 		context.webpackConfig.module.rules.push({
-			test: /\.s[ac]ss$/,
-			use: [
+			'test': /\.s[ac]ss$/,
+			'use': [
 				{
 					'loader': MiniCssExtractPlugin.loader,
 					'options': {
@@ -153,13 +159,14 @@ module.exports = function WebpackConfigBuilder_2(context) {
 						'outputStyle': 'expanded',
 						'sourceMapContents': true
 					}
-				},
+				}
 			]
 		});
 
 		// Less loader
 		context.webpackConfig.module.rules.push({
 			test: /\.less$/,
+			'enforce': 'pre',
 			use: [
 				{
 					'loader': MiniCssExtractPlugin.loader,
@@ -179,6 +186,19 @@ module.exports = function WebpackConfigBuilder_2(context) {
 						'sourceMap': true
 					}
 				},
+			]
+		});
+
+		// Import stylesheet resources
+		context.webpackConfig.module.rules.push({
+			test: /\.less$|\.s[ac]ss$|\.css$/,
+			use: [
+				{
+					'loader': path.resolve(context.dir.controller, './WebpackLoaders/AutoImportStylesheetResourcesLoader.js'),
+					'options': {
+						'context': context
+					}
+				}
 			]
 		});
 
@@ -224,13 +244,17 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// that would be too small to be worth loading separately
 		context.webpackConfig.plugins.push(
 			new webpack.optimize.MinChunkSizePlugin({
-				minChunkSize: 10000 // ~10kb
+				minChunkSize: typeof app.minChunkSize === 'undefined' ? 10000 : app.minChunkSize
 			})
 		);
 
 		// Add plugin to clean the output directory when the app is compiled
-		context.webpackConfig.plugins.push(new CleanWebpackPlugin(path.basename(outputDirectory), {
-			'root': path.dirname(outputDirectory)
+		// But make sure to keep all sources which have been defined in there
+		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift();
+		context.webpackConfig.plugins.push(new CleanWebpackPlugin([path.basename(outputDirectory)], {
+			'root': path.dirname(outputDirectory),
+			'exclude': sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + '/'] : undefined,
+			'verbose': true,
 		}));
 
 		// Add plugin to extract the css of all NON-dynamic chunks
@@ -245,16 +269,17 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Plugins for production usage
 		if (context.isProd) {
+			context.webpackConfig = merge({'optimization': {'minimize': true, 'minimizer': []}}, context.webpackConfig);
 
 			// Enable minification
 			context.webpackConfig.optimization.minimize = true;
 
 			// Register JS uglifier
 			context.webpackConfig.optimization.minimizer.push(new UglifyJsPlugin({
-				'mangle': true,
 				'sourceMap': true,
 				'extractComments': true,
 				'uglifyOptions': {
+					'mangle': true,
 					'ecma': 5,
 					'toplevel': true
 				}
@@ -270,6 +295,10 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				}
 			}))
 		}
+
+		// Add given copy configuration
+		if (typeof context.laborConfig.copy !== 'undefined' && Array.isArray(context.laborConfig.copy) && context.laborConfig.copy.length > 0)
+			buildCopyConfig(context.webpackConfig, context.laborConfig.copy, context);
 
 		// Apply given, additional configuration
 		if (typeof app.config === 'object')

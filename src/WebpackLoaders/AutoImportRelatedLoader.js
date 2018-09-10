@@ -4,12 +4,13 @@
  */
 const fs = require('fs');
 const path = require('path');
-module.exports = function(source){
-	let dirname = path.dirname(this.resourcePath);
-	let baseName = path.basename(this.resourcePath).replace(/\.js$/, '');
-	let matcher = new RegExp(baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\.(css|sass|scss|less)$');
-	let matcherSource = new RegExp(baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\.(css|sass|scss|less)');
-	let addImport = [];
+module.exports = function AutoImportRelatedLoader (source){
+	const dirname = path.dirname(this.resourcePath);
+	const baseName = path.basename(this.resourcePath).replace(/\.js$/, '');
+	const baseRegex = baseName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\.(css|sass|scss|less)';
+	const matcher = new RegExp(baseRegex + '$');
+	const matcherSource = new RegExp(baseRegex);
+	const addImport = [];
 	fs.readdirSync(dirname).forEach(file => {
 		if(!file.match(matcher)) return;
 		if(source.match(matcherSource)) return;

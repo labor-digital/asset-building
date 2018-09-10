@@ -12,6 +12,12 @@ module.exports = class ConfigBuilderContext {
 		this.builderVersion = 1;
 
 		/**
+		 * Only used in version 2 of the builder. The numeric zero-based index of the app which is currently compiled.
+		 * @type {number}
+		 */
+		this.currentApp = 0;
+
+		/**
 		 * True if this build should be executed as webpack's "production" mode
 		 * @type {boolean}
 		 */
@@ -25,7 +31,7 @@ module.exports = class ConfigBuilderContext {
 
 		/**
 		 * Contains the configuration given in the package.json in the "labor" node
-		 * @type {{}}
+		 * @type {*}
 		 */
 		this.laborConfig = laborConfig;
 
@@ -40,6 +46,9 @@ module.exports = class ConfigBuilderContext {
 			'plugins': [],
 			'module': {
 				'rules': []
+			},
+			'performance': {
+				'hints': false
 			},
 			'resolve': {
 				'modules': ['node_modules', dir.nodeModules, dir.buildingNodeModules]

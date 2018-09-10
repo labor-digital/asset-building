@@ -6,3 +6,5 @@ demo/webroot/assets/*
 !.keep
 demo/webroot/js/*.js
 demo/webroot/js/*.map
+demo2/*
+!demo2/webroot/src

@@ -5,6 +5,23 @@ There are some adjustments to make if you want to migrate your old project but I
 
 As a general rule of thumb: All configuration is now done within your package.json file in a node called: "labor", but you can also extend this library using "plugin" to get access to the real webpack configuration if you like to do stuff manually.
 
+**Included webpack modules and plugins:**
+- Copy files with (copy-webpack-plugin9)
+- Build css from sass, scss and less sources (sass-loader, less-loader)
+- Extract css files (mini-css-extract-plugin)
+- Minify css files when using "build" (optimize-css-assets-webpack-plugin)
+- Transpiling Es6 Js sources to es3 (babel-loader with babel-plugin-transform-runtime, babel-preset-env and babel-preset-es3)
+- Linting javascript (eslint-loader)
+- Minify js files when using "build" (uglifyjs-webpack-plugin)
+- Creation of source-maps for js and css files
+
+## Different builder versions
+Currently there are two different versions of the configuration generator. Version 1.0 is basically a carbon copy of our "old" / well known style of monolytic style.(sass/scss/less) and application.js files. With version 1.0 you should be able to transfer all your existing projects to the new asset building. That includes a lot of manual labor like copying files to your public folder manually, using relative path's to css assets based on your public path and so on.
+
+Version 2.0 follows a different approach, it takes the "webpack" approach, where everything you build is seen as a "component" of an app. It takes care of your assets and styles and you sould define your pathes relative to your source files. 
+
+The basic folder structure and example files can be explored in the "demo2" directory of this repository.
+
 ## Installation
 * Use our private npm registry!
 * Install the npm dependency
@@ -31,6 +48,24 @@ This will build your sources in production environment and stop itself.
 This will build your sources in dev environment and keep doing so while it
 watches the given entrypoints and their children for changes.
 
+## Magic in Version 2.0
+The second version of the config builder comes with some magic included. 
+1. Including with wildcards `` import "./Components/*/*.js"; `` This will resolve all possible imports in a glob like `` ./Components/**/*.js ``
+2. Auto including related css files of js components. All css/sass/less files which have the exact same name as your js component
+will be autoincluded. So: You only import ``import "./Components/ComponentA/ComponentA.js";`` and if there is a "ComponentA.sass" in the same 
+directory as "ComponentA.js" it is autoloaded on top of the js file. 
+3. Promises will work, I promise! We inject a tiny promise [polyfill](https://github.com/taylorhakes/promise-polyfill) in the runtime of the main webpack file which is then used to import chunkfiles using webpack dynamic imports.
+4. Auto including entry.(sass/less/scss) when compiling css (Take a look at the "Compiled CSS section")
+
+## Compiled CSS - Version 2.0
+When you are using the second version of the asset building you will notice that every css (or its respective sass / less sources) will be included from the javascript modules. 
+
+Now you will ask yourself, but how the hey do I include my mixins/variables/configuration if I do this? 
+
+The answer is quite simple: There is a "resource" file which is located in the same directory as your entrypoint and has the same name as your entry point but .scss/less/sass as extension. Every stylesheet included by webpack will check if this "resource" or "base" file is present and autoinclude it for compiling. With that you can be sure to have all your required mixins and variables in place. 
+
+**Important: The resource file is for variable and mixin definition ONLY! It is not however for global css rule definition! The resource file will be included every time a css file is imported, because every import runs in its own transpiler context! If you define styles in a resource file, those styles will be rendered every time!**
+
 ## Configuration
 If you want to see an example configuration take a look at "demo/package.json" of this directory.
 To begin adding configuration add to your package.json a new node called: `"labor"`.
@@ -45,23 +80,7 @@ To begin adding configuration add to your package.json a new node called: `"labo
 }
 ```
 
-## Options
-__NOTE__: _All options are optional and you can mix am match them as you like._
-
-### js
-You can have multiple combinations of entry points and output files. So 
-the "js" option has to be an Array, containing your combinations. 
-The basic rule is, that webpack loads your "entry" file and converts it into the "output" file, combining all included files into on.
-The filepaths have to be relative to your package.json.
-
-By default the script will assume you are writing es6 and use BABEL to
-transpile it down to es3, so it is compatible to IE8 and higher. If your know your package does not use ES code and you want to save performance go in there and add a new node at after "output" like ("babel": false"). Please note, that if even one of your combinations uses babel, ALL of them will be parsed through it. 
-
-If the "build" mode is used the scripts will be minified and linted using eslint.
-
-Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
-
-**On Node Modules:**
+## Babel & Node Modules
 By default all node_modules will be excluded from babel compiling. (Js Loader for .js files has an exclude on: "node_modules").
 But sometimes if you want to work with es6 components from other packages you need
 to allow transpiling of their files. (LABOR internal projects all depend on that!)
@@ -81,7 +100,23 @@ The @labor scope is allowed for js handling by default. Added in 1.1.6
 }
 ```
 
-### jsCompat
+## Options
+__NOTE__: _All options are optional and you can mix am match them as you like._
+
+#### labor -> js - Version 1.0
+You can have multiple combinations of entry points and output files. So 
+the "js" option has to be an Array, containing your combinations. 
+The basic rule is, that webpack loads your "entry" file and converts it into the "output" file, combining all included files into on.
+The filepaths have to be relative to your package.json.
+
+By default the script will assume you are writing es6 and use BABEL to
+transpile it down to es3, so it is compatible to IE8 and higher. If your know your package does not use ES code and you want to save performance go in there and add a new node at after "output" like ("babel": false"). Please note, that if even one of your combinations uses babel, ALL of them will be parsed through it. 
+
+If the "build" mode is used the scripts will be minified and linted using eslint.
+
+Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
+
+#### labor -> jsCompat - Version 1.0
 Sometimes you have to fix an old JS library which does not work nice with webpack. In this case the "imports-loader" comes to your rescue.
 This configuration registers the module and make it a little bit easier to write.
 For all configuration options take a look at: https://github.com/webpack-contrib/imports-loader.
@@ -112,7 +147,7 @@ As general rule => test and fix => loader in the other documentation.
 }
 ```
 
-### css
+#### labor -> css - Version 1.0
 The general idea is exactly the same as with "js", but for, well, css files. 
 You can also have multiple combinations of entry points and output files. So 
 the "css" option has to be an Array containing your combinations, again. 
@@ -138,7 +173,7 @@ Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
 }
 ```
 
-### copy
+### labor -> copy - Version 1.0 & 2.0
 There are a lot of usecases where you have to automatically copy files from a destination to a output directory. For example to copy fonts to your webroot, or assets from one folder to another.
 You can have multiple copy-jobs for a single project, so make sure that your "copy" node is an array of configuration objects.
 
@@ -166,7 +201,68 @@ If you don't want to flatten everything into a directory set "flatten: true" and
 }
 ```
 
-### plugins
+### labor -> builderVersion - Version 2.0
+This is used to switch the internal builder version. If it is empty / not given the default builder is version 1.0.
+If you want to use version 2.0 just specify it using:
+```
+"labor": {
+    "builderVersion": 2,
+    "apps": [...]
+}
+```
+
+### labor -> apps - Version 2.0
+When you are using the version 2.0 of the configuration the configuration is no longer split into multiple 
+nodes, because we follow webpack's approach to encapsulate all dependencies in a single 
+javascript source file. **Make sure you set builderVersion to 2!**
+
+For this reason you create an app with an entrypoint and specify it's output 
+directory / file name. To make sure your path's can be resolved propperly on your webserver you may use 
+"publicPath" to define the url which leads to the output files. If your path on your local machine is 
+different from your productive publicPath use "publicPathDev" too (publicPath is used for "build", 
+"publicPathDev" is preferred when using "watch").
+
+To add additional, basic configuration to your webpack config you can use "config" which will be merged
+into your webpack config after our internal builder is finished with it. (To do more advanced manipulation of your 
+webpack config, take a look at plugins and use the "filter" hook).
+
+"allowedModules" is used to allow specific node_modules which then will be included in babel es6 transpiling. 
+For further information, take a look at the "Babel & Node Modules" section.
+
+The "minChunkSize" is used to define the minimal size of a resource chunk before it should be extracted into it's own file. This is used to prevent unneccessary http requests if a chunkfile is less then 10kb in size. Sometimes you might want to change that behaviour to match your needs.
+
+
+Minimal:
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      "entry": "./src/app.js",
+      "output": "./dist/bundle.js",
+    }
+  ],
+}
+```
+All features:
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      "entry": "./src/app.js",
+      "output": "./dist/bundle.js",
+      "publicPath": "dist/",
+      "publicPathDev": "",
+      "config": {},
+      "allowedModules": [],
+      "minChunkSize": 10000
+    }
+  ],
+}
+```
+
+### labor -> plugins - Version 1.0 & 2.0
 With this set of tools you should be able to do the same stuff you did with our old gulpfile without problems. But if you want to dive deeper, or want to edit the webpack config manually. You can also write a (really simple) plugin.
 The list of defined plugins is an Array of relative pathes (from the package.json) to node modules which will be used as plugins. More information can be found in the "Plugins" section.
 ```
@@ -266,7 +362,7 @@ module.exports = function () {
 ```
 
 #### filter(webpackConfig, context)
-This is the last hook available to a plugin. It is called right before the generated configuration is put into the webpack controller and is then, out of our hands.
+It is called right before the generated configuration is put into the webpack controller and is then, out of our hands.
 That hook is the perfect place to add additional loaders, plugins or anything else to the configuration, because the internal configuration building is already done,
 so you can be sure that except other plugins, nothing will change the wepackConfig anymore.
 ```
@@ -280,3 +376,10 @@ module.exports = function () {
     };
 };
 ```
+
+#### filterContextBeforeCompiler(context)
+This hook is called after the config builder is finished with the configuration, after the filter hook has been applied.
+
+#### compilingDone(output, context)
+This hook is called every time the webpack compiler is finished with its work. It receives the result of webpack's ["stats.toJson()"](https://webpack.js.org/configuration/stats/).
+Please note, that the value of "output" is rendered using different configuration based on the current builderVersion.
