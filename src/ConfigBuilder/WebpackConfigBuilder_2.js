@@ -242,11 +242,13 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// This plugin prevents Webpack from creating chunks
 		// that would be too small to be worth loading separately
-		context.webpackConfig.plugins.push(
-			new webpack.optimize.MinChunkSizePlugin({
-				minChunkSize: typeof app.minChunkSize === 'undefined' ? 10000 : app.minChunkSize
-			})
-		);
+		if(app.minChunkSize !== 0){
+			context.webpackConfig.plugins.push(
+				new webpack.optimize.MinChunkSizePlugin({
+					minChunkSize: typeof app.minChunkSize === 'undefined' ? 10000 : app.minChunkSize
+				})
+			);
+		}
 
 		// Add plugin to clean the output directory when the app is compiled
 		// But make sure to keep all sources which have been defined in there

@@ -230,7 +230,7 @@ webpack config, take a look at plugins and use the "filter" hook).
 For further information, take a look at the "Babel & Node Modules" section.
 
 The "minChunkSize" is used to define the minimal size of a resource chunk before it should be extracted into it's own file. This is used to prevent unneccessary http requests if a chunkfile is less then 10kb in size. Sometimes you might want to change that behaviour to match your needs.
-
+Setting this value to 0 will disable this feature and we use webpack's default chunk building.
 
 Minimal:
 ```

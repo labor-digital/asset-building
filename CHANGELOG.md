@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- minChunkSize can now be set to 0 to disalbe the feature
+
+### Fixed
+- Adds correct package.json to "demo2" and re-renames package.json in "demo"
+
 ## [2.0.0] - 2018-09-10
 ### Added
 - Adds new and advanced version 2 config builder 
