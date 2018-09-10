@@ -2,8 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Adds "resolve-url-loader" to sass lifecycle to make sure even external assets can be resolved
+- Removes [hash] from chunkfile names
+- Adds a wrapper around node's module loader to make sure we can load all es lint plugins correctly
+
 ### Changed
-- minChunkSize can now be set to 0 to disalbe the feature
+- minChunkSize can now be set to 0 to disable the feature
 
 ### Fixed
 - Adds correct package.json to "demo2" and re-renames package.json in "demo"

@@ -3,12 +3,14 @@
  * For LABOR.digital
  */
 const EsLintConfig_1 = require('./EsLintConfig_1');
+
 module.exports = class EsLintConfig_2 extends EsLintConfig_1{
+
 	/**
-	 * @param {boolean} isProd
+	 * @param {module.ConfigBuilderContext} context
 	 */
-	constructor(isProd) {
-		super(true);
+	constructor(context) {
+		super(context.isProd);
 		this.parser = 'babel-eslint';
 		this.env = {'browser': true};
 		this.extends = 'eslint:recommended';

@@ -42,7 +42,6 @@ module.exports = function AutoImportStylesheetResourcesLoader(source) {
 	if (resourcePath === currentRealPath) return source;
 
 	// Add import statement
-	console.log(path.relative(path.dirname(currentRealPath), resourcePath));
 	let importStatement = '@import "' + path.relative(path.dirname(currentRealPath), resourcePath).replace(/\\/g, '/') + '"';
 	if (ext !== 'sass') importStatement += ';';
 	importStatement += '\r\n';

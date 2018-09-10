@@ -2,6 +2,7 @@
  * Created by Martin Neundorfer on 06.09.2018.
  * For LABOR.digital
  */
+const Module = require('module');
 const path = require('path');
 const webpack = require('webpack');
 const kill = require('../Helpers/kill');
@@ -48,7 +49,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		context.webpackConfig = Object.assign({'output': {}}, context.webpackConfig);
 		context.webpackConfig.output.path = outputDirectory;
 		context.webpackConfig.output.filename = outputFile;
-		context.webpackConfig.output.chunkFilename = 'js/' + outputFileWithoutExtension + '-[id].[hash].js';
+		context.webpackConfig.output.chunkFilename = 'js/' + outputFileWithoutExtension + '-[id].js';
 
 		// Add public path if given
 		if (typeof app.publicPath === 'string' && app.publicPath.trim() !== '')
@@ -104,7 +105,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					'loader': 'eslint-loader',
 					'options': context.callPluginMethod('filterEslintOptions', [
-						new EsLintConfig_2(context.isProd), context])
+						new EsLintConfig_2(context), context])
 				}
 			]
 		});
@@ -150,6 +151,13 @@ module.exports = function WebpackConfigBuilder_2(context) {
 					'loader': 'css-loader',
 					'options': {
 						'sourceMap': true
+					}
+				},
+				{
+					'loader': 'resolve-url-loader',
+					'options': {
+						'sourceMap': true,
+						'attempts': 2
 					}
 				},
 				{
@@ -262,7 +270,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// Add plugin to extract the css of all NON-dynamic chunks
 		context.webpackConfig.plugins.push(new MiniCssExtractPlugin({
 			'filename': 'css/' + outputFileWithoutExtension + '.css',
-			'chunkFilename': 'css/' + outputFileWithoutExtension + '-[id].[hash].css'
+			'chunkFilename': 'css/' + outputFileWithoutExtension + '-[id].css'
 		}));
 
 		// Add our custom plugins
@@ -315,6 +323,28 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 	// Inject real webpack config into context
 	context.webpackConfig = webpackConfigReal;
+
+	// Make sure we can supply modules from our build context
+	const loadOrig = Module._load;
+	const additionalPaths = [
+		context.dir.buildingNodeModules.substr(context.dir.buildingNodeModules, context.dir.buildingNodeModules.length -2),
+		context.dir.nodeModules.substr(context.dir.nodeModules, context.dir.nodeModules.length -2),
+		context.dir.current.substr(context.dir.current, context.dir.current.length -1),
+	];
+	Module._load = function loadOverride(request, parent){
+		try {
+			parent.paths = parent.paths.concat(additionalPaths);
+			return loadOrig(request, parent);
+		} catch (e) {
+			const realPath = path.resolve(context.dir.buildingNodeModules, request);
+			const relativePath = '.\\' + path.relative(context.dir.current, realPath);
+			try {
+				return loadOrig(relativePath, parent);
+			} catch (e) {
+				throw e;
+			}
+		}
+	};
 
 	// Done
 	return context;

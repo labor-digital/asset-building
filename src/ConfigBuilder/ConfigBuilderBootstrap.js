@@ -39,7 +39,6 @@ module.exports = class ConfigBuilderBootstrap {
 				let plugin = null;
 				let pluginBaseName = path.basename(v);
 				for (let basePath of [dir.buildingNodeModules, dir.nodeModules, dir.current]) {
-					console.log(path.resolve(basePath, v));
 					try {
 						plugin = require(path.resolve(basePath, v));
 					} catch (e) {
