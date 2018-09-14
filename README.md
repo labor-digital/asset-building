@@ -18,10 +18,14 @@ As a general rule of thumb: All configuration is now done within your package.js
 ## Different builder versions
 Currently there are two different versions of the configuration generator. Version 1.0 is basically a carbon copy of our "old" / well known style of monolytic style.(sass/scss/less) and application.js files. With version 1.0 you should be able to transfer all your existing projects to the new asset building. That includes a lot of manual labor like copying files to your public folder manually, using relative path's to css assets based on your public path and so on.
 
-Version 2.0 follows a different approach, it takes the "webpack" approach, where everything you build is seen as a "component" of an app. It takes care of your assets and styles and you sould define your pathes relative to your source files. 
+Version 2.0 follows a different approach, it takes the "webpack/angular/vue..." approach, where everything you build is seen as a "component" of an app. It takes care of your assets and styles and you sould define your pathes relative to your source files. 
 
 The basic folder structure and example files can be explored in the "demo2" directory of this repository.
 
+### Alternative Ways and Gotchas
+With that approach you will encounter some points that will not work in the way you are accustomed with. 
+
+1. Every  
 ## Installation
 * Use our private npm registry!
 * Install the npm dependency
@@ -50,12 +54,8 @@ watches the given entrypoints and their children for changes.
 
 ## Magic in Version 2.0
 The second version of the config builder comes with some magic included. 
-1. Including with wildcards `` import "./Components/*/*.js"; `` This will resolve all possible imports in a glob like `` ./Components/**/*.js ``
-2. Auto including related css files of js components. All css/sass/less files which have the exact same name as your js component
-will be autoincluded. So: You only import ``import "./Components/ComponentA/ComponentA.js";`` and if there is a "ComponentA.sass" in the same 
-directory as "ComponentA.js" it is autoloaded on top of the js file. 
-3. Promises will work, I promise! We inject a tiny promise [polyfill](https://github.com/taylorhakes/promise-polyfill) in the runtime of the main webpack file which is then used to import chunkfiles using webpack dynamic imports.
-4. Auto including entry.(sass/less/scss) when compiling css (Take a look at the "Compiled CSS section")
+1. Promises will work, I promise! We inject a tiny promise [polyfill](https://github.com/taylorhakes/promise-polyfill) in the runtime of the main webpack file which is then used to import chunkfiles using webpack dynamic imports.
+
 
 ## Compiled CSS - Version 2.0
 When you are using the second version of the asset building you will notice that every css (or its respective sass / less sources) will be included from the javascript modules. 

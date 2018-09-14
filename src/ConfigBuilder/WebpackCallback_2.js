@@ -2,7 +2,7 @@
  * Created by Martin Neundorfer on 07.09.2018.
  * For LABOR.digital
  */
-const humanFileSize = require('../Helpers/humanFileSize');
+const FileHelpers = require('../Helpers/FileHelpers');
 const kill = require('../Helpers/kill');
 
 function colorRed(string) {
@@ -74,11 +74,11 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 			let realAssetName = (child.outputPath + '/' + asset.name).replace(/[\\\/]/g, '/');
 			console.log(
 				colorGreen(realAssetName.substr(-(assetColLength - 5)).padStart(assetColLength)) + '  '
-				+ humanFileSize(asset.size).padStart(sizeColLength));
+				+ FileHelpers.humanFileSize(asset.size).padStart(sizeColLength));
 		});
 		if (ignoredChunks !== 0)
 			console.log(('  + ' + ignoredChunks + ' hidden files (maps, chunks, assets, and so on)').padStart(assetColLength) + '  ' +
-				humanFileSize(ignoredSize).padStart(sizeColLength));
+				FileHelpers.humanFileSize(ignoredSize).padStart(sizeColLength));
 
 		// Check if there are warnings
 		if (child.warnings.length > 0) {
@@ -106,9 +106,11 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 			console.log('');
 			console.error(colorRed('MISTAKES HAVE BEEN MADE!'));
 			console.log('');
-			child.errors.forEach(entry => {
+			child.errors.forEach((entry, i) => {
 				let isBreak = false;
+				if(i > 0) console.log('');
 				entry.split(/\r?\n/).forEach(line => {
+					// Strip footer for problems with eslint
 					if (isBreak || line.match(/\sproblems?\s\(.*?\serrors?,\s.*?\swarnings?\)/)) {
 						isBreak = true;
 						return;

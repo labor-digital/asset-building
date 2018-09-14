@@ -4,7 +4,7 @@
  */
 
 const path = require('path');
-const humanFileSize = require('../Helpers/humanFileSize');
+const FileHelpers = require('../Helpers/FileHelpers');
 
 module.exports = function WebpackCallback_1 (context, err, stats){
 
@@ -50,7 +50,7 @@ module.exports = function WebpackCallback_1 (context, err, stats){
 		if(asset.name.match(/\.drop\.css$/)) asset.name = asset.name.substr(0, asset.name.length-9);
 		else if(asset.name.match(/\.drop\.css\.map$/)) asset.name = asset.name.substr(0, asset.name.length-13) + '.map';
 		console.log('\x1b[32m' + path.resolve(asset.name).substr(-70).padStart(70, ' ') + '\x1b[0m  ' +
-			(humanFileSize(asset.size) + '').padStart(10));
+			(FileHelpers.humanFileSize(asset.size) + '').padStart(10));
 	});
 
 	let state = '\x1b[32mOK\x1b[0m';

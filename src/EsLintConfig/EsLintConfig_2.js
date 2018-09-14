@@ -4,7 +4,7 @@
  */
 const EsLintConfig_1 = require('./EsLintConfig_1');
 
-module.exports = class EsLintConfig_2 extends EsLintConfig_1{
+module.exports = class EsLintConfig_2 extends EsLintConfig_1 {
 
 	/**
 	 * @param {module.ConfigBuilderContext} context
@@ -12,8 +12,9 @@ module.exports = class EsLintConfig_2 extends EsLintConfig_1{
 	constructor(context) {
 		super(context.isProd);
 		this.parser = 'babel-eslint';
+		this.cache = true;
 		this.env = {'browser': true};
-		this.extends = 'eslint:recommended';
+		if (context.isProd) this.extends = 'eslint:recommended';
 		this.parserOptions = {
 			'ecmaVersion': 2017,
 			'sourceType': 'module',
@@ -26,12 +27,7 @@ module.exports = class EsLintConfig_2 extends EsLintConfig_1{
 			'import/first': 'warn',
 			'import/namespace': ['error', {allowComputed: true}],
 			'import/no-duplicates': 'error',
-			'import/order': ['warn', {
-				groups: [['builtin', 'external'], 'internal', ['parent', 'index', 'sibling']],
-				'newlines-between': 'ignore',
-			},
-			],
+			'import/order': 'off'
 		});
-
 	}
 };

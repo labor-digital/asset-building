@@ -3,12 +3,17 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Added
-- Adds "resolve-url-loader" to sass lifecycle to make sure even external assets can be resolved
 - Removes [hash] from chunkfile names
 - Adds a wrapper around node's module loader to make sure we can load all es lint plugins correctly
+- Adds internal "custom-sass-loader" to speed up the compiling process
+- Adds internal "component-loader" to import components more efficently and to resolv url()s correctly
+- Adds "image-webpack-loader" to shrink image assets when building for production.
+- Adds windows wrapper cmd to increase the memory limit of node
 
 ### Changed
 - minChunkSize can now be set to 0 to disable the feature
+- Removes unused node modules
+- Removes resource loader and wildcard loader
 
 ### Fixed
 - Adds correct package.json to "demo2" and re-renames package.json in "demo"

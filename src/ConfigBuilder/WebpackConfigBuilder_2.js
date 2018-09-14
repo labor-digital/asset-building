@@ -90,56 +90,28 @@ module.exports = function WebpackConfigBuilder_2(context) {
 			]
 		});
 
-		// Eslint loader && Require related && Import Wildcard
+		// Eslint loader && Import components
 		context.webpackConfig.module.rules.push({
 			'test': /\.js$/,
 			'enforce': 'pre',
 			'exclude': new RegExp(jsExclude),
 			'use': [
 				{
-					'loader': path.resolve(context.dir.controller, './WebpackLoaders/ImportWildcardLoader.js'),
-				},
-				{
-					'loader': path.resolve(context.dir.controller, './WebpackLoaders/AutoImportRelatedLoader.js'),
-				},
-				{
 					'loader': 'eslint-loader',
 					'options': context.callPluginMethod('filterEslintOptions', [
 						new EsLintConfig_2(context), context])
-				}
-			]
-		});
-
-		// Html loader
-		context.webpackConfig.module.rules.push({
-			'test': /\.html$/,
-			'use': [{
-				loader: 'html-loader'
-			}],
-		});
-
-		// Css loader
-		context.webpackConfig.module.rules.push({
-			'test': /\.css$/,
-			'use': [
-				{
-					'loader': MiniCssExtractPlugin.loader,
-					'options': {
-						'publicPath': '../'
-					}
 				},
 				{
-					'loader': 'css-loader',
-					'options': {
-						'sourceMap': true
-					}
+					'loader': path.resolve(context.dir.controller, './WebpackLoaders/ComponentLoader.js')
 				}
 			]
 		});
 
-		// Sass loader
+		// Sass and css loader
+		// We route the css over the sass parser, because our internal script will take care of
+		// any urls which could otherwise not be resolved correctly
 		context.webpackConfig.module.rules.push({
-			'test': /\.s[ac]ss$/,
+			'test': /\.s?[ac]ss$/,
 			'use': [
 				{
 					'loader': MiniCssExtractPlugin.loader,
@@ -154,55 +126,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 					}
 				},
 				{
-					'loader': 'resolve-url-loader',
-					'options': {
-						'sourceMap': true,
-						'attempts': 2
-					}
-				},
-				{
-					'loader': 'sass-loader',
-					'options': {
-						'sourceMap': true,
-						'outputStyle': 'expanded',
-						'sourceMapContents': true
-					}
-				}
-			]
-		});
-
-		// Less loader
-		context.webpackConfig.module.rules.push({
-			test: /\.less$/,
-			'enforce': 'pre',
-			use: [
-				{
-					'loader': MiniCssExtractPlugin.loader,
-					'options': {
-						'publicPath': '../'
-					}
-				},
-				{
-					'loader': 'css-loader',
-					'options': {
-						'sourceMap': true
-					}
-				},
-				{
-					'loader': 'less-loader',
-					'options': {
-						'sourceMap': true
-					}
-				},
-			]
-		});
-
-		// Import stylesheet resources
-		context.webpackConfig.module.rules.push({
-			test: /\.less$|\.s[ac]ss$|\.css$/,
-			use: [
-				{
-					'loader': path.resolve(context.dir.controller, './WebpackLoaders/AutoImportStylesheetResourcesLoader.js'),
+					'loader': path.resolve(context.dir.controller, './WebpackLoaders/CustomSassLoader.js'),
 					'options': {
 						'context': context
 					}
@@ -221,13 +145,19 @@ module.exports = function WebpackConfigBuilder_2(context) {
 						'outputPath': 'images/',
 						'limit': 10000
 					}
-				}
+				},
+				{
+					loader: 'image-webpack-loader',
+					options: {
+						disable: !context.isProd || app.imageCompression === false
+					},
+				},
 			]
 		});
 
 		// Font loader
 		context.webpackConfig.module.rules.push({
-			test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+			test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
 			use: [
 				{
 					loader: 'file-loader',
@@ -245,12 +175,11 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// Register the provider plugin
 		context.webpackConfig.plugins.push(
 			new webpack.ProvidePlugin(
-				context.callPluginMethod('getJsProvides', [{
-				}, context])));
+				context.callPluginMethod('getJsProvides', [{}, context])));
 
 		// This plugin prevents Webpack from creating chunks
 		// that would be too small to be worth loading separately
-		if(app.minChunkSize !== 0){
+		if (app.minChunkSize !== 0) {
 			context.webpackConfig.plugins.push(
 				new webpack.optimize.MinChunkSizePlugin({
 					minChunkSize: typeof app.minChunkSize === 'undefined' ? 10000 : app.minChunkSize
@@ -327,11 +256,11 @@ module.exports = function WebpackConfigBuilder_2(context) {
 	// Make sure we can supply modules from our build context
 	const loadOrig = Module._load;
 	const additionalPaths = [
-		context.dir.buildingNodeModules.substr(context.dir.buildingNodeModules, context.dir.buildingNodeModules.length -2),
-		context.dir.nodeModules.substr(context.dir.nodeModules, context.dir.nodeModules.length -2),
-		context.dir.current.substr(context.dir.current, context.dir.current.length -1),
+		context.dir.buildingNodeModules.substr(context.dir.buildingNodeModules, context.dir.buildingNodeModules.length - 2),
+		context.dir.nodeModules.substr(context.dir.nodeModules, context.dir.nodeModules.length - 2),
+		context.dir.current.substr(context.dir.current, context.dir.current.length - 1),
 	];
-	Module._load = function loadOverride(request, parent){
+	Module._load = function loadOverride(request, parent) {
 		try {
 			parent.paths = parent.paths.concat(additionalPaths);
 			return loadOrig(request, parent);
@@ -341,7 +270,12 @@ module.exports = function WebpackConfigBuilder_2(context) {
 			try {
 				return loadOrig(relativePath, parent);
 			} catch (e) {
-				throw e;
+				try {
+					return loadOrig(path.resolve(path.dirname(parent.filename), request), parent);
+				} catch (e) {
+					console.log('Error while resolving node module! "' + request + '"');
+					throw e;
+				}
 			}
 		}
 	};

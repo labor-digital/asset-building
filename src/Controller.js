@@ -15,3 +15,5 @@ let context = ConfigBuilderBootstrap.generateConfigFor(dir);
 
 // Start webpack
 webpack(context.webpackConfig, (err, stats) => context.callback(context, err, stats));
+
+// context.callback(context, err, stats)
