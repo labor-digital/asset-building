@@ -2,6 +2,8 @@
  * Created by Martin Neundorfer on 10.09.2018.
  * For LABOR.digital
  */
+import "./ComponentA.sass";
+
 document.addEventListener('DOMContentLoaded', () => {
 	console.log('loaded');
 	document.querySelector('.componentA').addEventListener('click', e => {

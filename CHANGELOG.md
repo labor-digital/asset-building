@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.0] - 2018-09-21
 ### Added
 - Removes [hash] from chunkfile names
 - Adds a wrapper around node's module loader to make sure we can load all es lint plugins correctly
@@ -9,11 +10,15 @@ All notable changes to this project will be documented in this file.
 - Adds internal "component-loader" to import components more efficently and to resolv url()s correctly
 - Adds "image-webpack-loader" to shrink image assets when building for production.
 - Adds windows wrapper cmd to increase the memory limit of node
+- Adds a hacky bridge to "css-loader" to speed up css compilation
+- Adds typescript loader
+- Adds progress bar plugin vor version 2.0
 
 ### Changed
 - minChunkSize can now be set to 0 to disable the feature
 - Removes unused node modules
 - Removes resource loader and wildcard loader
+- Removes babel compiler
 
 ### Fixed
 - Adds correct package.json to "demo2" and re-renames package.json in "demo"

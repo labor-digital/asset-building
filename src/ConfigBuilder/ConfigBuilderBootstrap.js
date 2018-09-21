@@ -77,6 +77,24 @@ module.exports = class ConfigBuilderBootstrap {
 		// Execute the builder
 		builder(context);
 
+		// Merge with potential user defined configuration
+		if(typeof laborConfig.webpackConfig === 'string'){
+			let customWebpackConfig = null;
+			try {
+				customWebpackConfig = require(path.resolve(dir.current, laborConfig.webpackConfig));
+			} catch (e) {
+				kill('Could not resolve the custom webpack config at: "' + laborConfig.webpackConfig + '"');
+			}
+			if(typeof customWebpackConfig !== 'function')
+				kill('The custom webpack config has to be a function!');
+			let changedWebpackConfig = customWebpackConfig(context.webpackConfig, context);
+			if(typeof changedWebpackConfig === 'undefined')
+				kill('The custom webpack config did not return anything! Make sure you return your changed webpack config!');
+			if(typeof changedWebpackConfig !== 'object' && !Array.isArray(changedWebpackConfig))
+				kill('The result ov custom webpack config should either be an object or an array!');
+			context.webpackConfig = changedWebpackConfig;
+		}
+
 		// Call filters
 		context.callPluginMethod('filterContextBeforeCompiler', [context]);
 

@@ -2,19 +2,22 @@
  * Created by Martin Neundorfer on 06.09.2018.
  * For LABOR.digital
  */
-const Module = require('module');
 const path = require('path');
 const webpack = require('webpack');
 const kill = require('../Helpers/kill');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const merge = require('webpack-merge');
-const EsLintConfig_2 = require('../EsLintConfig/EsLintConfig_2');
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const WebpackPromiseShimPlugin = require('../WebpackPlugins/WebpackPromiseShimPlugin');
 const WebpackFixBrokenChunkPlugin = require('../WebpackPlugins/WebpackFixBrokenChunkPlugin');
 const buildCopyConfig = require('./Parts/buildCopyConfig');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const addEsLintConfig = require('./Parts/addEsLintConfig');
+const addJsAndTsUtilityLoaders = require('./Parts/addJsAndTsUtilityLoaders');
+const resolveFilenameFix = require('./Parts/resolveFilenameFix');
+const addTypescriptLoader = require('./Parts/addTypescriptLoader');
 
 /**
  * @param {module.ConfigBuilderContext} context
@@ -58,51 +61,54 @@ module.exports = function WebpackConfigBuilder_2(context) {
 			context.webpackConfig.output.publicPath = app.publicPathDev;
 
 		// Set devtool based on context
-		context.webpackConfig.devtool = 'source-map';
+		context.webpackConfig.devtool = context.isProd ? 'source-map' : 'cheap-module-eval-source-map';
 
 		// Add loaders to do the main magic
 		context.webpackConfig = merge({'module': {'rules': []}}, context.webpackConfig);
 
-		// Handle modules which are allowed to be compiled as es6
-		let allowedModules = ['@labor'];
-		if (typeof app.allowedModules !== 'undefined' && Array.isArray(app.allowedModules)) {
-			app.allowedModules.forEach(v => {
-				// Remove all slashes at the front and the back && Make paths ready for regex
-				v = v.replace(/^[\\\/]|[\\\/]$/g, '').replace(/[\\\/]/g, '[\\\\\\/]');
-				if (allowedModules.indexOf(v) === -1) allowedModules.push(v);
-			});
-		}
-		let jsExclude = 'node_modules(?![\\/\\\\]' + allowedModules.join('[\\/\\\\]|[\\/\\\\]') + '[\\/\\\\])';
-
-		// Babel loader
+		// Html loader
 		context.webpackConfig.module.rules.push({
-			'test': /\.js$/,
-			'exclude': new RegExp(jsExclude),
-			'use': [
-				{
-					'loader': 'babel-loader',
-					'options': context.callPluginMethod('filterBabelOptions', [{
-						'compact': false,
-						'presets': [require('babel-preset-env'), require('babel-preset-es3')],
-						"plugins": [require('babel-plugin-transform-runtime'), require('babel-plugin-syntax-dynamic-import')]
-					}, context])
-				}
-			]
+			'test': /\.html$/,
+			'use': [{
+				loader: 'html-loader'
+			}],
 		});
 
-		// Eslint loader && Import components
+		// Typescript compiler
+		addTypescriptLoader(context, app.useTypeChecker === true);
+
+		// Add utility loaders
+		let additionalPolyfills = Array.isArray(app.polyfills) ? app.polyfills : [];
+		addJsAndTsUtilityLoaders(path.resolve(context.dir.current, app.entry), context, true, additionalPolyfills);
+
+		// Eslint
+		addEsLintConfig(context);
+
+		// Add plugins to do the additional magic
+		context.webpackConfig = merge({'plugins': []}, context.webpackConfig);
+
+		// Register the provider plugin
+		context.webpackConfig.plugins.push(
+			new webpack.ProvidePlugin(
+				context.callPluginMethod('getJsProvides', [{}, context])));
+
+		// Less loader
 		context.webpackConfig.module.rules.push({
-			'test': /\.js$/,
-			'enforce': 'pre',
-			'exclude': new RegExp(jsExclude),
+			'test': /\.less$/,
 			'use': [
 				{
-					'loader': 'eslint-loader',
-					'options': context.callPluginMethod('filterEslintOptions', [
-						new EsLintConfig_2(context), context])
+					'loader': MiniCssExtractPlugin.loader,
+					'options': {
+						'publicPath': '../'
+					}
 				},
 				{
-					'loader': path.resolve(context.dir.controller, './WebpackLoaders/ComponentLoader.js')
+					'loader': 'css-loader',
+					'options': {
+						'import': false,
+					}
+				}, {
+					'loader': 'less-loader'
 				}
 			]
 		});
@@ -122,17 +128,22 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					'loader': 'css-loader',
 					'options': {
-						'sourceMap': true
+						'import': false,
 					}
 				},
 				{
 					'loader': path.resolve(context.dir.controller, './WebpackLoaders/CustomSassLoader.js'),
 					'options': {
-						'context': context
+						'app': context.laborConfig.apps[context.currentApp],
+						'dir': context.dir,
+						'useCssLoaderBridge': true
 					}
 				}
 			]
 		});
+
+		// Hack to speed up the css-loader compilation
+		require('../Helpers/CssLoaderProcessCssWrapper');
 
 		// Image loader
 		context.webpackConfig.module.rules.push({
@@ -143,7 +154,13 @@ module.exports = function WebpackConfigBuilder_2(context) {
 					options: {
 						'name': '[name].[ext]',
 						'outputPath': 'images/',
-						'limit': 10000
+						'limit': context.isProd ? 10000 : 1,
+						'fallback': {
+							'loader': 'file-loader',
+							'options': {
+								'name': '[name].[ext]?[hash]'
+							}
+						}
 					}
 				},
 				{
@@ -162,20 +179,12 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					loader: 'file-loader',
 					options: {
-						'name': '[name].[ext]',
+						'name': '[name].[ext]?[hash]',
 						'outputPath': 'fonts/'
 					}
 				}
 			]
 		});
-
-		// Add plugins to do the additional magic
-		context.webpackConfig = merge({'plugins': []}, context.webpackConfig);
-
-		// Register the provider plugin
-		context.webpackConfig.plugins.push(
-			new webpack.ProvidePlugin(
-				context.callPluginMethod('getJsProvides', [{}, context])));
 
 		// This plugin prevents Webpack from creating chunks
 		// that would be too small to be worth loading separately
@@ -190,11 +199,17 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// Add plugin to clean the output directory when the app is compiled
 		// But make sure to keep all sources which have been defined in there
 		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift();
-		context.webpackConfig.plugins.push(new CleanWebpackPlugin([path.basename(outputDirectory)], {
-			'root': path.dirname(outputDirectory),
-			'exclude': sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + '/'] : undefined,
-			'verbose': true,
-		}));
+		const cleanConfig = context.callPluginMethod('filterCleanOptions', [
+			{
+				'directories': [path.basename(outputDirectory)],
+				'options': {
+					'root': path.dirname(outputDirectory),
+					'exclude': sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + '/'] : undefined,
+					'verbose': true,
+				}
+			}, context
+		]);
+		context.webpackConfig.plugins.push(new CleanWebpackPlugin(cleanConfig.directories, cleanConfig.options));
 
 		// Add plugin to extract the css of all NON-dynamic chunks
 		context.webpackConfig.plugins.push(new MiniCssExtractPlugin({
@@ -205,6 +220,15 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// Add our custom plugins
 		context.webpackConfig.plugins.push(new WebpackPromiseShimPlugin());
 		context.webpackConfig.plugins.push(new WebpackFixBrokenChunkPlugin());
+		context.webpackConfig.plugins.push(new ProgressBarPlugin());
+
+		// Special optimization when in dev mode
+		if (!context.isProd) {
+			context.webpackConfig = merge({'output': {'pathinfo': false}, 'optimization': {}}, context.webpackConfig);
+			context.webpackConfig.optimization.removeAvailableModules = false;
+			context.webpackConfig.optimization.removeEmptyChunks = false;
+			context.webpackConfig.optimization.splitChunks = false;
+		}
 
 		// Plugins for production usage
 		if (context.isProd) {
@@ -215,6 +239,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 			// Register JS uglifier
 			context.webpackConfig.optimization.minimizer.push(new UglifyJsPlugin({
+				'cache': true,
+				'parallel': true,
 				'sourceMap': true,
 				'extractComments': true,
 				'uglifyOptions': {
@@ -239,10 +265,6 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		if (typeof context.laborConfig.copy !== 'undefined' && Array.isArray(context.laborConfig.copy) && context.laborConfig.copy.length > 0)
 			buildCopyConfig(context.webpackConfig, context.laborConfig.copy, context);
 
-		// Apply given, additional configuration
-		if (typeof app.config === 'object')
-			context.webpackConfig = merge(context.webpackConfig, app.config);
-
 		// Call filters
 		context.callPluginMethod('filter', [context.webpackConfig, context]);
 
@@ -253,32 +275,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 	// Inject real webpack config into context
 	context.webpackConfig = webpackConfigReal;
 
-	// Make sure we can supply modules from our build context
-	const loadOrig = Module._load;
-	const additionalPaths = [
-		context.dir.buildingNodeModules.substr(context.dir.buildingNodeModules, context.dir.buildingNodeModules.length - 2),
-		context.dir.nodeModules.substr(context.dir.nodeModules, context.dir.nodeModules.length - 2),
-		context.dir.current.substr(context.dir.current, context.dir.current.length - 1),
-	];
-	Module._load = function loadOverride(request, parent) {
-		try {
-			parent.paths = parent.paths.concat(additionalPaths);
-			return loadOrig(request, parent);
-		} catch (e) {
-			const realPath = path.resolve(context.dir.buildingNodeModules, request);
-			const relativePath = '.\\' + path.relative(context.dir.current, realPath);
-			try {
-				return loadOrig(relativePath, parent);
-			} catch (e) {
-				try {
-					return loadOrig(path.resolve(path.dirname(parent.filename), request), parent);
-				} catch (e) {
-					console.log('Error while resolving node module! "' + request + '"');
-					throw e;
-				}
-			}
-		}
-	};
+	// Apply resolve filename fix
+	resolveFilenameFix(context.dir);
 
 	// Done
 	return context;

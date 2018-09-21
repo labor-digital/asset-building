@@ -5,20 +5,16 @@
 const sass = require('node-sass');
 const path = require('path');
 const ResourceRepository = require('../Helpers/ResourceRepository');
-const FileRepository = require('../Helpers/FileRepository');
 const sassPreParser = require('../Helpers/sassPreParser');
 const fs = require('fs');
 
 const resolvedUrlCache = new Map();
 
 module.exports = function customSassLoader(sassSource) {
-	/**
-	 * @type {module.ConfigBuilderContext}
-	 */
-	const context = this.query.context;
+
 	const stylesheetPath = this.resourcePath;
-	const app = context.laborConfig.apps[context.currentApp];
-	const entry = path.resolve(context.dir.current, app.entry);
+	const app = this.query.app;
+	const entry = path.resolve(this.query.dir.current, app.entry);
 	const urlRelativeRoot = path.dirname(stylesheetPath);
 	const self = this;
 	const callback = this.async();
@@ -30,15 +26,20 @@ module.exports = function customSassLoader(sassSource) {
 		return;
 	}
 
+	// True if we should use the internal css loader bridge to speed up css compiling
+	const useCssLoaderBridge = this.query.useCssLoaderBridge;
+	let cssLoaderBridgeUrls = [];
+	let urlCounter = 0;
+
 	new Promise((resolve, reject) => {
 
 		// Preparse stylesheet
-		const stylesheet = sassPreParser(stylesheetPath, context.dir.nodeModules);
+		const stylesheet = sassPreParser(stylesheetPath, this.query.dir.nodeModules);
 
 		// Add resources to stylesheet
 		const resourcePath = ResourceRepository.getResourcePathForStylesheet(entry, stylesheetPath);
 		ResourceRepository.addResourcesToStylesheet(resourcePath, stylesheet, () => {
-			return sassPreParser(resourcePath, context.dir.nodeModules);
+			return sassPreParser(resourcePath, this.query.dir.nodeModules);
 		});
 
 		// Get the entry point
@@ -51,14 +52,21 @@ module.exports = function customSassLoader(sassSource) {
 		const importedFiles = new Set();
 
 		try {
+
+			function makeReplacementFor(cacheKey) {
+				if(useCssLoaderBridge){
+					let url = resolvedUrlCache.get(cacheKey).getValue().replace(/^"|"$/g, '');
+					if(url.match(/^[\w\d]/)) url = './' + url;
+					cssLoaderBridgeUrls.push({'url': url});
+					return new sass.types.String('___CSS_LOADER_BRIDGE_URL___' + urlCounter++ + '___');
+				}
+				return resolvedUrlCache.get(cacheKey);
+			}
+
 			let result = sass.renderSync({
 				'data': entrySass,
 				'sourceComments': true,
 				'outputStyle': 'expanded',
-				'omitSourceMapUrl': true,
-				'sourceMapRoot': process.cwd(),
-				'sourceMapContents': true,
-				'sourceMap': path.join(process.cwd(), "/sass.map"),
 				'importer': function customSassLoaderFileImporter(url, prev) {
 					if (importedFiles.has(url)) return {'contents': ''};
 					importedFiles.add(url);
@@ -72,15 +80,21 @@ module.exports = function customSassLoader(sassSource) {
 						return sass.types.Null.NULL;
 					},
 					'custom-sass-loader-close-file()': function customSassLoaderCloseFile() {
+						compilerPath.pop();
 						return sass.types.Null.NULL;
 					},
 					'custom-sass-loader-url-resolver($url: "")': function customSassLoaderUrlResolver(url) {
 						url = url.getValue();
 						const cacheKey = compilerPath[compilerPath.length - 1] + '-' + url;
-						if (resolvedUrlCache.has(cacheKey)) return resolvedUrlCache.get(cacheKey);
+						if (resolvedUrlCache.has(cacheKey)) return makeReplacementFor(cacheKey);
 
 						// Check if this is a data url
 						if (url.trim().indexOf('data:') === 0) {
+							return url;
+						}
+
+						// Check if this is a url
+						if(url.trim().match(/^https?:/)){
 							return url;
 						}
 
@@ -92,7 +106,7 @@ module.exports = function customSassLoader(sassSource) {
 						// Check if the url is already readable
 						if (fs.existsSync(url)) {
 							resolvedUrlCache.set(cacheKey, new sass.types.String('"' + url + queryString + '"'));
-							return resolvedUrlCache.get(cacheKey);
+							return makeReplacementFor(cacheKey);
 						}
 
 						// Try to resolve the file by walking trough the compiler path
@@ -101,7 +115,7 @@ module.exports = function customSassLoader(sassSource) {
 							if (fs.existsSync(resolvedPath)) {
 								resolvedPath = path.relative(urlRelativeRoot, resolvedPath).replace(/\\/g, '/');
 								resolvedUrlCache.set(cacheKey, sass.types.String('"' + resolvedPath + queryString + '"'));
-								return resolvedUrlCache.get(cacheKey);
+								return makeReplacementFor(cacheKey);
 							}
 						}
 
@@ -113,7 +127,7 @@ module.exports = function customSassLoader(sassSource) {
 			resolve([result, stylesheet]);
 		} catch (e) {
 
-			let debug = path.dirname(stylesheetPath) + path.sep + 'debug.scss';
+			let debug = path.dirname(stylesheetPath) + path.sep + '.debug.scss';
 			let dbg = [];
 			stylesheet.contents.forEach((v, k) => {
 				dbg.push('// FILE: ' + k);
@@ -127,57 +141,23 @@ module.exports = function customSassLoader(sassSource) {
 		}
 	})
 		.then(([result,stylesheet]) => {
-			// Handle the source map of the compiled sass
-			if (result.map && result.map !== "{}") {
-				// Remove all import and open-file statements from the source map -> origin disclosure
-				// let map = result.map.toString('utf-8');
-				// map = map.replace(/((?:\s+)?(?:@import\s+|custom-sass-loader-open-file\()\\?["'])([^"']*?)(\\?["'];?(?:\s+)?)/gm,
-				// 	(a, before, content, after) => {
-				// 		return before + 'x'.repeat(content.length) + after;
-				// 	});
-
-
-				// This part is stolen from sass-loader
-				// https://github.com/webpack-contrib/sass-loader/blob/master/lib/loader.js#L56
-				result.map = JSON.parse(result.map);
-
-				// Make sure to replace our resource loader pseudo wrapper as first map source
-				result.map.sourcesContent[0] = sassSource;
-
-				// Revert all the sources we know are real back to their initial content -> Remove our changes
-				const knownFileContents = FileRepository.getAll();
-				const knownFileBase = process.cwd() + path.sep;
-				result.map.sources.forEach((filename, key) => {
-					if(typeof filename !== 'string') return;
-					filename = knownFileBase + path.normalize(filename);
-					if(!knownFileContents.has(filename)){
-						return;
-					}
-					result.map.sourcesContent[key] = knownFileContents.get(key);
-				});
-
-				// result.map.file is an optional property that provides the output filename.
-				// Since we don't know the final filename in the webpack build chain yet, it makes no sense to have it.
-				delete result.map.file;
-				// The first source is 'stdin' according to node-sass because we've used the data input.
-				// Now let's override that value with the correct relative path.
-				// Since we specified options.sourceMap = path.join(process.cwd(), "/sass.map"); in normalizeOptions,
-				// we know that this path is relative to process.cwd(). This is how node-sass works.
-				result.map.sources[0] = path.relative(process.cwd(), stylesheetPath);
-				// node-sass returns POSIX paths, that's why we need to transform them back to native paths.
-				// This fixes an error on windows where the source-map module cannot resolve the source maps.
-				// @see https://github.com/webpack-contrib/sass-loader/issues/366#issuecomment-279460722
-				result.map.sourceRoot = path.normalize(result.map.sourceRoot);
-				result.map.sources = result.map.sources.map(path.normalize);
-			} else {
-				result.map = null;
-			}
 
 			// Register dependencies
 			stylesheet.files.forEach(self.addDependency);
 
+			// Store contents to bridge if required
+			if(useCssLoaderBridge){
+				const bridge = require('../Helpers/CssLoaderBridge');
+				bridge.setDefinitionForStylesheet(stylesheetPath, result.css.toString(), cssLoaderBridgeUrls);
+
+				// Empty string -> Save overhead
+				callback(null, '#foo');
+				return;
+			}
+
 			// Resolve ajax request
-			callback(null, result.css.toString(), result.map);
+			callback(null, result.css.toString());
+
 		})
 		.catch(err => {
 			err.hideStack = true;

@@ -4,15 +4,24 @@
  */
 /**
  * The es lint config used by WebpackConfigBuilder_1 which contains mostly the original es lint configuration.
- * @type {module.EsLintConfig_1}
+ * @type {module.EsLintConfig}
  */
-module.exports = class EsLintConfig_1 {
+module.exports = class EsLintConfig {
 	/**
-	 * @param {boolean} isProd
+	 * @param {module.ConfigBuilderContext} context
 	 */
-	constructor(isProd) {
+	constructor(context) {
+		// this.cache = true;
+		this.parser = 'babel-eslint';
 		this.env = {'browser': true};
 		this.ecmaFeatures = {'jsx': true};
+		if (context.isProd) this.extends = 'eslint:recommended';
+		this.plugins = ['import'];
+		this.parserOptions = {
+			'ecmaVersion': 2017,
+			'sourceType': 'module',
+			'ecmaFeatures': {'impliedStrict': true},
+		};
 		this.globals = [
 			'document:true',
 			'console:true',
@@ -42,14 +51,22 @@ module.exports = class EsLintConfig_1 {
 			'HTMLElement:true',
 			'history:true',
 			'Int8Array:true',
-			'Promise:true'
+			'Promise:true',
+			'Map:true',
+			'Set:true'
 		];
 		this.rules = {
 			'comma-dangle': ['error', 'never'],
 			'no-undef': 'error',
-			'max-len': 'off'
+			'max-len': 'off',
+			'import/default': 'off',
+			'import/export': 'error',
+			'import/first': 'warn',
+			'import/namespace': ['error', {allowComputed: true}],
+			'import/no-duplicates': 'error',
+			'import/order': 'off'
 		};
-		if (isProd) this.rules = Object.assign(this.rules, {
+		if (context.isProd) this.rules = Object.assign(this.rules, {
 			'no-dupe-args': 'error',
 			'no-duplicate-case': 'error',
 			'no-template-curly-in-string': 'error',

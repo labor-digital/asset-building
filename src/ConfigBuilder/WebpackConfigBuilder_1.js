@@ -8,6 +8,7 @@ const buildCssConfig = require('./Parts/buildCssConfig');
 const buildCopyConfig = require('./Parts/buildCopyConfig');
 const buildJsConfig = require('./Parts/buildJsConfig');
 const buildJsCompatConfig = require('./Parts/buildJsCompatConfig');
+const resolveFilenameFix = require('./Parts/resolveFilenameFix');
 
 /**
  * Builds a valid webpack config based of the labor configuration syntax
@@ -84,6 +85,9 @@ module.exports = function WebpackConfigBuilder_1 (context) {
 
 	// Call filters
 	context.callPluginMethod('filter', [context.webpackConfig, context]);
+
+	// Apply resolve filename fix
+	resolveFilenameFix(context.dir);
 
 	// Done
 	return context;

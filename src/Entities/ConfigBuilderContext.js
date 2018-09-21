@@ -6,7 +6,7 @@ module.exports = class ConfigBuilderContext {
 	constructor(laborConfig, dir, mode) {
 
 		/**
-		 * The version numberof the current config builder
+		 * The version number of the current config builder
 		 * @type {number}
 		 */
 		this.builderVersion = 1;
@@ -51,10 +51,11 @@ module.exports = class ConfigBuilderContext {
 				'hints': false
 			},
 			'resolve': {
-				'modules': ['node_modules', dir.nodeModules, dir.buildingNodeModules]
+				'modules': [dir.nodeModules, dir.buildingNodeModules, 'node_modules'],
+				'extensions': [".ts", ".tsx", ".js"]
 			},
 			'resolveLoader': {
-				'modules': ['node_modules', dir.buildingNodeModules, dir.nodeModules, '/']
+				'modules': [dir.buildingNodeModules, dir.nodeModules, 'node_modules', '/']
 			}
 		};
 

@@ -2,7 +2,8 @@
  * Created by Martin Neundorfer on 13.09.2018.
  * For LABOR.digital
  */
-module.exports = function sass2scss2(content) {
+module.exports = function sass2scss(content) {
+	if(typeof content !== 'string') return content;
 
 	let lines = content.split(/\r?\n/g);
 
@@ -134,11 +135,6 @@ module.exports = function sass2scss2(content) {
 
 	// Remove all semicolons in front of an "else"
 	output = output.replace(/(});+([^;]*?@else)/gm, '$1$2');
-
-	// if(output.indexOf('@else') !== -1){
-	// 	console.log(output);
-	// 	process.exit();
-	// }
 
 	// Done
 	return output;

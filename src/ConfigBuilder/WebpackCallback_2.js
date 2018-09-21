@@ -128,4 +128,8 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 	if (numberOfWarnings !== 0 && numberOfErrors !== 0) state += ' | ';
 	if (numberOfErrors > 0) state += colorRed(numberOfErrors + ' error' + (numberOfErrors === 1 ? '' : 's'));
 	console.log(new Date().toLocaleTimeString(), '| Time:', times.join(', '), ' |', state);
+
+	// Kill the process if we do not watch
+	if(Array.isArray(context.webpackConfig) ? context.webpackConfig[0].watch : context.webpackConfig.watch) return;
+	process.exit();
 };

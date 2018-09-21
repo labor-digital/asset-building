@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+	"sourceMap": true
+  },
+  "files": [
+	"./a-file-which-is-hopefully-never-there.ts"
+  ]
+}

@@ -2,7 +2,6 @@
  * Created by Martin Neundorfer on 13.09.2018.
  * For LABOR.digital
  */
-const path = require('path');
 const sass2scss = require('../Helpers/sass2scss');
 const FileRepository = require('../Helpers/FileRepository');
 const FileHelpers = require('../Helpers/FileHelpers');
@@ -31,6 +30,8 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		const ext = FileHelpers.getFileExtension(filename);
 		const posixFilename = FileHelpers.filenameToPosix(filename);
 
+		if (content === null) throw new Error('Could not read contents of sass file: "' + filename + '"');
+
 		// Make sure that everything looks like scss
 		if (ext === 'sass') {
 			content = sass2scss(content);
@@ -58,10 +59,10 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		// Wrap url calls to make sure they get resolved propperly
 		content = content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:\s+)?)(\))/gm, (a, before, url, after) => {
 			// Ignore data urls
-			if(url.indexOf('data: ') !== -1) return a;
+			if (url.indexOf('data: ') !== -1) return a;
 
 			// Make sure to enquote everything that does not look like it is a variable
-			if(!url.match(/[$#{}"']/)) url = '"' + url + '"';
+			if (!url.match(/[$#{}"']/)) url = '"' + url + '"';
 			return before + 'custom-sass-loader-url-resolver(' + url + ')' + after;
 		});
 

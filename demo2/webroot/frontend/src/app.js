@@ -6,4 +6,4 @@
 import './Globals/Globals.sass';
 
 // Import all components
-import './Components/*/*.js'
+import './Components/Components.js'
