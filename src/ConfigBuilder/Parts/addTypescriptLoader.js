@@ -18,8 +18,9 @@ module.exports = function addTypescriptLoader(context, useTypechecker) {
 						'onlyCompileBundledFiles': true,
 						'compilerOptions': {
 							'allowJs': true,
-							'target': 'ES5',
-							"module": "commonjs"
+							'target': 'es5',
+							'moduleResolution': 'node',
+							"module": "esnext"
 						}
 					},
 					context

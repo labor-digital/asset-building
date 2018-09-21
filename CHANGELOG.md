@@ -2,8 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.1] - 2018-09-21
 ### Fixed
 - Readme lists where not correctly parsed on bitbucket.org
+- Sets ts-loader module resolution to "esnext" to prevent it breaking dynamic imports.
 
 ## [2.1.0] - 2018-09-21
 ### Added
