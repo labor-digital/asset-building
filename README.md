@@ -14,7 +14,8 @@ should be more or less agnostic to webpack. If you want more configuration optio
 when it comes to webpack, you can extend this library using its lightwight 
 "Plugin-API" (You can learn mor about plugins in the section **labor -> plugins**). 
 
-**Included webpack modules and plugins:**
+**Included webpack modules and plugins:**  
+
 * Copy files with ([copy-webpack-plugin](https://github.com/webpack-contrib/copy-webpack-plugin))
 * Build css from sass, scss and less sources ([css-loader](https://github.com/webpack-contrib/css-loader), [sass-loader](https://github.com/webpack-contrib/sass-loader), [less-loader](https://github.com/webpack-contrib/less-loader))
 * Extract css files ([mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
@@ -24,7 +25,8 @@ when it comes to webpack, you can extend this library using its lightwight
 * Minify js files when using "build" ([uglifyjs-webpack-plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin))
 * Creation of source-maps for js files
 
-**Included webpack modules and plugins * Builder Version 2.0**
+**Included webpack modules and plugins * Builder Version 2.0**  
+
 * Import html in javascript ([html-loader](https://webpack.js.org/loaders/html-loader/))
 * Image minification when using "build" ([image-webpack-loader](https://github.com/tcoopman/image-webpack-loader))
 * Font handling ([file-loader](https://github.com/webpack-contrib/file-loader))
@@ -59,6 +61,7 @@ Anyway, befor you start to convert your projects it is highly recommended
 to check out the rest of this documentation, as it will explain a lot by itself.
 
 In addition to that:
+
 * When you are converting the "jsConfig":
  	* copy the value `jsConfig -> baseDir`,
  	add "/application.js" behind it and paste it as `js -> entry`.
@@ -271,6 +274,7 @@ Now, when the configuration was prepared by the config builder the defined
 callback will receive the current configuration and can alter it.
 
 **Parameters**
+
 * webpackConfig: The prepared webpack configuration
 * context: The current config builder context. See **Config Builder Context**
 
@@ -341,9 +345,11 @@ This configuration registers the module and make it a little bit easier to write
 For all configuration options take a look at [imports-loader](https://github.com/webpack-contrib/imports-loader).
 
 As general rule => test and fix => loader in the other documentation.
+
 * "test" is a regex of a filename
 * "fix" is the definition for the imports-loader, eg a mapping of one value to 
 another
+
 ```
 "labor": {
   "jsCompat": [
@@ -604,8 +610,10 @@ The second version of the config builder uses [clean-webpack-plugin](https://git
 to flush the output directory. This hook can be used to filter it's options
 
 Children of configuration:
+
 * directories: The list of all directories to flush, relative to the "root" directory.
 * options: The preconfigured options
+
 ```javascript
 module.exports = function () {
     this.filterCleanOptions = function(configuration, context){
@@ -740,6 +748,7 @@ import "@components@exclude:componentA,componentD"
 ```
 
 **But what about...**
+
 * dynamic imports of stylesheets? Dynamic imports will be ignored.
 * my web-components where I need the css inside my javascript? 
 Only generic imports that do not alias the content will be stripped by the component loader.
