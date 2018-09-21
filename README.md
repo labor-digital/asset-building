@@ -144,6 +144,7 @@ so called "polyfills" for older browsers. Those polyfills are provided by anothe
 library which is called [Core-js](https://github.com/zloirock/core-js/tree/v2) of which
 we are using version 2.5.x. To keep your files small we only include some basics.
 Included polyfills are by default: 
+
 * [core-js/fn/promise](https://github.com/zloirock/core-js#ecmascript-promise)
 * [core-js/fn/set](https://github.com/zloirock/core-js#set)
 * [core-js/fn/map](https://github.com/zloirock/core-js#map)
