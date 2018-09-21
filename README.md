@@ -15,24 +15,24 @@ when it comes to webpack, you can extend this library using its lightwight
 "Plugin-API" (You can learn mor about plugins in the section **labor -> plugins**). 
 
 **Included webpack modules and plugins:**
-- Copy files with ([copy-webpack-plugin](https://github.com/webpack-contrib/copy-webpack-plugin))
-- Build css from sass, scss and less sources ([css-loader](https://github.com/webpack-contrib/css-loader), [sass-loader](https://github.com/webpack-contrib/sass-loader), [less-loader](https://github.com/webpack-contrib/less-loader))
-- Extract css files ([mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
-- Minify css files when using "build" ([optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin))
-- Transpiling Es6 Js and typescript sources to es5 ([ts-loader](https://github.com/TypeStrong/ts-loader))
-- Linting javascript ([eslint-loader](https://github.com/webpack-contrib/eslint-loader))
-- Minify js files when using "build" ([uglifyjs-webpack-plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin))
-- Creation of source-maps for js files
+* Copy files with ([copy-webpack-plugin](https://github.com/webpack-contrib/copy-webpack-plugin))
+* Build css from sass, scss and less sources ([css-loader](https://github.com/webpack-contrib/css-loader), [sass-loader](https://github.com/webpack-contrib/sass-loader), [less-loader](https://github.com/webpack-contrib/less-loader))
+* Extract css files ([mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
+* Minify css files when using "build" ([optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin))
+* Transpiling Es6 Js and typescript sources to es5 ([ts-loader](https://github.com/TypeStrong/ts-loader))
+* Linting javascript ([eslint-loader](https://github.com/webpack-contrib/eslint-loader))
+* Minify js files when using "build" ([uglifyjs-webpack-plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin))
+* Creation of source-maps for js files
 
-**Included webpack modules and plugins - Builder Version 2.0**
-- Import html in javascript ([html-loader](https://webpack.js.org/loaders/html-loader/))
-- Image minification when using "build" ([image-webpack-loader](https://github.com/tcoopman/image-webpack-loader))
-- Font handling ([file-loader](https://github.com/webpack-contrib/file-loader))
-- Output directory cleaning ([CleanWebpackPlugin](https://github.com/johnagan/clean-webpack-plugin))
-- Progressbar while building ([progress-bar-webpack-plugin](https://github.com/clessg/progress-bar-webpack-plugin))
-- I implemented a custom sass loader to speed up module based sass compiling
-- You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
-- A custom component loader to keep component compiling lightning fast
+**Included webpack modules and plugins * Builder Version 2.0**
+* Import html in javascript ([html-loader](https://webpack.js.org/loaders/html-loader/))
+* Image minification when using "build" ([image-webpack-loader](https://github.com/tcoopman/image-webpack-loader))
+* Font handling ([file-loader](https://github.com/webpack-contrib/file-loader))
+* Output directory cleaning ([CleanWebpackPlugin](https://github.com/johnagan/clean-webpack-plugin))
+* Progressbar while building ([progress-bar-webpack-plugin](https://github.com/clessg/progress-bar-webpack-plugin))
+* I implemented a custom sass loader to speed up module based sass compiling
+* You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
+* A custom component loader to keep component compiling lightning fast
 
 ## Installation
 * Use our private npm registry!
@@ -59,27 +59,27 @@ Anyway, befor you start to convert your projects it is highly recommended
 to check out the rest of this documentation, as it will explain a lot by itself.
 
 In addition to that:
-- When you are converting the "jsConfig":
- 	- copy the value `jsConfig -> baseDir`,
+* When you are converting the "jsConfig":
+ 	* copy the value `jsConfig -> baseDir`,
  	add "/application.js" behind it and paste it as `js -> entry`.
-	- copy the value `jsConfig -> distDir` add "bundle.js" behind it 
+	* copy the value `jsConfig -> distDir` add "bundle.js" behind it 
 	and paste it as `js -> output`
-	- When porting from a gulpfile v2.0.8 or higher "jsConfig" will 
+	* When porting from a gulpfile v2.0.8 or higher "jsConfig" will 
 	be named "webpackConfig".
-	- When porting from a gulpfile less than v2.0.8 there additional
+	* When porting from a gulpfile less than v2.0.8 there additional
 	changes will be required, because you need to introduce node-imports,
 	as they will no longer be auto-resolved
-	- Make sure you remove no longer needed files, like: first.js, last.js, base.framework.js, base.last.js and jQuery-3.2.1.js
-- When you are converting the "cssConfig":
- 	- copy the value `cssConfig -> baseDir`,
+	* Make sure you remove no longer needed files, like: first.js, last.js, base.framework.js, base.last.js and jQuery-3.2.1.js
+* When you are converting the "cssConfig":
+ 	* copy the value `cssConfig -> baseDir`,
  	add "/application.(sass/less/scss)" behind it and paste it as `css -> entry`.
- 	- copy the value `cssConfig -> distDir` add `cssConfig -> distName` in addition of ".css" 
+ 	* copy the value `cssConfig -> distDir` add `cssConfig -> distName` in addition of ".css" 
  	behind it and paste it as `css -> output`	
-- There is no replacement for "fontConfig", you probably want to use "copy" for that now.
-- To convert "fileCopyConfig":
-	- copy your contents of `fileCopyConfig -> files` to `copy -> from`
-	- copy the contents of `fileCopyConfig -> distDir` to `copy -> to`
-	- Make sure to check the `copy -> flatten` option if required.
+* There is no replacement for "fontConfig", you probably want to use "copy" for that now.
+* To convert "fileCopyConfig":
+	* copy your contents of `fileCopyConfig -> files` to `copy -> from`
+	* copy the contents of `fileCopyConfig -> distDir` to `copy -> to`
+	* Make sure to check the `copy -> flatten` option if required.
 
 ## Different config builder versions
 The main part of this package is the so called **Config Builder** which takes
@@ -271,8 +271,8 @@ Now, when the configuration was prepared by the config builder the defined
 callback will receive the current configuration and can alter it.
 
 **Parameters**
-- webpackConfig: The prepared webpack configuration
-- context: The current config builder context. See **Config Builder Context**
+* webpackConfig: The prepared webpack configuration
+* context: The current config builder context. See **Config Builder Context**
 
 **Important**: The function has to return the altered webpack config!
 
@@ -740,8 +740,8 @@ import "@components@exclude:componentA,componentD"
 ```
 
 **But what about...**
-- dynamic imports of stylesheets? Dynamic imports will be ignored.
-- my web-components where I need the css inside my javascript? 
+* dynamic imports of stylesheets? Dynamic imports will be ignored.
+* my web-components where I need the css inside my javascript? 
 Only generic imports that do not alias the content will be stripped by the component loader.
 
 ## CSS Superscript resources
