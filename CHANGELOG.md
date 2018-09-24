@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.2] - 2018-09-24
+### Changed
+- Adds imports-loader dependency
+- Adds "FormData" to EsLint globals
+### Fixed
+- Fixes some parts where documentation was outdated.
+- Disables the "no-undef" eslint rule for typescript, because it crashes otherwise.
+
 ## [2.1.1] - 2018-09-21
 ### Fixed
 - Readme lists where not correctly parsed on bitbucket.org

@@ -12,5 +12,8 @@ module.exports = class EsLintConfig_Typescript extends EsLintConfig {
 	constructor(context) {
 		super(context.isProd);
 		this.parser = 'typescript-eslint-parser';
+
+		// Disable this rule, because typescript crashes eslint otherwise
+		this.rules['no-undef'] = 'off';
 	}
 };

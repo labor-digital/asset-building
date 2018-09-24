@@ -347,7 +347,7 @@ For all configuration options take a look at [imports-loader](https://github.com
 
 As general rule => test and fix => loader in the other documentation.
 
-* "test" is a regex of a filename
+* "rule" is a regex of a filename -> as a string in a json file. Without delimiters!
 * "fix" is the definition for the imports-loader, eg a mapping of one value to 
 another
 

@@ -2,7 +2,6 @@
   "name": "demo",
   "version": "1.0.0",
   "description": "A demoproject to show how the buildprocess works",
-  "main": "index.js",
   "scripts": {
     "build": "labor-asset-building build",
     "watch": "labor-asset-building watch"

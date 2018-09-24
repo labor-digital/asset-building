@@ -7,7 +7,7 @@ const EsLintConfig_Typescript = require('../../LintConfig/EsLintConfig_Typescrip
 module.exports = function addEsLintConfig(context){
 	// Javascript
 	context.webpackConfig.module.rules.push({
-		'test': /\.js$|\.ts$|\.tsx$/,
+		'test': /\.js$/,
 		'enforce': 'pre',
 		'use': [
 			{

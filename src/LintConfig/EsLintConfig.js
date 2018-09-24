@@ -51,6 +51,7 @@ module.exports = class EsLintConfig {
 			'HTMLElement:true',
 			'history:true',
 			'Int8Array:true',
+			'FormData:true',
 			'Promise:true',
 			'Map:true',
 			'Set:true'
