@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.3] - 2018-09-25
+### Fixed
+- Fixed an issue where the sassPreParser removed linebreaks before an @import which 
+caused the import statement to be ignored if it was placed after a block comment
+
 ## [2.1.2] - 2018-09-24
 ### Changed
 - Adds imports-loader dependency

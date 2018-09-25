@@ -38,7 +38,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		}
 
 		// Resolve imports
-		content = content.replace(/((?:\s+)?@import\s+["'])([^"']*?)(["'];?(?:\s+)?)/gm, (a, before, importStatement, after) => {
+		content = content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:\s+)?)/gm, (a, before, importStatement, after) => {
 			const importFilename = SassHelpers.resolveImportFilename(importStatement, nodeDirectory, filename);
 			const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
 
