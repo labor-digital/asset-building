@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Added
+- Added default configuration for image optimization
+
 ## [2.1.3] - 2018-09-25
 ### Fixed
 - Fixed an issue where the sassPreParser removed linebreaks before an @import which 
