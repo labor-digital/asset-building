@@ -228,7 +228,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Add plugin to extract the css of all NON-dynamic chunks
 		context.webpackConfig.plugins.push(new MiniCssExtractPlugin({
-			filename: "css/" + outputFileWithoutExtension + "-[hash].css",
+			filename: "css/" + outputFileWithoutExtension + ".css",
 			chunkFilename: "css/" + outputFileWithoutExtension + "-[id]-[hash].css"
 		}));
 

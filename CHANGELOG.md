@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.5] - 2018-09-26
+### Added
+- Added .npmignore
+- Added output hash to all bundle files, except the base files - version 2.0
+
 ## [2.1.4] - 2018-09-26
 ### Added
 - Added default configuration for image optimization - version 2.0
