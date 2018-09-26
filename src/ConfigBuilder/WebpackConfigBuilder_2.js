@@ -18,6 +18,7 @@ const addEsLintConfig = require("./Parts/addEsLintConfig");
 const addJsAndTsUtilityLoaders = require("./Parts/addJsAndTsUtilityLoaders");
 const resolveFilenameFix = require("./Parts/resolveFilenameFix");
 const addTypescriptLoader = require("./Parts/addTypescriptLoader");
+const WebpackAutoAddEmittedFilesToGitPlugin = require("../WebpackPlugins/WebpackAutoAddEmittedFilesToGitPlugin");
 
 /**
  * @param {module.ConfigBuilderContext} context
@@ -49,10 +50,10 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		let outputFile = path.basename(outputDirectory);
 		let outputFileWithoutExtension = outputFile.replace(/\..*$/, "");
 		outputDirectory = path.dirname(outputDirectory);
-		context.webpackConfig = Object.assign({"output": {}}, context.webpackConfig);
+		context.webpackConfig = Object.assign({output: {}}, context.webpackConfig);
 		context.webpackConfig.output.path = outputDirectory;
 		context.webpackConfig.output.filename = outputFile;
-		context.webpackConfig.output.chunkFilename = "js/" + outputFileWithoutExtension + "-[id].js";
+		context.webpackConfig.output.chunkFilename = "js/" + outputFileWithoutExtension + "-[id]-[hash].js";
 
 		// Add public path if given
 		if (typeof app.publicPath === "string" && app.publicPath.trim() !== "")
@@ -64,12 +65,12 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		context.webpackConfig.devtool = context.isProd ? "source-map" : "cheap-module-eval-source-map";
 
 		// Add loaders to do the main magic
-		context.webpackConfig = merge({"module": {"rules": []}}, context.webpackConfig);
+		context.webpackConfig = merge({module: {rules: []}}, context.webpackConfig);
 
 		// Html loader
 		context.webpackConfig.module.rules.push({
-			"test": /\.html$/,
-			"use": [{
+			test: /\.html$/,
+			use: [{
 				loader: "html-loader"
 			}]
 		});
@@ -85,7 +86,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		addEsLintConfig(context);
 
 		// Add plugins to do the additional magic
-		context.webpackConfig = merge({"plugins": []}, context.webpackConfig);
+		context.webpackConfig = merge({plugins: []}, context.webpackConfig);
 
 		// Register the provider plugin
 		context.webpackConfig.plugins.push(
@@ -94,21 +95,21 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Less loader
 		context.webpackConfig.module.rules.push({
-			"test": /\.less$/,
-			"use": [
+			test: /\.less$/,
+			use: [
 				{
-					"loader": MiniCssExtractPlugin.loader,
-					"options": {
-						"publicPath": "../"
+					loader: MiniCssExtractPlugin.loader,
+					options: {
+						publicPath: "../"
 					}
 				},
 				{
-					"loader": "css-loader",
-					"options": {
-						"import": false
+					loader: "css-loader",
+					options: {
+						import: false
 					}
 				}, {
-					"loader": "less-loader"
+					loader: "less-loader"
 				}
 			]
 		});
@@ -117,26 +118,26 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// We route the css over the sass parser, because our internal script will take care of
 		// any urls which could otherwise not be resolved correctly
 		context.webpackConfig.module.rules.push({
-			"test": /\.s?[ac]ss$/,
-			"use": [
+			test: /\.s?[ac]ss$/,
+			use: [
 				{
-					"loader": MiniCssExtractPlugin.loader,
-					"options": {
-						"publicPath": "../"
+					loader: MiniCssExtractPlugin.loader,
+					options: {
+						publicPath: "../"
 					}
 				},
 				{
-					"loader": "css-loader",
-					"options": {
-						"import": false
+					loader: "css-loader",
+					options: {
+						import: false
 					}
 				},
 				{
-					"loader": path.resolve(context.dir.controller, "./WebpackLoaders/CustomSassLoader.js"),
-					"options": {
-						"app": context.laborConfig.apps[context.currentApp],
-						"dir": context.dir,
-						"useCssLoaderBridge": true
+					loader: path.resolve(context.dir.controller, "./WebpackLoaders/CustomSassLoader.js"),
+					options: {
+						app: context.laborConfig.apps[context.currentApp],
+						dir: context.dir,
+						useCssLoaderBridge: true
 					}
 				}
 			]
@@ -152,13 +153,13 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					loader: "url-loader",
 					options: {
-						"name": "[name].[ext]",
-						"outputPath": "images/",
-						"limit": context.isProd ? 10000 : 1,
-						"fallback": {
-							"loader": "file-loader",
-							"options": {
-								"name": "[name].[ext]?[hash]"
+						name: "[name].[ext]",
+						outputPath: "images/",
+						limit: context.isProd ? 10000 : 1,
+						fallback: {
+							loader: "file-loader",
+							options: {
+								name: "[name].[ext]?[hash]"
 							}
 						}
 					}
@@ -169,7 +170,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 						disable: !context.isProd || app.imageCompression === false,
 						mozjpeg: {
 							progressive: true,
-							quality: typeof app.imageCompressionQuality === "number" ? app.imageCompressionQuality : 85,
+							quality: typeof app.imageCompressionQuality === "number" ? app.imageCompressionQuality : 80,
 							dcScanOpt: 2,
 							dct: "float"
 						},
@@ -177,7 +178,7 @@ module.exports = function WebpackConfigBuilder_2(context) {
 							optimizationLevel: 5
 						},
 						pngquant: {
-							quality: typeof app.imageCompressionQuality === "number" ? app.imageCompressionQuality : 85,
+							quality: typeof app.imageCompressionQuality === "number" ? app.imageCompressionQuality : 80,
 							speed: 2,
 							strip: true
 						}
@@ -193,8 +194,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					loader: "file-loader",
 					options: {
-						"name": "[name].[ext]?[hash]",
-						"outputPath": "fonts/"
+						name: "[name].[ext]?[hash]",
+						outputPath: "fonts/"
 					}
 				}
 			]
@@ -215,11 +216,11 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift();
 		const cleanConfig = context.callPluginMethod("filterCleanOptions", [
 			{
-				"directories": [path.basename(outputDirectory)],
-				"options": {
-					"root": path.dirname(outputDirectory),
-					"exclude": sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + "/"] : undefined,
-					"verbose": true
+				directories: [path.basename(outputDirectory)],
+				options: {
+					root: path.dirname(outputDirectory),
+					exclude: sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + "/"] : undefined,
+					verbose: true
 				}
 			}, context
 		]);
@@ -227,8 +228,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Add plugin to extract the css of all NON-dynamic chunks
 		context.webpackConfig.plugins.push(new MiniCssExtractPlugin({
-			"filename": "css/" + outputFileWithoutExtension + ".css",
-			"chunkFilename": "css/" + outputFileWithoutExtension + "-[id].css"
+			filename: "css/" + outputFileWithoutExtension + "-[hash].css",
+			chunkFilename: "css/" + outputFileWithoutExtension + "-[id]-[hash].css"
 		}));
 
 		// Add our custom plugins
@@ -236,9 +237,16 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		context.webpackConfig.plugins.push(new WebpackFixBrokenChunkPlugin());
 		context.webpackConfig.plugins.push(new ProgressBarPlugin());
 
+		// Automatically add all files in the output directory to the git watch list
+		if(context.isProd && app.disableAutoGitAdd !== false){
+			context.webpackConfig.plugins.push(new WebpackAutoAddEmittedFilesToGitPlugin({
+				outputDirectory: outputDirectory
+			}));
+		}
+
 		// Special optimization when in dev mode
 		if (!context.isProd) {
-			context.webpackConfig = merge({"output": {"pathinfo": false}, "optimization": {}}, context.webpackConfig);
+			context.webpackConfig = merge({output: {pathinfo: false}, optimization: {}}, context.webpackConfig);
 			context.webpackConfig.optimization.removeAvailableModules = false;
 			context.webpackConfig.optimization.removeEmptyChunks = false;
 			context.webpackConfig.optimization.splitChunks = false;
@@ -246,30 +254,30 @@ module.exports = function WebpackConfigBuilder_2(context) {
 
 		// Plugins for production usage
 		if (context.isProd) {
-			context.webpackConfig = merge({"optimization": {"minimize": true, "minimizer": []}}, context.webpackConfig);
+			context.webpackConfig = merge({optimization: {minimize: true, minimizer: []}}, context.webpackConfig);
 
 			// Enable minification
 			context.webpackConfig.optimization.minimize = true;
 
 			// Register JS uglifier
 			context.webpackConfig.optimization.minimizer.push(new UglifyJsPlugin({
-				"cache": true,
-				"parallel": true,
-				"sourceMap": true,
-				"extractComments": true,
-				"uglifyOptions": {
-					"mangle": true,
-					"ecma": 5,
-					"toplevel": true
+				cache: true,
+				parallel: true,
+				sourceMap: true,
+				extractComments: true,
+				uglifyOptions: {
+					mangle: true,
+					ecma: 5,
+					toplevel: true
 				}
 			}));
 
 			// Register CSS uglifier
 			context.webpackConfig.optimization.minimizer.push(new OptimizeCssAssetsPlugin({
-				"cssProcessorOptions": {
-					"map": {
-						"inline": false,
-						"annotation": true
+				cssProcessorOptions: {
+					map: {
+						inline: false,
+						annotation: true
 					}
 				}
 			}));

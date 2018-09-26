@@ -2,8 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.4] - 2018-09-26
 ### Added
-- Added default configuration for image optimization
+- Added default configuration for image optimization - version 2.0
+- Added a small plugin to automatically "add" all emitted output files to the current git repository - version 2.0
 
 ## [2.1.3] - 2018-09-25
 ### Fixed
