@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Changed typescript version requirement to make eslint happy
+
 ## [2.1.5] - 2018-09-26
 ### Added
 - Added .npmignore
