@@ -40,17 +40,20 @@ module.exports = function buildJsConfig(webpackConfig, jsConfig, context) {
 		if(Array.isArray(config.polyfills)) additionalPolyfills.concat(config.polyfills);
 	});
 
+	// Prepare jsExclude
+	const jsExclude = /node_modules(?![\\/\\\\]@labor[\\/\\\\])/;
+
 	// Add typescript loader
-	addTypescriptLoader(context, useTypechecker);
+	addTypescriptLoader(context, useTypechecker, jsExclude);
 
 	// Add utility loaders
 	let entryFiles = Object.entries(webpackConfig.entry)
 		.map(v => path.resolve(context.dir.current, v[1])).filter(file =>
 			['js','ts','tsx'].indexOf(FileHelpers.getFileExtension(file)) !== -1);
-	addJsAndTsUtilityLoaders(entryFiles, context, false, additionalPolyfills);
+	addJsAndTsUtilityLoaders(entryFiles, context, false, additionalPolyfills, jsExclude);
 
 	// Eslint
-	addEsLintConfig(context);
+	addEsLintConfig(context, jsExclude);
 
 	// Check if there are provided elements
 	var provided = context.callPluginMethod('getJsProvides', [{}, context]);

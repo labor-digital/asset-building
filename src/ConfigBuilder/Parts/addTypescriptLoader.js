@@ -3,9 +3,10 @@
  * For LABOR.digital
  */
 const path = require('path');
-module.exports = function addTypescriptLoader(context, useTypechecker) {
+module.exports = function addTypescriptLoader(context, useTypechecker, jsExclude) {
 	context.webpackConfig.module.rules.push({
 		test: /\.js$|\.ts$|\.tsx$/,
+		exclude: jsExclude, // Legacy for builder version 1
 		use: [
 			{
 				'loader': 'ts-loader',

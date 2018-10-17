@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 ### Changed
 - Changed typescript version requirement to make eslint happy
+- Readded exclude on js loaders of builder version 1 to make sure no node_module sources are parsed
 
 ## [2.1.5] - 2018-09-26
 ### Added
