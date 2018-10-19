@@ -53,11 +53,26 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		context.webpackConfig = Object.assign({output: {}}, context.webpackConfig);
 		context.webpackConfig.output.path = outputDirectory;
 		context.webpackConfig.output.filename = outputFile;
-		context.webpackConfig.output.chunkFilename = "js/" + outputFileWithoutExtension + "-[id]-[hash].js";
+		context.webpackConfig.output.chunkFilename = "js/" + outputFileWithoutExtension +
+			(context.isProd ? "-[id]-[hash].js" : "-[id].js");
 
-		// Add public path if given
-		if (typeof app.publicPath === "string" && app.publicPath.trim() !== "")
-			context.webpackConfig.output.publicPath = app.publicPath;
+		// Autogenerate public path if non was given via configuration
+		let publicPath = null;
+		if(typeof app.publicPath !== "string" || app.publicPath.trim() === ""){
+			let publicPathRoot = inputDirectory;
+			if(path.basename(publicPathRoot) === "src")
+				publicPathRoot = path.dirname(publicPathRoot);
+			publicPathRoot = path.dirname(publicPathRoot);
+			publicPath = path.relative(publicPathRoot, outputDirectory);
+			publicPath = publicPath.replace("\\", "/");
+			if(!publicPath.match(/^\.\//)) publicPath = "/" + publicPath;
+			if(!publicPath.match(/\/$/)) publicPath += "/";
+		} else {
+			publicPath = app.publicPath;
+		}
+		context.webpackConfig.output.publicPath = publicPath;
+
+		// Add dev public path if given
 		if (context.isProd === false && typeof app.publicPathDev === "string" && app.publicPathDev.trim() !== "")
 			context.webpackConfig.output.publicPath = app.publicPathDev;
 
@@ -153,13 +168,13 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					loader: "url-loader",
 					options: {
-						name: "[name].[ext]",
-						outputPath: "images/",
+						name: "[name]-[hash].[ext]",
+						outputPath: "assets/",
 						limit: context.isProd ? 10000 : 1,
 						fallback: {
 							loader: "file-loader",
 							options: {
-								name: "[name].[ext]?[hash]"
+								name: "[name]-[hash].[ext]"
 							}
 						}
 					}
@@ -194,8 +209,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				{
 					loader: "file-loader",
 					options: {
-						name: "[name].[ext]?[hash]",
-						outputPath: "fonts/"
+						name: "[name]-[hash].[ext]",
+						outputPath: "assets/"
 					}
 				}
 			]
@@ -229,7 +244,8 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// Add plugin to extract the css of all NON-dynamic chunks
 		context.webpackConfig.plugins.push(new MiniCssExtractPlugin({
 			filename: "css/" + outputFileWithoutExtension + ".css",
-			chunkFilename: "css/" + outputFileWithoutExtension + "-[id]-[hash].css"
+			chunkFilename: "css/" + outputFileWithoutExtension +
+				(context.isProd ? "-[id]-[hash].css" : "-[id].css")
 		}));
 
 		// Add our custom plugins

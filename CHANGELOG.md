@@ -2,9 +2,16 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+### Added
+- Added minor logic to WebpackConfigBuilder_2 to let the script figure out
+the most likely publicPath if none is given
+
 ### Changed
 - Changed typescript version requirement to make eslint happy
 - Readded exclude on js loaders of builder version 1 to make sure no node_module sources are parsed
+- Changed WebpackFixBrokenChunkPlugin so that \_\_webpack_require__.e() returns a Promise.resolve() object
+
 
 ## [2.1.5] - 2018-09-26
 ### Added

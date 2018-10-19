@@ -19,7 +19,7 @@ module.exports = class WebpackFixBrokenChunkPlugin {
 	apply(compiler) {
 		compiler.hooks.compilation.tap("WebpackFixBrokenChunkPlugin", compilation => {
 			compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (_, chunk, hash, chunkIdVar) {
-				_ += '\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== \'function\') __webpack_require__.e = function(e){return e;};\r\n'
+				_ += '\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== \'function\') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n'
 				return _;
 			});
 		});
