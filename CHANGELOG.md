@@ -12,6 +12,8 @@ the most likely publicPath if none is given
 - Readded exclude on js loaders of builder version 1 to make sure no node_module sources are parsed
 - Changed WebpackFixBrokenChunkPlugin so that \_\_webpack_require__.e() returns a Promise.resolve() object
 
+### Fixed
+- Finally fixed the issue, that broke css compiling when using empty sass selectors 
 
 ## [2.1.5] - 2018-09-26
 ### Added
