@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-
+## [2.1.6] - 2018-10-24
 ### Added
 - Added minor logic to WebpackConfigBuilder_2 to let the script figure out
 the most likely publicPath if none is given
