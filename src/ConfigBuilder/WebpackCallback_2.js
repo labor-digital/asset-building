@@ -2,23 +2,23 @@
  * Created by Martin Neundorfer on 07.09.2018.
  * For LABOR.digital
  */
-const FileHelpers = require('../Helpers/FileHelpers');
-const kill = require('../Helpers/kill');
+const FileHelpers = require("../Helpers/FileHelpers");
+const kill = require("../Helpers/kill");
 
 function colorRed(string) {
-	return '\x1b[91m' + string + '\x1b[0m';
+	return "\x1b[91m" + string + "\x1b[0m";
 }
 
 function colorGreen(string) {
-	return '\x1b[32m' + string + '\x1b[0m';
+	return "\x1b[32m" + string + "\x1b[0m";
 }
 
 function colorYellow(string) {
-	return '\x1b[93m' + string + '\x1b[0m';
+	return "\x1b[93m" + string + "\x1b[0m";
 }
 
 function getLine(char) {
-	char = typeof char === 'string' ? char : '=';
+	char = typeof char === "string" ? char : "=";
 	return char.repeat(90);
 }
 
@@ -27,43 +27,48 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 
 	// Generate output
 	let output = stats.toJson({
-		'assets': true,
-		'errorDetails': false
+		assets: true,
+		errorDetails: false,
+		publicPath: true
 	});
 
 	// Call hooks
-	output = context.callPluginMethod('compilingDone', [output, context]);
+	output = context.callPluginMethod("compilingDone", [output, context]);
 
 	// Define column char lengths
 	const assetColLength = 70;
 	const sizeColLength = 14;
 
+	// 1 if there were errors or warnings
+	let exitCode = 0;
+
 	// Render output
-	console.log('');
-	console.log('COMPILING DONE:', new Date().toLocaleTimeString());
+	console.log("");
+	console.log("COMPILING DONE:", new Date().toLocaleTimeString());
 	console.log(getLine());
 	let times = [];
 	let numberOfErrors = 0;
 	let numberOfWarnings = 0;
 	output.children.forEach(child => {
+
 		// Render a separator between different apps
 		if (times.length !== 0) {
-			console.log(getLine('-'));
-			console.log('');
+			console.log(getLine("-"));
+			console.log("");
 		}
 
 		// Render the asset list
-		let time = child.time > 5000 ? Math.round(child.time / 100) / 10 + 's' : child.time + 'ms';
+		let time = child.time > 5000 ? Math.round(child.time / 100) / 10 + "s" : child.time + "ms";
 		times.push(time);
-		console.log('APP-' + times.length + ' | Time: ' + time);
-		console.log('Asset'.padStart(assetColLength, ' ') + '  ' + 'Size'.padStart(sizeColLength));
+		console.log("APP-" + times.length + " | Time: " + time);
+		console.log("Asset".padStart(assetColLength, " ") + "  " + "Size".padStart(sizeColLength));
 		let ignoredChunks = 0;
 		let ignoredSize = 0;
 		child.assets.forEach(asset => {
 			// console.log(' - > ', asset.name, asset.chunks, asset.chunkNames);
 			const isMap = asset.name.match(/\.map$/);
-			const chunkIsMain = typeof asset.chunks[0] === 'string' && asset.chunks[0].indexOf('main') === 0;
-			const chunkNameIsMain = typeof asset.chunkNames[0] === 'string' && asset.chunkNames[0].indexOf('main') === 0
+			const chunkIsMain = typeof asset.chunks[0] === "string" && asset.chunks[0].indexOf("main") === 0;
+			const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0
 			const useAsset = !isMap && (chunkIsMain || chunkNameIsMain);
 
 			if (!useAsset) {
@@ -71,22 +76,23 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 				ignoredSize += asset.size;
 				return;
 			}
-			let realAssetName = (child.outputPath + '/' + asset.name).replace(/[\\\/]/g, '/');
+			let realAssetName = (child.outputPath + "/" + asset.name).replace(/[\\\/]/g, "/");
 			console.log(
-				colorGreen(realAssetName.substr(-(assetColLength - 5)).padStart(assetColLength)) + '  '
+				colorGreen(realAssetName.substr(-(assetColLength - 5)).padStart(assetColLength)) + "  "
 				+ FileHelpers.humanFileSize(asset.size).padStart(sizeColLength));
 		});
 		if (ignoredChunks !== 0)
-			console.log(('  + ' + ignoredChunks + ' hidden files (maps, chunks, assets, and so on)').padStart(assetColLength) + '  ' +
+			console.log(("  + " + ignoredChunks + " hidden files (maps, chunks, assets, and so on)").padStart(assetColLength) + "  " +
 				FileHelpers.humanFileSize(ignoredSize).padStart(sizeColLength));
 
 		// Check if there are warnings
 		if (child.warnings.length > 0) {
+			exitCode = 1;
 			numberOfWarnings += child.warnings.length;
-			console.log(getLine('.'));
-			console.log('');
-			console.error(colorYellow('BEWARE! There are warnings!'));
-			console.log('');
+			console.log(getLine("."));
+			console.log("");
+			console.error(colorYellow("BEWARE! There are warnings!"));
+			console.log("");
 			child.warnings.forEach(entry => {
 				let isBreak = false;
 				entry.split(/\r?\n/).forEach(line => {
@@ -101,14 +107,15 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 
 		// Check if there are errors
 		if (child.errors.length > 0) {
+			exitCode = 1;
 			numberOfErrors += child.errors.length;
-			console.log(getLine('.'));
-			console.log('');
-			console.error(colorRed('MISTAKES HAVE BEEN MADE!'));
-			console.log('');
+			console.log(getLine("."));
+			console.log("");
+			console.error(colorRed("MISTAKES HAVE BEEN MADE!"));
+			console.log("");
 			child.errors.forEach((entry, i) => {
 				let isBreak = false;
-				if(i > 0) console.log('');
+				if (i > 0) console.log("");
 				entry.split(/\r?\n/).forEach(line => {
 					// Strip footer for problems with eslint
 					if (isBreak || line.match(/\sproblems?\s\(.*?\serrors?,\s.*?\swarnings?\)/)) {
@@ -123,13 +130,13 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 
 	// Render a footer
 	console.log(getLine());
-	let state = numberOfWarnings === 0 && numberOfErrors === 0 ? colorGreen('OK') : '';
-	if (numberOfWarnings > 0) state = colorYellow(numberOfWarnings + ' warning' + (numberOfWarnings === 1 ? '' : 's'));
-	if (numberOfWarnings !== 0 && numberOfErrors !== 0) state += ' | ';
-	if (numberOfErrors > 0) state += colorRed(numberOfErrors + ' error' + (numberOfErrors === 1 ? '' : 's'));
-	console.log(new Date().toLocaleTimeString(), '| Time:', times.join(', '), ' |', state);
+	let state = numberOfWarnings === 0 && numberOfErrors === 0 ? colorGreen("OK") : "";
+	if (numberOfWarnings > 0) state = colorYellow(numberOfWarnings + " warning" + (numberOfWarnings === 1 ? "" : "s"));
+	if (numberOfWarnings !== 0 && numberOfErrors !== 0) state += " | ";
+	if (numberOfErrors > 0) state += colorRed(numberOfErrors + " error" + (numberOfErrors === 1 ? "" : "s"));
+	console.log(new Date().toLocaleTimeString(), "| Time:", times.join(", "), " |", state);
 
 	// Kill the process if we do not watch
-	if(Array.isArray(context.webpackConfig) ? context.webpackConfig[0].watch : context.webpackConfig.watch) return;
-	process.exit();
+	if (Array.isArray(context.webpackConfig) ? context.webpackConfig[0].watch : context.webpackConfig.watch) return;
+	process.exit(exitCode);
 };

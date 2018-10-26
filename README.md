@@ -573,6 +573,17 @@ module.exports = function () {
 };
 ```
 
+### filterJsPreLoaders(jsPreLoaders, context)
+This hook can be used to add additional javascript preloaders into the stack
+```javascript
+module.exports = function () {
+    this.filterJsPreLoaders = function(jsPreLoaders, context){
+    	jsPreLoaders.push(require($MY_LOADER));
+        return jsPreLoaders
+    };
+};
+```
+
 #### filterEslintOptions(eslintOptions, context, type)
 This hook can be used to add or remove eslint options before the module is created.
 The function is called twice. Once for the "js-lint" and once for the "ts-lint" instance.

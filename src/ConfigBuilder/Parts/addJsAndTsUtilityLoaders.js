@@ -29,6 +29,8 @@ module.exports = function addJsAndTsUtilityLoaders(entry, context, withComponent
 		});
 	}
 
+	loaders = context.callPluginMethod("filterJsPreLoaders", [loaders, context]);
+
 	context.webpackConfig.module.rules.push({
 		test: /\.js$|\.ts$|\.tsx$/,
 		exclude: jsExclude, // Legacy for builder version 1,

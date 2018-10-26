@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.7] - 2018-10-26
+### Added
+- If the script is not called in "watch" mode, it will now return an error code 1 if an error occured
+- Added new hook "filterJsPreLoaders" which is called when 
+- Added exports-loader as requirement so it is usable in code requests
+
+### Fixed
+- Fixed an issue in sassPreParser that occured if multiple @import statements followed each other with spaces at the beginning of the line
+
 ## [2.1.6] - 2018-10-24
 ### Added
 - Added minor logic to WebpackConfigBuilder_2 to let the script figure out

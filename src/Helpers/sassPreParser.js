@@ -38,7 +38,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		}
 
 		// Resolve imports
-		content = content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:\s+)?)/gm, (a, before, importStatement, after) => {
+		content = content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:[^\S\n]+)?)/gm, (a, before, importStatement, after) => {
 			const importFilename = SassHelpers.resolveImportFilename(importStatement, nodeDirectory, filename);
 			const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
 
@@ -57,7 +57,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		});
 
 		// Wrap url calls to make sure they get resolved propperly
-		content = content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:\s+)?)(\))/gm, (a, before, url, after) => {
+		content = content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:[^\S\n]+)?)(\))/gm, (a, before, url, after) => {
 			// Ignore data urls
 			if (url.indexOf('data: ') !== -1) return a;
 

@@ -53,9 +53,14 @@ module.exports = function WebpackCallback_1 (context, err, stats){
 			(FileHelpers.humanFileSize(asset.size) + '').padStart(10));
 	});
 
+
+	// 1 if there were errors or warnings
+	let exitCode = 0;
+
 	let state = '\x1b[32mOK\x1b[0m';
 	// Render errors
 	if(lines.errors.length > 0){
+		exitCode = 1;
 		state = '\x1b[31mERROR\x1b[0m';
 		console.log('');
 		console.error('ERRORS OCCURED:');
@@ -71,4 +76,8 @@ module.exports = function WebpackCallback_1 (context, err, stats){
 	}
 	console.log('..................................................................................');
 	console.log(new Date().toLocaleTimeString(), '| Time:', time, '|', state);
+
+	// Kill the process if we do not watch
+	if (context.webpackConfig.watch) return;
+	process.exit(exitCode);
 };
