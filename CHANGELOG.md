@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [2.1.7] - 2018-10-26
 ### Added
 - If the script is not called in "watch" mode, it will now return an error code 1 if an error occured
-- Added new hook "filterJsPreLoaders" which is called when 
+- Added new hook "filterJsPreLoaders" which is called when the js stack is collected
 - Added exports-loader as requirement so it is usable in code requests
 
 ### Fixed
