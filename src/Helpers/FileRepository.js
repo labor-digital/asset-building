@@ -41,4 +41,7 @@ module.exports = class FileRepository {
 		return storage;
 	}
 
+	static flush(){
+		storage.clear();
+	}
 };

@@ -107,4 +107,9 @@ module.exports = class ResourceRepository {
 		// Merge both together
 		resourceAndStylesheetMerger(resourceCache.get(cacheKey), stylesheet);
 	}
+
+	static flush(){
+		resourceCache.clear();
+		fileToCacheMap.clear();
+	}
 };

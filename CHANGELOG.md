@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Fixed some issues when files were deleted while webpack ran in "watch" mode. 
+
 ## [2.1.7] - 2018-10-26
 ### Added
 - If the script is not called in "watch" mode, it will now return an error code 1 if an error occured

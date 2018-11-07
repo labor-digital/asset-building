@@ -26,4 +26,8 @@ module.exports = class CssLoaderBridge {
 	static getDefinitionForStylesheet(stylesheet){
 		return storage.get(stylesheet);
 	}
+
+	static flush(){
+		storage.clear();
+	}
 };

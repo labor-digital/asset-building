@@ -4,18 +4,7 @@
  */
 const FileHelpers = require("../Helpers/FileHelpers");
 const kill = require("../Helpers/kill");
-
-function colorRed(string) {
-	return "\x1b[91m" + string + "\x1b[0m";
-}
-
-function colorGreen(string) {
-	return "\x1b[32m" + string + "\x1b[0m";
-}
-
-function colorYellow(string) {
-	return "\x1b[93m" + string + "\x1b[0m";
-}
+const Colors = require("../Helpers/Colors");
 
 function getLine(char) {
 	char = typeof char === "string" ? char : "=";
@@ -78,7 +67,7 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 			}
 			let realAssetName = (child.outputPath + "/" + asset.name).replace(/[\\\/]/g, "/");
 			console.log(
-				colorGreen(realAssetName.substr(-(assetColLength - 5)).padStart(assetColLength)) + "  "
+				Colors.green(realAssetName.substr(-(assetColLength - 5)).padStart(assetColLength)) + "  "
 				+ FileHelpers.humanFileSize(asset.size).padStart(sizeColLength));
 		});
 		if (ignoredChunks !== 0)
@@ -91,7 +80,7 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 			numberOfWarnings += child.warnings.length;
 			console.log(getLine("."));
 			console.log("");
-			console.error(colorYellow("BEWARE! There are warnings!"));
+			console.error(Colors.yellow("BEWARE! There are warnings!"));
 			console.log("");
 			child.warnings.forEach(entry => {
 				let isBreak = false;
@@ -100,7 +89,7 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 						isBreak = true;
 						return;
 					}
-					console.log(colorYellow(line));
+					console.log(Colors.yellow(line));
 				});
 			});
 		}
@@ -111,7 +100,7 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 			numberOfErrors += child.errors.length;
 			console.log(getLine("."));
 			console.log("");
-			console.error(colorRed("MISTAKES HAVE BEEN MADE!"));
+			console.error(Colors.red("MISTAKES HAVE BEEN MADE!"));
 			console.log("");
 			child.errors.forEach((entry, i) => {
 				let isBreak = false;
@@ -122,7 +111,7 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 						isBreak = true;
 						return;
 					}
-					console.log(colorRed(line));
+					console.log(Colors.red(line));
 				});
 			});
 		}
@@ -130,10 +119,10 @@ module.exports = function WebpackCallback_2(context, err, stats) {
 
 	// Render a footer
 	console.log(getLine());
-	let state = numberOfWarnings === 0 && numberOfErrors === 0 ? colorGreen("OK") : "";
-	if (numberOfWarnings > 0) state = colorYellow(numberOfWarnings + " warning" + (numberOfWarnings === 1 ? "" : "s"));
+	let state = numberOfWarnings === 0 && numberOfErrors === 0 ? Colors.green("OK") : "";
+	if (numberOfWarnings > 0) state = Colors.yellow(numberOfWarnings + " warning" + (numberOfWarnings === 1 ? "" : "s"));
 	if (numberOfWarnings !== 0 && numberOfErrors !== 0) state += " | ";
-	if (numberOfErrors > 0) state += colorRed(numberOfErrors + " error" + (numberOfErrors === 1 ? "" : "s"));
+	if (numberOfErrors > 0) state += Colors.red(numberOfErrors + " error" + (numberOfErrors === 1 ? "" : "s"));
 	console.log(new Date().toLocaleTimeString(), "| Time:", times.join(", "), " |", state);
 
 	// Kill the process if we do not watch

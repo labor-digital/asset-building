@@ -98,7 +98,7 @@ module.exports = class ComponentHelpers {
 			const realFilename = directory + filename + path.sep;
 
 			// Ignore files on my level
-			if (!fs.statSync(realFilename).isDirectory()) continue;
+			if (!fs.existsSync(realFilename) || !fs.statSync(realFilename).isDirectory()) continue;
 
 			// Check if this file is ignored
 			if(excludedComponents.indexOf(filename) !== -1) continue;
