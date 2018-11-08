@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.8] - 2018-11-08
 ### Fixed
 - Fixed some issues when files were deleted while webpack ran in "watch" mode. 
 
