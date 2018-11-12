@@ -96,18 +96,17 @@ module.exports = function customSassLoader(sassSource) {
 
 							// Check if this is a data url
 							if (url.trim().indexOf("data:") === 0) {
-								return url;
+								return new sass.types.String(url);
 							}
 
 							// Check if this is a url
 							if (url.trim().match(/^https?:/)) {
-								return url;
+								return new sass.types.String(url);
 							}
 
 							// Handle query string
 							const queryString = url.indexOf("?") === -1 && url.indexOf("#") === -1 ? "" : url.replace(/[^?#]*/, "");
 							if (queryString !== "") url = url.replace(/[?#].*$/, "");
-
 
 							// Check if the url is already readable
 							if (fs.existsSync(url)) {
