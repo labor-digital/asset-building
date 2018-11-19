@@ -2,6 +2,9 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Fixed
+- Fixed an issue with the componentLoader that occurend when no sass files were found
+
 ## [2.1.9] - 2018-11-19
 ### Fixed
 - Fixed an issue with customSassLoader when data urls where used

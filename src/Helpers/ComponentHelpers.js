@@ -155,7 +155,7 @@ module.exports = class ComponentHelpers {
 		});
 
 		// Merge sass and scss
-		componentsByExtension.get('scss').forEach(componentsByExtension.get('sass').add);
+		componentsByExtension.get('scss').forEach((file) => componentsByExtension.get('sass').add(file));
 		componentsByExtension.delete('scss');
 
 		// Filter out empty extensions
