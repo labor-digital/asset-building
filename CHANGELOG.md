@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- The script will now automatically generate jsonp function names for every app configured
+to prevent issues when multiple bundles are used on the same website
+
 ### Fixed
 - Fixed an issue with the componentLoader that occurend when no sass files were found
 

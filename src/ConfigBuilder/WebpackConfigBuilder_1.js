@@ -83,6 +83,10 @@ module.exports = function WebpackConfigBuilder_1 (context) {
 		}
 	});
 
+	// Generate a name for our jsonp function
+	const jsonpFunction = "webpack_" + crypto.createHash('md5').update(context.dir.packageJson).digest("hex") + "_" + i;
+	context.webpackConfig.output.jsonpFunction = jsonpFunction;
+
 	// Call filters
 	context.callPluginMethod('filter', [context.webpackConfig, context]);
 

@@ -4,6 +4,7 @@
  */
 const path = require("path");
 const webpack = require("webpack");
+const crypto = require('crypto');
 const kill = require("../Helpers/kill");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -284,7 +285,10 @@ module.exports = function WebpackConfigBuilder_2(context) {
 				uglifyOptions: {
 					mangle: true,
 					ecma: 5,
-					toplevel: true
+					toplevel: true,
+					compress: {
+						typeofs: false
+					}
 				}
 			}));
 
@@ -302,6 +306,10 @@ module.exports = function WebpackConfigBuilder_2(context) {
 		// Add given copy configuration
 		if (typeof context.laborConfig.copy !== "undefined" && Array.isArray(context.laborConfig.copy) && context.laborConfig.copy.length > 0)
 			buildCopyConfig(context.webpackConfig, context.laborConfig.copy, context);
+
+		// Generate a name for our jsonp function
+		const jsonpFunction = "webpack_" + crypto.createHash('md5').update(context.dir.packageJson).digest("hex") + "_" + i;
+		context.webpackConfig.output.jsonpFunction = jsonpFunction;
 
 		// Call filters
 		context.callPluginMethod("filter", [context.webpackConfig, context]);
