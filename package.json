@@ -4,7 +4,7 @@
     "type": "git",
     "url": "git+ssh://git@bitbucket.org:labor-digital/labor-dev-assetbuilding.git"
   },
-  "version": "2.1.9",
+  "version": "2.1.10",
   "description": "Our toolbox to build webassets with webpack",
   "main": "index.js",
   "bin": {
