@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.11] - 2018-11-26
+### Fixed
+- Fixes a invalid character in WebpackPromiseShimPlugin that broke the building process
+
 ## [2.1.10] - 2018-11-26
 ### Changed
 - The script will now automatically generate jsonp function names for every app configured
