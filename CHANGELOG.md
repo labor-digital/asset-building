@@ -2,9 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [2.1.10] - 2018-11-26
 ### Changed
 - The script will now automatically generate jsonp function names for every app configured
 to prevent issues when multiple bundles are used on the same website
+- Removed module.export and define() loaders from WebpackPromiseShimPlugin() to make sure we don't collide with require.js
 
 ### Fixed
 - Fixed an issue with the componentLoader that occurend when no sass files were found
