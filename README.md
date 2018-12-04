@@ -765,37 +765,6 @@ import "@components@exclude:componentA,componentD"
 * my web-components where I need the css inside my javascript? 
 Only generic imports that do not alias the content will be stripped by the component loader.
 
-## HTML Partial Loader
-**Only interesting if you are using builder version 2.0**  
-This loader is fairly simple. The main idea is that there are always parts of your website you want to use over and over and over.
-And those elements are probably not really a whole block that requires js logic. Think about form-fields, separators, and so on. 
-
-In all html that is parsed using the webpack loading mechanism you may use the following:
-```html
-<section>partial:/Block/Partial</section>
-```
-The "\<section>" is crucial here! The loader will now load a partial beginning from
-the absolute root path of your app (this is the same directory where your entrypoint lives)
-If you are sorting your Chunks into "Chunks" (Using WebpackChunkLoader), that directory
-will automatically added. If you start your path using a period (.) the path
-is used relative to the current html file. 
-
-But there is always the question of how your data ends up in your partial. To do so there is a simple solution,
-add a json object containing key -> values to your section and the partial will be parsed using the [mustache](http://mustache.github.io/)
-template engine.
-
-```html
-<section>partial:/Block/Partial, { "foo": "bar", "bar": "baz"}</section>
-```
-Note the comma after the path name!
-In your partial you may now use:
-```html
-{{foo}} -> "bar", {{bar}} -> "baz"
-```
-
-Now the cool part: You may use partials, inside partials, inside partials...
-
-
 ## CSS Superscript resources
 **Only interesting if you are using builder version 2.0**  
 **!!CURRENTLY ONLY WORKS FOR SASS/SCSS!!**  

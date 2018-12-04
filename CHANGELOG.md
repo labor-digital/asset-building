@@ -2,8 +2,6 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
-### Added
-- Added new html partial loader 
 
 ## [2.1.11] - 2018-11-26
 ### Fixed

@@ -91,19 +91,6 @@ module.exports = function WebpackConfigBuilder_2(context) {
 			}]
 		});
 
-		// Html partial preloader
-		context.webpackConfig.module.rules.push({
-			test: /\.html$/,
-			enforce: "pre",
-			use: [{
-				loader: path.resolve(context.dir.controller, "./WebpackLoaders/HtmlPartialLoader.js"),
-				options: {
-					app: context.laborConfig.apps[context.currentApp],
-					dir: context.dir
-				}
-			}]
-		});
-
 		// Typescript compiler
 		addTypescriptLoader(context, app.useTypeChecker === true);
 
