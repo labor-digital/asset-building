@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.12] - 2018-12-10
+### Fixed
+- Fixes config for WebpackConfigBuilder_1 (crypto and minor typo)
+
 ## [2.1.11] - 2018-11-26
 ### Fixed
 - Fixes a invalid character in WebpackPromiseShimPlugin that broke the building process

@@ -2,6 +2,7 @@
  * Created by Martin Neundorfer on 09.08.2018.
  * For LABOR.digital
  */
+const crypto = require('crypto');
 const webpack = require('webpack');
 const addPseudoJsEntryPoint = require('./Parts/addPseudoJsEntryPoint');
 const buildCssConfig = require('./Parts/buildCssConfig');
@@ -84,7 +85,7 @@ module.exports = function WebpackConfigBuilder_1 (context) {
 	});
 
 	// Generate a name for our jsonp function
-	const jsonpFunction = "webpack_" + crypto.createHash('md5').update(context.dir.packageJson).digest("hex") + "_" + i;
+	const jsonpFunction = "webpack_" + crypto.createHash('md5').update(context.dir.packageJson).digest("hex");
 	context.webpackConfig.output.jsonpFunction = jsonpFunction;
 
 	// Call filters
