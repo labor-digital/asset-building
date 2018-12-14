@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.0.0] - 2018-12-14
+### Changed
+- Major refactoring to simplify the cluttered code
+- Added a legacy adapter to simulate an app based config for the config version 1
+- There are no longer two different config builders, but one that handles the remaining
+few exceptions of config version 1 over config version 2
+- Splits up the config builder into multiple components that are executed after eachother to create the whole webpack config.
+- Removed some npm dependencies that were no longer required
+
+### Added
+- Added the concept of "Environments" which can be used to preconfigure webpack for frameworks like vuejs. This allows for further expansion to other frameworks if required.
 
 ## [2.1.12] - 2018-12-10
 ### Fixed

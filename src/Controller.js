@@ -4,18 +4,34 @@
  * For LABOR.digital
  */
 const webpack = require("webpack");
+const pjson = require("../package.json");
 const Dir = require("./Entities/Dir");
-const ConfigBuilderBootstrap = require("./ConfigBuilder/ConfigBuilderBootstrap");
-const eventsJsUncaughtErrorFix = require("./Helpers/eventsJsUncaughtErrorFix");
+const MiscFixes = require("./Bugfixes/MiscFixes");
+const MiscHelpers = require("./Helpers/MiscHelpers");
+const ContextFactory = require("./ContextFactory");
+const WebpackConfigBuilder = require("./WebpackConfigBuilder");
+
+// Do our fancy intro
+MiscHelpers.fancyIntro(pjson.version);
+
+// Get directory representation
+const dir = new Dir(process.cwd(), __dirname);
 
 // Apply fixes
-eventsJsUncaughtErrorFix();
+MiscFixes.eventsJsUncaughtErrorFix();
+MiscFixes.resolveFilenameFix(dir);
 
-// Prepare directory stroage
-let dir = new Dir(process.cwd(), __dirname);
+try {
+	// Build our configuration
+	const context = ContextFactory.createContext(dir);
+	WebpackConfigBuilder.createConfig(context);
 
-// Build webpack config
-let context = ConfigBuilderBootstrap.generateConfigFor(dir);
+	// Call filters
+	context.callPluginMethod("filterContextBeforeCompiler", [context]);
 
-// Start webpack
-webpack(context.webpackConfig, (err, stats) => context.callback(context, err, stats));
+	// Start webpack
+	webpack(context.webpackConfig, (err, stats) => context.callback(context, err, stats));
+
+} catch (e) {
+	MiscHelpers.kill(e.stack);
+}

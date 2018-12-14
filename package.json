@@ -14,6 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-eslint": "^9.0.0",
+    "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
     "clean-webpack-plugin": "^0.1.19",
     "copy-webpack-plugin": "^4.5.2",
@@ -30,7 +31,6 @@
     "less": "^3.8.1",
     "less-loader": "^4.1.0",
     "mini-css-extract-plugin": "^0.4.3",
-    "mustache": "^3.0.1",
     "node-sass": "^4.9.3",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "progress-bar-webpack-plugin": "^1.11.0",
@@ -40,6 +40,8 @@
     "typescript-eslint-parser": "^18.0.0",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "url-loader": "^1.1.1",
+    "vue-loader": "^15.4.2",
+    "vue-template-compiler": "^2.5.21",
     "webpack": "^4.19.1",
     "webpack-merge": "^4.1.4"
   }

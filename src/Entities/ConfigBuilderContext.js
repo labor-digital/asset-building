@@ -3,7 +3,12 @@
  * For LABOR.digital
  */
 module.exports = class ConfigBuilderContext {
-	constructor(laborConfig, dir, mode) {
+	/**
+	 * Injects the basic configuration
+	 * @param {*} laborConfig
+	 * @param {module.Dir} dir
+	 */
+	constructor(laborConfig, dir) {
 
 		/**
 		 * The version number of the current config builder
@@ -12,10 +17,23 @@ module.exports = class ConfigBuilderContext {
 		this.builderVersion = 1;
 
 		/**
-		 * Only used in version 2 of the builder. The numeric zero-based index of the app which is currently compiled.
+		 * Can be used to define an additional layer of configuration, which may be used based on the used framework
+		 * @type {string|null}
+		 */
+		this.environment = null;
+
+		/**
+		 * The numeric zero-based index of the app which is currently configured.
+		 * -1 If there is currently no app based action underway
 		 * @type {number}
 		 */
-		this.currentApp = 0;
+		this.currentApp = -1;
+
+		/**
+		 * The configuration containing the laborConfig of the app which is currently configured
+		 * @type {*}
+		 */
+		this.currentAppConfig = {};
 
 		/**
 		 * True if this build should be executed as webpack's "production" mode
@@ -27,7 +45,7 @@ module.exports = class ConfigBuilderContext {
 		 * The mode key which was given as cli parameter
 		 * @type {string}
 		 */
-		this.mode = mode;
+		this.mode = "";
 
 		/**
 		 * Contains the configuration given in the package.json in the "labor" node
@@ -39,25 +57,7 @@ module.exports = class ConfigBuilderContext {
 		 * Contains the webpack configuration we are currently working on
 		 * @type {{}}
 		 */
-		this.webpackConfig = {
-			'mode': 'production',
-			'watch': false,
-			'entry': {},
-			'plugins': [],
-			'module': {
-				'rules': []
-			},
-			'performance': {
-				'hints': false
-			},
-			'resolve': {
-				'modules': [dir.nodeModules, dir.buildingNodeModules, 'node_modules'],
-				'extensions': [".ts", ".tsx", ".js"]
-			},
-			'resolveLoader': {
-				'modules': [dir.buildingNodeModules, dir.nodeModules, 'node_modules', '/']
-			}
-		};
+		this.webpackConfig = {};
 
 		/**
 		 * The list of plugininstances that are currently registerd in the package.json
@@ -75,7 +75,8 @@ module.exports = class ConfigBuilderContext {
 		 * The callback for the webpack compiler
 		 * @type {function}
 		 */
-		this.callback = () => {};
+		this.callback = () => {
+		};
 	}
 
 	/**
@@ -85,14 +86,14 @@ module.exports = class ConfigBuilderContext {
 	 *
 	 * @param {string} method
 	 * @param {Array} args
-	 * @returns {null}
+	 * @returns {*}
 	 */
-	callPluginMethod (method, args){
+	callPluginMethod(method, args) {
 		this.plugins.forEach(plugin => {
-			if (typeof plugin[method] !== 'function') return;
+			if (typeof plugin[method] !== "function") return;
 			let result = plugin[method].apply(plugin, args);
-			if (typeof result !== 'undefined') args[0] = result;
+			if (typeof result !== "undefined") args[0] = result;
 		});
-		return typeof args[0] !== 'undefined' ? args[0] : null;
+		return typeof args[0] !== "undefined" ? args[0] : null;
 	}
 };

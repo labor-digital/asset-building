@@ -2,35 +2,35 @@
  * Created by Martin Neundorfer on 13.09.2018.
  * For LABOR.digital
  */
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
 module.exports = class FileHelpers {
 
-	static unifyFilename(filename){
+	static unifyFilename(filename) {
 		// Make sure windows drives are unified to lowercase
-		if(filename.charAt(1) === ':'){
+		if (filename.charAt(1) === ":") {
 			filename = filename.charAt(0).toLowerCase() + filename.substr(1);
 		}
 		return path.normalize(filename);
 	}
 
 	static getFileExtension(filename) {
-		return filename.replace(/^(.*?\.)([^\\\/]*)$/, '$2').toLowerCase();
+		return filename.replace(/^(.*?\.)([^\\\/]*)$/, "$2").toLowerCase();
 	}
 
 	static getFileWithoutExtension(filename) {
 		const ext = FileHelpers.getFileExtension(filename);
-		return filename.replace(new RegExp('\\.' + ext + '$'), '');
+		return filename.replace(new RegExp("\\." + ext + "$"), "");
 	}
 
 	static filenameToPosix(filename) {
-		return filename.replace(/\\/g, '/');
+		return filename.replace(/\\/g, "/");
 	}
 
 	static humanFileSize(size) {
 		var i = Math.floor(Math.log(size) / Math.log(1024));
-		return (size / Math.pow(1024, i)).toFixed(2) * 1 + ' ' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+		return (size / Math.pow(1024, i)).toFixed(2) * 1 + " " + ["B", "kB", "MB", "GB", "TB"][i];
 	}
 
 	/**
@@ -39,21 +39,21 @@ module.exports = class FileHelpers {
 	 * @return {string}
 	 */
 	static mkdir(directory) {
-		var path = directory.replace(/[\\\/]/g, '/').replace(/\/$/, '').split('/');
+		var path = directory.replace(/[\\\/]/g, "/").replace(/\/$/, "").split("/");
 
 		for (var i = 1; i <= path.length; i++) {
-			var segment = path.slice(0, i).join('/');
-			!fs.existsSync(segment) ? fs.mkdirSync(segment) : null ;
+			var segment = path.slice(0, i).join("/");
+			!fs.existsSync(segment) ? fs.mkdirSync(segment) : null;
 		}
 	}
 
-	static flushDirectory(directory){
+	static flushDirectory(directory) {
 		fs.readdirSync(directory).forEach(file => {
 			fs.unlinkSync(path.join(directory, file));
 		});
 	}
 
-	static touch(filename){
+	static touch(filename) {
 		fs.utimesSync(filename, new Date(), new Date());
 	}
 };
