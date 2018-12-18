@@ -30,8 +30,9 @@ try {
 	context.callPluginMethod("filterContextBeforeCompiler", [context]);
 
 	// Start webpack
-	webpack(context.webpackConfig, (err, stats) => context.callback(context, err, stats));
-
+	const callback = (err, stats) => context.callback(context, err, stats);
+	const useDefaultCompiler = context.callPluginMethod("alternativeCompiler", [true, webpack, callback, context]);
+	if(useDefaultCompiler) webpack(context.webpackConfig, callback);
 } catch (e) {
 	MiscHelpers.kill(e.stack);
 }

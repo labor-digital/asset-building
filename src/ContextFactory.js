@@ -52,6 +52,18 @@ module.exports = class ContextFactory {
 			for (let basePath of [dir.buildingNodeModules, dir.nodeModules, dir.current]) {
 				try {
 					plugin = require(path.resolve(basePath, v));
+
+					// Add additional lookup path for all plugin sources
+					let parts = path.dirname(path.resolve(basePath, v)).split(path.sep);
+					while (parts.length > 0){
+						const pl = parts.join(path.sep) + path.sep + "node_modules";
+						if(fs.existsSync(pl)){
+							dir.additionalResolverPaths.add(pl);
+							break;
+						}
+						parts.pop();
+					}
+					break;
 				} catch (e) {
 					if (e.toString().indexOf("find module") === -1 || e.toString().indexOf(pluginBaseName) === -1)
 						throw new Error("Error while loading plugin: \"" + v + "\" | " + e.toString());
@@ -78,7 +90,7 @@ module.exports = class ContextFactory {
 
 		// Validate modes
 		if (modes.indexOf(mode) === -1)
-			throw new Error("Invalid mode given: \"" + mode + "\", valid modes are: \"" + validModes.join(", ") + "\"!");
+			throw new Error("Invalid mode given: \"" + mode + "\", valid modes are: \"" + modes.join(", ") + "\"!");
 
 		// Store the mode
 		context.mode = mode;

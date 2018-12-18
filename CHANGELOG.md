@@ -2,6 +2,22 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.0.1] - 2018-12-18
+### Added
+- Added HtmlWebpackPlugin for easy creation of html base files
+- Added new hook "filterHtmlTemplate" 
+- Added new hook "alternativeCompiler" 
+- Added new hook "filterExcludePattern" 
+- Added check to hide "hot-reload" files in callback outputs
+- Added HtmlPlugin.js component
+- Added additionalResolverPaths to Dir
+
+### Changed
+- Every plugin now adds it's own additionalResolverPath to make sure all external dependencies and loaders can be resolved without problem
+
+### Removed
+- Removed Vue.js environment from the core
+
 ## [3.0.0] - 2018-12-14
 ### Changed
 - Major refactoring to simplify the cluttered code

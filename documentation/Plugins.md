@@ -84,6 +84,13 @@ Is called before a component with the given "key" is applied to the config.
 ## afterComponent(context, key)
 Is called after a component with the given "key" is applied to the config but before the environment is applied.
 
+## filterExcludePattern(pattern, request, basePattern, context)
+Can be used to change the exclude pattern for some webpack loaders.
+The **pattern** is either undefined or a regex like basePattern.
+The **request** defines which loader requests the exclude pattern. Options are: "typescript", "tsJsPreLoaders" and "esLint", 
+named after the components they are used in.
+The **basePattern** is used by default and is a regex like: ``/node_modules(?![\\/\\\\]@labor[\\/\\\\])/``,
+
 ## filterTypescriptOptions(tsLoaderOptions, context)
 This hook can be used to change ts-loader options.
 ```javascript
@@ -131,6 +138,10 @@ module.exports = function () {
 };
 ```
 
+## filterHtmlTemplate(template, context)
+Can be used to filter the given template for the "HtmlWebpackPlugin". The given
+template is always an object, even if the laborConfig says only "true". 
+
 ## getJsProvides(provides, context)
 To make js objects like the "$" in jQuery globally available without including 
 it in every fileyou can "provide" certain variables using the webpack 
@@ -150,7 +161,6 @@ module.exports = function () {
 ```
 
 ## filterCleanOptions(configuration, context)
-**Only used in config builder 2.0**  
 The second version of the config builder uses [clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin)
 to flush the output directory. This hook can be used to filter it's options
 
@@ -189,6 +199,13 @@ module.exports = function () {
 ## filterContextBeforeCompiler(context)
 This hook is called after the config was enriched with the custom webpack config 
 provided by labor.webpackConfig.
+
+## alternativeCompiler(useDefaultCompiler, webpack, callback, context)
+Allows plugins to completely replace the webpack call. If your hook returns FALSE the 
+webpack() function in Controller.js is omitted so that your logic can take over and
+create its own webpack instances. useDefaultCompiler tells you if one of the plugins
+before the current one already disabled the default compiler. Webpack holds the 
+reference to the webpack API. The callback is the prepared wrapper around context.callback.
 
 ## compilingDone(output, context)
 This hook is called every time the webpack compiler is finished with its work. 

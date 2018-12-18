@@ -32,6 +32,7 @@ when it comes to webpack, you can extend this library using its lightwight
 * Font handling ([file-loader](https://github.com/webpack-contrib/file-loader))
 * Output directory cleaning ([CleanWebpackPlugin](https://github.com/johnagan/clean-webpack-plugin))
 * Progressbar while building ([progress-bar-webpack-plugin](https://github.com/clessg/progress-bar-webpack-plugin))
+* A HTML templating plugin ([Html Webpack Plugin](https://github.com/jantimon/html-webpack-plugin))
 * I implemented a custom sass loader to speed up module based sass compiling
 * You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
 * A custom component loader to keep component compiling lightning fast

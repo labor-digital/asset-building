@@ -45,8 +45,9 @@ module.exports = class WebpackConfigBuilder {
 				"MinChunkSize.js",
 
 				"DevOnly.js",
-				"ProdOnly.js"
-			], context
+				"ProdOnly.js",
+				"HtmlPlugin.js"
+			], componentPath, context
 		]).forEach(file => {
 			const key = file.replace(/\.js$/, "").trim();
 			components.set(key, require(componentPath + file))
@@ -125,11 +126,11 @@ module.exports = class WebpackConfigBuilder {
 				hints: false
 			},
 			resolve: {
-				modules: [context.dir.nodeModules, context.dir.buildingNodeModules, "node_modules"],
+				modules: Array.from(context.dir.additionalResolverPaths),
 				extensions: [".ts", ".tsx", ".js", ".json"]
 			},
 			resolveLoader: {
-				modules: [context.dir.buildingNodeModules, context.dir.nodeModules, "node_modules", "/"]
+				modules: Array.from(context.dir.additionalResolverPaths)
 			},
 			output: {
 				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson) + "_" + context.currentApp
@@ -146,11 +147,6 @@ module.exports = class WebpackConfigBuilder {
 
 		// Load possible environments
 		let environmentHandlers = new Map();
-		const dir = path.resolve(__dirname + "/Environments/") + path.sep;
-		fs.readdirSync(dir).forEach(file => {
-			const key = file.toLowerCase().replace(/\.[^.]*?$/g, "");
-			environmentHandlers.set(key, dir + file);
-		});
 		context.callPluginMethod("getEnvironmentHandlers", [environmentHandlers, context]);
 
 		// Detect an environment
@@ -162,9 +158,14 @@ module.exports = class WebpackConfigBuilder {
 		if (context.environment === null) return null;
 
 		// Check if we can handle this environment
+		if(environmentHandlers.size === 0)
+			throw new Error("There are no environment handlers registered!");
 		if (!environmentHandlers.has(context.environment))
 			throw new Error("Can't handle the given environment: \"" + context.environment + "\"!");
-		const handlerFile = environmentHandlers.get(context.environment);
+		let handlerFile = environmentHandlers.get(context.environment);
+		try {
+			handlerFile = require.resolve(handlerFile);
+		} catch (e) { }
 		if(typeof handlerFile !== "string" || !fs.existsSync(handlerFile))
 			throw new Error("The handler for the given environment: \"" + context.environment + "\" can not be loaded!");
 		const handler = require(handlerFile);

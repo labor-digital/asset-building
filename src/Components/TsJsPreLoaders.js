@@ -37,7 +37,7 @@ module.exports = class TsJsPreLoaders {
 		}
 
 		// Component loader
-		if (context.builderVersion !== 1) {
+		if (context.builderVersion !== 1 && context.currentAppConfig.componentLoader !== false) {
 			loaders.push({
 				"loader": path.resolve(context.dir.controller, "./WebpackLoaders/ComponentLoader/ComponentLoader.js")
 			});
@@ -46,11 +46,18 @@ module.exports = class TsJsPreLoaders {
 		// Plugin loaders
 		loaders = context.callPluginMethod("filterJsPreLoaders", [loaders, context]);
 
+		// Prepare exclude pattern
+		const baseExcludePattern = /node_modules(?![\\/\\\\]@labor[\\/\\\\])/;
+		const excludePattern = context.callPluginMethod("filterExcludePattern", [
+			context.builderVersion === 1 ? baseExcludePattern : undefined,
+			"tsJsPreLoaders", baseExcludePattern, context
+		]);
+
 		// Inject if not empty
 		if(!Array.isArray(loaders) || loaders.length === 0) return;
 		context.webpackConfig.module.rules.push({
 			test: /\.js$|\.ts$|\.tsx$/,
-			exclude: context.builderVersion === 1 ? /node_modules(?![\\/\\\\]@labor[\\/\\\\])/ : undefined,
+			exclude: excludePattern === null ? undefined : excludePattern,
 			enforce: "pre",
 			use: loaders
 		});

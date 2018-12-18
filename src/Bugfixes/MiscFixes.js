@@ -57,14 +57,11 @@ module.exports = class MiscFixes {
 	static resolveFilenameFix(dir) {
 		// Make sure we can supply modules from our build context
 		const resolveFilenameOrig = Module._resolveFilename;
-		const additionalPaths = [
-			dir.nodeModules.substr(0, dir.nodeModules.length - 1),
-			dir.buildingNodeModules.substr(0, dir.buildingNodeModules.length - 1),
-			dir.current.substr(0, dir.current.length - 1)
-		];
-
 		const resolverCache = {};
 		Module._resolveFilename = function resolveFilenameOverride(request, parent, isMain, options) {
+			// Create local paths
+			let additionalResolverPaths = Array.from(dir.additionalResolverPaths).map(s => s.replace(/[\\\/]*$/, ""));
+
 			// Prepare cache key to make sure to prevent caching overlay's
 			const cacheKey = request + parent.id + isMain;
 			const isCacheable = typeof options === "undefined" || options === null;
@@ -81,7 +78,7 @@ module.exports = class MiscFixes {
 			} catch (e) {
 				// Try additional path's to resolve the request filename
 				if (typeof options !== "object") options = {};
-				options.paths = [path.dirname(parent.filename)].concat(additionalPaths);
+				options.paths = [path.dirname(parent.filename)].concat(additionalResolverPaths);
 				result = resolveFilenameOrig(request, parent, isMain, options);
 			}
 
@@ -89,7 +86,7 @@ module.exports = class MiscFixes {
 			if (result === null) {
 				throw new Error("Could not resolve module request: \"" + request +
 					"\", tried: \"" + [path.dirname(request), path.dirname(parent.filename)]
-						.concat(additionalPaths).join("\", \"") + "\"");
+						.concat(additionalResolverPaths).join("\", \"") + "\"");
 			}
 
 			// Store output or skip if the value is not cacheable

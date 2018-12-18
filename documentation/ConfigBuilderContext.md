@@ -19,6 +19,7 @@ may use for your current task of setting up webpack.
 	* **nodeModules:** The absolute path to the current base package's node modules
 	* **buildingNodeModules:** The absolute path to the asset-building's node modules
 	* **packageJson:** The absolute path to the base package's package.json
+	* **additionalResolverPaths:** Is used to store additional paths that should be used for node and webpack file resolution
 * **callback:** The callback for the webpack compiler
 * **callPluginMethod(method, args)**
 Internal helper to loop over all plugin instances and call a requested method on 

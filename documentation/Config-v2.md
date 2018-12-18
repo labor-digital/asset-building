@@ -173,3 +173,28 @@ Currently only "vuejs" is supported, but you can add environments using plugins.
   ],
 }
 ```
+
+### app.htmlTemplate
+When you start to create real single page apps, you will sooner or later come to a point
+where you want webpack to create your entry html file which automatically includes the built assets.
+We provide such an option, just set your app.htmlTemplate to TRUE and an index.html containing a
+div with id "app" will be created for you using [Html Webpack Plugin](https://github.com/jantimon/html-webpack-plugin).
+If you want to go further you can also supply all configuration options for the plugin by passing an object instead of merely true.
+While you are on an intermediate level we also provide you with [Html Webpack Template](https://www.npmjs.com/package/html-webpack-template)
+which adds some additional markers of data that may be injected.  
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      [...]
+      "htmlTemplate": true // <-- Simple default template using a "app" mount point
+      [//]
+      "htmlTemplate": {
+      	"template": "./your/template.html,
+      	"title": "My fancy page"
+      }
+    }
+  ],
+}
+```

@@ -16,7 +16,6 @@ module.exports = class WebpackCallbackHandler {
 	static handle(context, err, stats) {
 		if (err) throw new Error(err.stack || err);
 
-
 		// Generate output
 		let statsJson = stats.toJson({
 			assets: true,
@@ -76,9 +75,10 @@ module.exports = class WebpackCallbackHandler {
 			child.assets.forEach(asset => {
 				// console.log(' - > ', asset.name, asset.chunks, asset.chunkNames);
 				const isMap = asset.name.match(/\.map$/);
+				const isHotUpdate = asset.name.match(/\.hot-update\./);
 				const chunkIsMain = typeof asset.chunks[0] === "string" && asset.chunks[0].indexOf("main") === 0;
 				const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0
-				const useAsset = !isMap && (chunkIsMain || chunkNameIsMain);
+				const useAsset = !isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain);
 
 				if (!useAsset) {
 					ignoredChunks++;
@@ -152,7 +152,7 @@ module.exports = class WebpackCallbackHandler {
 		context.callPluginMethod("callbackDone", [context]);
 
 		// Kill if we don't watch
-		if (!isWatch) process.exit(exitCode);
+		if (!isWatch && context.laborConfig.keepAlive !== true) process.exit(exitCode);
 	}
 
 	/**

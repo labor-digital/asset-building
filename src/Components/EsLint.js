@@ -10,10 +10,18 @@ module.exports = class EsLint {
 	 * @param {module.ConfigBuilderContext} context
 	 */
 	static apply(context){
+
+		// Prepare exclude pattern
+		const baseExcludePattern = /node_modules(?![\\/\\\\]@labor[\\/\\\\])/;
+		const excludePattern = context.callPluginMethod("filterExcludePattern", [
+			context.builderVersion === 1 ? baseExcludePattern : undefined,
+			"esLint", baseExcludePattern, context
+		]);
+
 		// Javascript
 		context.webpackConfig.module.rules.push({
 			test: /\.js$/,
-			exclude: context.builderVersion === 1 ? /node_modules(?![\\/\\\\]@labor[\\/\\\\])/ : undefined,
+			exclude: excludePattern === null ? undefined : excludePattern,
 			enforce: "pre",
 			use: [
 				{
@@ -27,7 +35,7 @@ module.exports = class EsLint {
 		// Typescript
 		context.webpackConfig.module.rules.push({
 			test: /\.ts$|\.tsx$/,
-			exclude: context.builderVersion === 1 ? /node_modules(?![\\/\\\\]@labor[\\/\\\\])/ : undefined,
+			exclude: excludePattern === null ? undefined : excludePattern,
 			enforce: "pre",
 			use: [
 				{

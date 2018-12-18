@@ -9,9 +9,16 @@ module.exports = class TypescriptLoader {
 	 * @param {module.ConfigBuilderContext} context
 	 */
 	static apply(context) {
+		// Prepare exclude pattern
+		const baseExcludePattern = /node_modules(?![\\/\\\\]@labor[\\/\\\\])/;
+		const excludePattern = context.callPluginMethod("filterExcludePattern", [
+			context.builderVersion === 1 ? baseExcludePattern : undefined,
+			"typescript", baseExcludePattern, context
+		]);
+
 		context.webpackConfig.module.rules.push({
 			test: /\.js$|\.ts$|\.tsx$/,
-			exclude: context.builderVersion === 1 ? /node_modules(?![\\/\\\\]@labor[\\/\\\\])/ : undefined,
+			exclude: excludePattern === null ? undefined : excludePattern,
 			use: [
 				{
 					"loader": "ts-loader",

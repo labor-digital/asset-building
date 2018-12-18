@@ -35,5 +35,16 @@ module.exports = class Dir {
 		 * @type {string}
 		 */
 		this.packageJson = this.current + "package.json";
+
+		/**
+		 * Is used to store additional paths that should be used for node and webpack file resolution
+		 * in addition to the default node_modules directory
+		 * @type {Set<any>}
+		 */
+		this.additionalResolverPaths = new Set();
+		this.additionalResolverPaths.add(this.nodeModules);
+		this.additionalResolverPaths.add(this.buildingNodeModules);
+		this.additionalResolverPaths.add("node_modules");
+		this.additionalResolverPaths.add(path.sep);
 	}
 };
