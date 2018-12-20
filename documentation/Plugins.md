@@ -84,6 +84,36 @@ Is called before a component with the given "key" is applied to the config.
 ## afterComponent(context, key)
 Is called after a component with the given "key" is applied to the config but before the environment is applied.
 
+## filterLoaderTest(regex, type, context)
+Can be used to filter the regular expression that is used for a loader's test
+Type defines the loader that currently gets it's config filtered. Is called for every loader that the library injects
+Types are (not ordered):
+- jsLintLoader
+- tsLintLoader
+- fontLoader
+- htmlLoader
+- imageLoader
+- lessLoader
+- sassLoader
+- tsJsPreLoader
+- typescriptLoader
+
+## filterLoaderConfig(config, type, context)
+Can be used to filter the configuration for every loader we create in the webpack config.
+Type defines the loader that currently gets it's config filtered. Is called for every loader that the library injects
+See filterLoaderTest() for the used types
+
+## filterPluginConfig(config, type, context)
+Is called right before a new webpack plugin instance is injected into the webpack config.
+Type defines the plugin that is currently configured
+Types are (not ordered):
+- copyPlugin
+- cleanOutputDirPlugin
+- cssExtractPlugin
+- htmlPlugin
+- minChunkSizePlugin
+- providePlugin
+
 ## filterExcludePattern(pattern, request, basePattern, context)
 Can be used to change the exclude pattern for some webpack loaders.
 The **pattern** is either undefined or a regex like basePattern.
@@ -206,6 +236,14 @@ webpack() function in Controller.js is omitted so that your logic can take over 
 create its own webpack instances. useDefaultCompiler tells you if one of the plugins
 before the current one already disabled the default compiler. Webpack holds the 
 reference to the webpack API. The callback is the prepared wrapper around context.callback.
+
+## customSassLoaderFileExtensionFallback(ext, stylesheetPath, resourceQuery, source, context)
+This hook is only executed if the custom sass loader is used. In some edge-cases, like
+vue single file components the stylesheetPath does not end with .sass or .scss on which the sass
+loader relies to determine how to parse the file. 
+
+This hook can be used to find the source's real extension and to inject it back
+into the loader.
 
 ## compilingDone(output, context)
 This hook is called every time the webpack compiler is finished with its work. 

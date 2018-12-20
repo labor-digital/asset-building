@@ -9,56 +9,64 @@ module.exports = class LessLoader {
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
-	static apply(context){
-		if(context.builderVersion === 1)
+	static apply(context) {
+		if (context.builderVersion === 1)
 			LessLoader._applyLegacy(context);
 		else
 			LessLoader._applyDefault(context);
 	}
 
-	static _applyDefault(context){
-		context.webpackConfig.module.rules.push({
-			test: /\.less$/,
-			use: [
+	static _applyDefault(context) {
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					loader: MiniCssExtractPlugin.loader,
-					options: {
-						publicPath: "../"
-					}
+					test: context.callPluginMethod("filterLoaderTest", [/\.less$/, "lessLoader", context]),
+					use: [
+						{
+							loader: MiniCssExtractPlugin.loader,
+							options: {
+								publicPath: "../"
+							}
+						},
+						{
+							loader: "css-loader",
+							options: {
+								import: false
+							}
+						}, {
+							loader: "less-loader"
+						}
+					]
 				},
-				{
-					loader: "css-loader",
-					options: {
-						import: false
-					}
-				}, {
-					loader: "less-loader"
-				}
-			]
-		});
+				"lessLoader", context
+			]));
 	}
 
-	static _applyLegacy(context){
-		context.webpackConfig.module.rules.push({
-			test: /\.less$/,
-			use: [
+	static _applyLegacy(context) {
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					loader: MiniCssExtractPlugin.loader
+					test: context.callPluginMethod("filterLoaderTest", [/\.less$/, "lessLoader", context]),
+					use: [
+						{
+							loader: MiniCssExtractPlugin.loader
+						},
+						{
+							loader: "css-loader",
+							options: {
+								import: false,
+								url: false
+							}
+						}, {
+							loader: "less-loader",
+							options: {
+								relativeUrls: false,
+								sourceMap: true
+							}
+						}
+					]
 				},
-				{
-					loader: "css-loader",
-					options: {
-						import: false,
-						url: false
-					}
-				}, {
-					loader: "less-loader",
-					options: {
-						relativeUrls: false,
-						sourceMap: true
-					}
-				}
-			]
-		});
+				"lessLoader", context
+			]));
 	}
 };

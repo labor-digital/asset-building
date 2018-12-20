@@ -44,7 +44,7 @@ module.exports = class Dir {
 		this.additionalResolverPaths = new Set();
 		this.additionalResolverPaths.add(this.nodeModules);
 		this.additionalResolverPaths.add(this.buildingNodeModules);
-		this.additionalResolverPaths.add("node_modules");
+		this.additionalResolverPaths.add("node_modules" + path.sep);
 		this.additionalResolverPaths.add(path.sep);
 	}
 };

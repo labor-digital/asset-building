@@ -21,59 +21,67 @@ module.exports = class SassLoader {
 	}
 
 	static _applyDefault(context) {
-		context.webpackConfig.module.rules.push({
-			test: /\.s?[ac]ss$/,
-			use: [
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					loader: MiniCssExtractPlugin.loader,
-					options: {
-						publicPath: "../"
-					}
+					test: context.callPluginMethod("filterLoaderTest", [/\.s?[ac]ss$/, "sassLoader", context]),
+					use: [
+						{
+							loader: MiniCssExtractPlugin.loader,
+							options: {
+								publicPath: "../"
+							}
+						},
+						{
+							loader: "css-loader",
+							options: {
+								import: true
+							}
+						},
+						{
+							loader: path.resolve(context.dir.controller, "./WebpackLoaders/CustomSassLoader/CustomSassLoader.js"),
+							options: {
+								currentAppConfig: context.currentAppConfig,
+								context,
+								useCssLoaderBridge: true
+							}
+						}
+					]
 				},
-				{
-					loader: "css-loader",
-					options: {
-						import: false
-					}
-				},
-				{
-					loader: path.resolve(context.dir.controller, "./WebpackLoaders/CustomSassLoader/CustomSassLoader.js"),
-					options: {
-						app: context.currentAppConfig,
-						dir: context.dir,
-						useCssLoaderBridge: true
-					}
-				}
-			]
-		});
+				"sassLoader", context
+			]));
 
 		// Hack to speed up the css-loader compilation
-		require("../WebpackLoaders/CustomSassLoader/CssLoaderProcessCssWrapper");
+		require("../WebpackLoaders/CustomSassLoader/CssLoaderProcessCssWrapper")(context);
 	}
 
 	static _applyLegacy(context) {
-		context.webpackConfig.module.rules.push({
-			test: /\.s?[ac]ss$/,
-			use: [
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					loader: MiniCssExtractPlugin.loader
+					test: context.callPluginMethod("filterLoaderTest", [/\.s?[ac]ss$/, "sassLoader", context]),
+					use: [
+						{
+							loader: MiniCssExtractPlugin.loader
+						},
+						{
+							loader: "css-loader?url=false&-url",
+							options: {
+								import: false,
+								url: false
+							}
+						},
+						{
+							loader: "sass-loader?sourceMapRoot=foo",
+							options: {
+								sourceMap: true,
+								outputStyle: "expanded",
+								sourceMapContents: true
+							}
+						}
+					]
 				},
-				{
-					loader: "css-loader?url=false&-url",
-					options: {
-						import: false,
-						url: false
-					}
-				},
-				{
-					loader: "sass-loader?sourceMapRoot=foo",
-					options: {
-						sourceMap: true,
-						outputStyle: "expanded",
-						sourceMapContents: true
-					}
-				}
-			]
-		});
+				"sassLoader", context
+			]));
 	}
 };

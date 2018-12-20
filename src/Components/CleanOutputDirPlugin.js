@@ -18,16 +18,14 @@ module.exports = class CleanOutputDirPlugin {
 		// Add plugin to clean the output directory when the app is compiled
 		// But make sure to keep all sources which have been defined in there
 		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift();
-		const cleanConfig = context.callPluginMethod("filterCleanOptions", [
-			{
-				directories: [path.basename(outputDirectory)],
-				options: {
+		context.webpackConfig.plugins.push(new CleanWebpackPlugin(
+			... context.callPluginMethod("filterPluginConfig", [
+				[[path.basename(outputDirectory)], {
 					root: path.dirname(outputDirectory),
 					exclude: sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + "/"] : undefined,
 					verbose: true
-				}
-			}, context
-		]);
-		context.webpackConfig.plugins.push(new CleanWebpackPlugin(cleanConfig.directories, cleanConfig.options));
+				}],
+				"cleanOutputDirPlugin", context]
+		)));
 	}
 };

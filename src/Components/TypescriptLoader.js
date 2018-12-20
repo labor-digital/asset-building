@@ -16,30 +16,34 @@ module.exports = class TypescriptLoader {
 			"typescript", baseExcludePattern, context
 		]);
 
-		context.webpackConfig.module.rules.push({
-			test: /\.js$|\.ts$|\.tsx$/,
-			exclude: excludePattern === null ? undefined : excludePattern,
-			use: [
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					"loader": "ts-loader",
-					"options": context.callPluginMethod("filterTypescriptOptions", [
+					test: context.callPluginMethod("filterLoaderTest", [/\.js$|\.ts$|\.tsx$/, "typescriptLoader", context]),
+					exclude: excludePattern === null ? undefined : excludePattern,
+					use: [
 						{
-							"context": context.dir.current,
-							"configFile": path.resolve(context.dir.controller, "../ts/tsconfig.json"),
-							"transpileOnly": !(context.currentAppConfig.useTypeChecker === true),
-							"experimentalWatchApi": true,
-							"onlyCompileBundledFiles": true,
-							"compilerOptions": {
-								"allowJs": true,
-								"target": "es5",
-								"moduleResolution": "node",
-								"module": "esnext"
-							}
-						},
-						context
-					])
-				}
-			]
-		});
+							"loader": "ts-loader",
+							"options": context.callPluginMethod("filterTypescriptOptions", [
+								{
+									"context": context.dir.current,
+									"configFile": path.resolve(context.dir.controller, "../ts/tsconfig.json"),
+									"transpileOnly": !(context.currentAppConfig.useTypeChecker === true),
+									"experimentalWatchApi": true,
+									"onlyCompileBundledFiles": true,
+									"compilerOptions": {
+										"allowJs": true,
+										"target": "es5",
+										"moduleResolution": "node",
+										"module": "esnext"
+									}
+								},
+								context
+							])
+						}
+					]
+				},
+				"typescriptLoader", context
+			]));
 	}
 };

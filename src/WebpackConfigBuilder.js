@@ -39,10 +39,10 @@ module.exports = class WebpackConfigBuilder {
 				"SassLoader.js",
 				"CssExtractPlugin",
 
-				"ProviderPlugin.js",
+				"ProvidePlugin.js",
 				"CopyPlugin.js",
 				"CleanOutputDirPlugin.js",
-				"MinChunkSize.js",
+				"MinChunkSizePlugin.js",
 
 				"DevOnly.js",
 				"ProdOnly.js",

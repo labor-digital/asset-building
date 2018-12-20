@@ -8,11 +8,16 @@ module.exports = class HtmlLoader {
 	 * @param {module.ConfigBuilderContext} context
 	 */
 	static apply(context){
-		context.webpackConfig.module.rules.push({
-			test: /\.html$/,
-			use: [{
-				loader: "html-loader"
-			}]
-		});
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig",[
+				{
+					test: context.callPluginMethod("filterLoaderTest", [/\.html$/, "htmlLoader", context]),
+					use: [{
+						loader: "html-loader"
+					}]
+				},
+				"htmlLoader", context
+			])
+		);
 	}
 };

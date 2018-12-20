@@ -4,8 +4,8 @@
  */
 const path = require("path");
 const FileService = require("../../Services/FileService");
-const FileHelpers = require('../../Helpers/FileHelpers');
-const Stylesheet = require('./Stylesheet');
+const FileHelpers = require("../../Helpers/FileHelpers");
+const Stylesheet = require("./Stylesheet");
 
 const importFilenameCache = new Map();
 let guid = 0;
@@ -70,15 +70,20 @@ module.exports = class SassHelpers {
 	 * to our sass loader to follow the relative path of the file
 	 * @param stylesheetPath
 	 * @param nodeDirectory
+	 * @param [injectedContent] Can be used to inject the stylesheets content
 	 * @return {module.Stylesheet|*}
 	 */
-	static preParseSass(stylesheetPath, nodeDirectory){
+	static preParseSass(stylesheetPath, nodeDirectory, injectedContent) {
 		const resolvedFiles = new Set();
 		const fileContents = new Map();
 		const posixStylesheetPath = FileHelpers.filenameToPosix(stylesheetPath);
 
+		// Inject injected content into file service
+		if (typeof injectedContent === "string")
+			FileService.setFileContent(stylesheetPath, injectedContent);
+
 		function makeImportWrapper(filename) {
-			const importKey = 'import-wrapper-' + guid++;
+			const importKey = "import-wrapper-" + guid++;
 			let content = `
 $customSassLoaderTmp: custom-sass-loader-open-file("${filename}");
 @import "${filename}";
@@ -92,10 +97,10 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 			const ext = FileHelpers.getFileExtension(filename);
 			const posixFilename = FileHelpers.filenameToPosix(filename);
 
-			if (content === null) throw new Error('Could not read contents of sass file: "' + filename + '"');
+			if (content === null) throw new Error("Could not read contents of sass file: \"" + filename + "\"");
 
 			// Make sure that everything looks like scss
-			if (ext === 'sass') content = SassHelpers.sass2scss(content);
+			if (ext === "sass") content = SassHelpers.sass2scss(content);
 
 			// Resolve imports
 			content = content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:[^\S\n]+)?)/gm, (a, before, importStatement, after) => {
@@ -103,7 +108,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 				const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
 
 				// Check if the import already happened
-				if (resolvedFiles.has(importFilename)) return '';
+				if (resolvedFiles.has(importFilename)) return "";
 
 				// Mark file as resolved
 				resolvedFiles.add(importFilename);
@@ -119,11 +124,11 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 			// Wrap url calls to make sure they get resolved propperly
 			content = content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:[^\S\n]+)?)(\))/gm, (a, before, url, after) => {
 				// Ignore data urls
-				if (url.indexOf('data: ') !== -1) return a;
+				if (url.indexOf("data: ") !== -1) return a;
 
 				// Make sure to enquote everything that does not look like it is a variable
-				if (!url.match(/[$#{}"']/)) url = '"' + url + '"';
-				return before + 'custom-sass-loader-url-resolver(' + url + ')' + after;
+				if (!url.match(/[$#{}"']/)) url = "\"" + url + "\"";
+				return before + "custom-sass-loader-url-resolver(" + url + ")" + after;
 			});
 
 			// Store the file content
@@ -132,17 +137,17 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 
 		// Load the stylesheet content
 		const sassContent = FileService.getFileContent(stylesheetPath);
-		if (sassContent === null) throw new Error('Invalid stylesheetPath to load: ' + stylesheetPath);
+		if (sassContent === null) throw new Error("Invalid stylesheetPath to load: " + stylesheetPath);
 
-		// Add stylehseet to the watchable files
+		// Add stylesheet to the watchable files
 		resolvedFiles.add(stylesheetPath);
 
 		// Parse contents and extract children
 		parseContent(stylesheetPath, sassContent);
 
 		// Create an outer wrapper to make sure url's in the basefile may be resolved as in all other files
-		const outerWrapper = '@import "' + makeImportWrapper(posixStylesheetPath) + '";';
-		const outerKey = 'main-' + guid++;
+		const outerWrapper = "@import \"" + makeImportWrapper(posixStylesheetPath) + "\";";
+		const outerKey = "main-" + guid++;
 		fileContents.set(outerKey, outerWrapper);
 
 		// Done
@@ -155,7 +160,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 	 * @param content
 	 * @return {*}
 	 */
-	static sass2scss(content){
+	static sass2scss(content) {
 		if (typeof content !== "string") return content;
 
 		let lines = content.split(/\r?\n/g);
@@ -275,7 +280,12 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		for (const [index, line] of parsedLines.entries()) {
 			if (line.empty !== true) {
 				// Try to find empty selectors which may break the process
-				if (line.text.indexOf(":") === -1 && line.text.match(/^\s*[^:+=@\n{}]*?[^\n{,]$/)) {
+				if (line.text.indexOf(":") === -1 && (
+					// Empty selector
+					line.text.match(/^\s*[^:+=@\n{}]*?[^\n{,]$/) ||
+					// Empty statement
+					line.text.match(/^\s*@(if|else if|elseif|else)[^\n{}]*?[^\n{,]$/)
+				)) {
 					line.text += "{}";
 				}
 

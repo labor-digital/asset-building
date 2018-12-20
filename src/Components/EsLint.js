@@ -9,7 +9,7 @@ module.exports = class EsLint {
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
-	static apply(context){
+	static apply(context) {
 
 		// Prepare exclude pattern
 		const baseExcludePattern = /node_modules(?![\\/\\\\]@labor[\\/\\\\])/;
@@ -19,31 +19,39 @@ module.exports = class EsLint {
 		]);
 
 		// Javascript
-		context.webpackConfig.module.rules.push({
-			test: /\.js$/,
-			exclude: excludePattern === null ? undefined : excludePattern,
-			enforce: "pre",
-			use: [
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					loader: "eslint-loader",
-					options: context.callPluginMethod("filterEslintOptions", [
-						new EsLintConfig(context), context, "javascript"])
+					test: context.callPluginMethod("filterLoaderTest", [/\.js$/, "jsLintLoader", context]),
+					exclude: excludePattern === null ? undefined : excludePattern,
+					enforce: "pre",
+					use: [
+						{
+							loader: "eslint-loader",
+							options: context.callPluginMethod("filterEslintOptions", [
+								new EsLintConfig(context), context, "javascript"])
+						}
+					]
 				},
-			]
-		});
+				"jsLintLoader", context
+			]));
 
 		// Typescript
-		context.webpackConfig.module.rules.push({
-			test: /\.ts$|\.tsx$/,
-			exclude: excludePattern === null ? undefined : excludePattern,
-			enforce: "pre",
-			use: [
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
 				{
-					loader: "eslint-loader",
-					options: context.callPluginMethod("filterEslintOptions", [
-						new EsLintConfig_Typescript(context), context, "typescript"])
+					test: context.callPluginMethod("filterLoaderTest", [/\.ts$|\.tsx$/, "tsLintLoader", context]),
+					exclude: excludePattern === null ? undefined : excludePattern,
+					enforce: "pre",
+					use: [
+						{
+							loader: "eslint-loader",
+							options: context.callPluginMethod("filterEslintOptions", [
+								new EsLintConfig_Typescript(context), context, "typescript"])
+						}
+					]
 				},
-			]
-		});
+				"tsLintLoader", context
+			]));
 	}
 };

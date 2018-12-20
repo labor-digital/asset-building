@@ -16,7 +16,11 @@ module.exports = class FileHelpers {
 	}
 
 	static getFileExtension(filename) {
-		return filename.replace(/^(.*?\.)([^\\\/]*)$/, "$2").toLowerCase();
+		return FileHelpers.stripOffQuery(filename.replace(/^(.*?\.)([^.\\\/]*)$/, "$2").toLowerCase());
+	}
+
+	static stripOffQuery(filename){
+		return filename.replace(/\?.*?$/, "")
 	}
 
 	static getFileWithoutExtension(filename) {

@@ -9,12 +9,17 @@ module.exports = class CssExtractPlugin {
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
-	static apply(context){
+	static apply(context) {
 		const outputFileWithoutExtension = FileHelpers.getFileWithoutExtension(context.webpackConfig.output.filename);
-		context.webpackConfig.plugins.push(new MiniCssExtractPlugin({
-			filename: "css/" + outputFileWithoutExtension + ".css",
-			chunkFilename: "css/" + outputFileWithoutExtension +
-				(context.isProd ? "-[id]-[hash].css" : "-[id].css")
-		}));
+		context.webpackConfig.plugins.push(new MiniCssExtractPlugin(
+			context.callPluginMethod("filterPluginConfig", [
+				{
+					filename: "css/" + outputFileWithoutExtension + ".css",
+					chunkFilename: "css/" + outputFileWithoutExtension +
+						(context.isProd ? "-[id]-[hash].css" : "-[id].css")
+				},
+				"cssExtractPlugin", context
+			])
+		));
 	}
 };

@@ -3,7 +3,7 @@
  * For LABOR.digital
  */
 const webpack = require("webpack");
-module.exports = class ProviderPlugin {
+module.exports = class ProvidePlugin {
 	/**
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
@@ -11,7 +11,12 @@ module.exports = class ProviderPlugin {
 	static apply(context) {
 		const providerConfig = context.callPluginMethod("getJsProvides", [{}, context]);
 		context.webpackConfig.plugins.push(
-			new webpack.ProvidePlugin(providerConfig)
-		);
+			new webpack.ProvidePlugin(
+				context.callPluginMethod("filterPluginConfig", [
+				providerConfig,
+					"providePlugin", context
+				]
+			)
+		));
 	}
 };

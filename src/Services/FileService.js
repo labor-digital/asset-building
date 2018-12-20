@@ -33,6 +33,11 @@ module.exports = class FileService {
 		return content;
 	}
 
+	static setFileContent(filename, content){
+		filename = path.resolve(filename);
+		storage.set(filename, content);
+	}
+
 	static fileExists(filename) {
 		return this.getFileContent(filename) !== null;
 	}

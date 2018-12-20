@@ -5,12 +5,11 @@
 const path = require("path");
 const CssLoaderBridge = require("./CssLoaderBridge");
 
-// Load the default process css to load it into the cache
-const file = path.dirname(require.resolve("css-loader")) + path.sep + "lib" + path.sep + "processCss.js";
-if (typeof require.cache[file] !== "undefined") throw new Error("We are to loate, css-loader is already set up!");
-const defaultProcessCss = require(file);
+// True if the hack was applied at least once
+let isHacked = false;
 
 /**
+ /**
  * This wrapper is used to wrap css-loader's internal "processCss", because it parses
  * the css using post-css which is extremely slow and takes up to 4/5th of the compiling time of my test-sass files.
  *
@@ -23,22 +22,42 @@ const defaultProcessCss = require(file);
  * If we request a file which was not prepared by our internal loader we simply pass the sources to the default
  * function and let it do what is here for.
  *
- * @param inputSource
- * @param inputMap
- * @param options
- * @param callback
- * @return {*}
+ * @param {module.ConfigBuilderContext} context
  */
-require.cache[file].exports = function cssLoaderProcessCssWrapper(inputSource, inputMap, options, callback) {
+module.exports = function(context){
+	if(isHacked) return;
+	isHacked = true;
 
-	// Check if we have a definition for this file
-	let definition = CssLoaderBridge.getDefinitionForStylesheet(options.from);
-	if (typeof definition !== "undefined") {
-		// Reroute directly to the callback
-		callback(null, definition);
-		return;
-	}
+	// Prepare file list of possible modules to rewrite
+	const fileSuffix = path.sep + "lib" + path.sep + "processCss.js";
+	const paths = new Set();
+	paths.add(context.dir.nodeModules + "css-loader" + fileSuffix);
+	paths.add(context.dir.buildingNodeModules + "css-loader" + fileSuffix);
+	paths.add(path.dirname(require.resolve("css-loader")) + fileSuffix);
+	context.dir.additionalResolverPaths.forEach(path => {
+		paths.add(path + fileSuffix);
+	});
 
-	// Use default processor
-	defaultProcessCss(inputSource, inputMap, options, callback);
+	// Inject the wrapper to all valid paths
+	paths.forEach(file => {
+		try {
+			const defaultProcessCss = require(file);
+			require.cache[file].exports = function cssLoaderProcessCssWrapper (inputSource, inputMap, options, callback) {
+
+				// Check if we have a definition for this file
+				let definition = CssLoaderBridge.getDefinitionForStylesheet(options.from);
+				if (typeof definition !== "undefined") {
+					// Reroute directly to the callback
+					callback(null, definition);
+					return;
+				}
+
+				// Use default processor
+				defaultProcessCss(inputSource, inputMap, options, callback);
+			};
+		} catch (e) {
+		}
+	});
 };
+
+

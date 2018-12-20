@@ -2,6 +2,26 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.0.2] - 2018-12-20
+### Added
+- Added new hook "filterLoaderConfig"
+- Added new hook "filterLoaderTest"
+- Added new hook "filterPluginConfig"
+- Added new hook "customSassLoaderFileExtensionFallback"
+- Added stripOffQuery method to FileHelpers
+
+### Changed
+- Makes sure that every path in context.dir.additionalResolverPaths ends with a slash
+- Rework of the "CssLoaderProcessCssWrapper" hack, so that the css-loader can be resolved even in the project's root nodeModules
+- Changed the context / config transfer to customSassLoader
+- FileHelpers.getFileExtension() now trims of the query string correctly
+- SassHelpers.preParseSass() now gets the entry sass file's content as injected code, instead of loading it by itself to make it compatible with other loaders, like vue-loader
+- Renamed component "ProviderPlugin.js" to "ProvidePlugin.js"
+- Renamed component "MinChunkSize.js" to "MinChunkSizePlugin.js"
+
+### Fixed
+- Fixed an issue with sass2css when using empty conditionals
+
 ## [3.0.1] - 2018-12-18
 ### Added
 - Added HtmlWebpackPlugin for easy creation of html base files

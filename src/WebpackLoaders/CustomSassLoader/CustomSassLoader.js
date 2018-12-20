@@ -8,17 +8,33 @@ const sass = require("node-sass");
 const SassHelpers = require("./SassHelpers");
 const ResourceService = require("./ResourceService");
 const FileService = require("../../Services/FileService");
+const FileHelpers = require("../../Helpers/FileHelpers");
 
 const resolvedUrlCache = new Map();
 
 module.exports = function customSassLoader(sassSource) {
 
-	const stylesheetPath = this.resourcePath;
-	const app = this.query.app;
-	const entry = path.resolve(this.query.dir.current, app.entry);
+	let stylesheetPath = FileHelpers.stripOffQuery(this.resource);
+	/**
+	 * @type {module.ConfigBuilderContext} context
+	 */
+	const context = this.query.context;
+	const app = this.query.currentAppConfig;
+	const entry = path.resolve(context.dir.current, app.entry);
 	const urlRelativeRoot = path.dirname(stylesheetPath);
 	const self = this;
 	const callback = this.async();
+
+	// Make sure the extension is ok for us
+	const validExtensions = ["css", "sass", "scss"];
+	let ext = FileHelpers.getFileExtension(stylesheetPath);
+	if(validExtensions.indexOf(ext) === -1){
+		// This is not a valid file extension, try to rewrite the stylesheet path
+		let alternativeExt = context.callPluginMethod("customSassLoaderFileExtensionFallback", [ext, stylesheetPath, this.resourceQuery, sassSource, context]);
+		if(alternativeExt === ext)
+			throw new Error("Error while parsing a file called: \"" + stylesheetPath + "\" the file's extension does not look like to be sass compatible!");
+		stylesheetPath += "." + alternativeExt;
+	}
 
 	// Check if source is empty
 	if (sassSource.trim().length === 0) {
@@ -36,12 +52,12 @@ module.exports = function customSassLoader(sassSource) {
 
 		try {
 			// Preparse stylesheet
-			const stylesheet = SassHelpers.preParseSass(stylesheetPath, this.query.dir.nodeModules);
+			const stylesheet = SassHelpers.preParseSass(stylesheetPath, context.dir.nodeModules, sassSource);
 
 			// Add resources to stylesheet
 			const resourcePath = ResourceService.getResourcePathForStylesheet(entry, stylesheetPath);
 			ResourceService.addResourcesToStylesheet(resourcePath, stylesheet, () => {
-				return SassHelpers.preParseSass(resourcePath, this.query.dir.nodeModules);
+				return SassHelpers.preParseSass(resourcePath, context.dir.nodeModules);
 			});
 
 			// Register dependencies
@@ -153,10 +169,10 @@ module.exports = function customSassLoader(sassSource) {
 			// Store contents to bridge if required
 			if (useCssLoaderBridge) {
 				const bridge = require("./CssLoaderBridge");
-				bridge.setDefinitionForStylesheet(stylesheetPath, result.css.toString(), cssLoaderBridgeUrls);
+				bridge.setDefinitionForStylesheet(this.resource, result.css.toString(), cssLoaderBridgeUrls);
 
 				// Empty string -> Save overhead
-				callback(null, "#foo");
+				callback(null, ".foo{};");
 				return;
 			}
 

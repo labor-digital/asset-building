@@ -54,12 +54,16 @@ module.exports = class TsJsPreLoaders {
 		]);
 
 		// Inject if not empty
-		if(!Array.isArray(loaders) || loaders.length === 0) return;
-		context.webpackConfig.module.rules.push({
-			test: /\.js$|\.ts$|\.tsx$/,
-			exclude: excludePattern === null ? undefined : excludePattern,
-			enforce: "pre",
-			use: loaders
-		});
+		if (!Array.isArray(loaders) || loaders.length === 0) return;
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
+				{
+					test: context.callPluginMethod("filterLoaderTest", [/\.js$|\.ts$|\.tsx$/, "jsTsPreLoader", context]),
+					exclude: excludePattern === null ? undefined : excludePattern,
+					enforce: "pre",
+					use: loaders
+				},
+				"tsJsPreLoader", context
+			]));
 	}
 };
