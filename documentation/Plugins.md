@@ -168,9 +168,10 @@ module.exports = function () {
 };
 ```
 
-## filterHtmlTemplate(template, context)
-Can be used to filter the given template for the "HtmlWebpackPlugin". The given
-template is always an object, even if the laborConfig says only "true". 
+## browserListFilter(browserList, context)
+PostCss uses a [Browserlist](https://github.com/browserslist/browserslist#best-practices) to determine which plugin it should use and how. By default our script uses "> 1%, last 10 versions". You can use this hook to change the default.
+## postCssPluginFilter(plugins, context)
+Is used to filter and modify the list of postCss plugins (by default only autoprefixer)
 
 ## getJsProvides(provides, context)
 To make js objects like the "$" in jQuery globally available without including 
@@ -189,6 +190,10 @@ module.exports = function () {
     };
 };
 ```
+
+## filterHtmlTemplate(template, context)
+Can be used to filter the given template for the "HtmlWebpackPlugin". The given
+template is always an object, even if the laborConfig says only "true". 
 
 ## filterCleanOptions(configuration, context)
 The second version of the config builder uses [clean-webpack-plugin](https://github.com/johnagan/clean-webpack-plugin)

@@ -3,6 +3,7 @@
  * For LABOR.digital
  */
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const Postcss = require("./SubComponents/Postcss");
 
 module.exports = class LessLoader {
 	/**
@@ -33,7 +34,9 @@ module.exports = class LessLoader {
 							options: {
 								import: false
 							}
-						}, {
+						},
+						Postcss.makeConfig(context),
+						{
 							loader: "less-loader"
 						}
 					]
@@ -57,7 +60,9 @@ module.exports = class LessLoader {
 								import: false,
 								url: false
 							}
-						}, {
+						},
+						Postcss.makeConfig(context),
+						{
 							loader: "less-loader",
 							options: {
 								relativeUrls: false,

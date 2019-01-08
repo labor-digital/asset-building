@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.1.0] - 2019-01-08
+### Added
+- Added ["autoprefixer"](https://github.com/postcss/autoprefixer) as sass/less/css postprocessor which makes the definition of browser-prefixes obsolete
+- Added new hook "postCssPluginFilter"
+- Added new hook "browserListFilter"
+
 ## [3.0.2] - 2018-12-20
 ### Added
 - Added new hook "filterLoaderConfig"

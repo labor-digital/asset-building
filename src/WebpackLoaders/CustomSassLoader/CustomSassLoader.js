@@ -9,6 +9,7 @@ const SassHelpers = require("./SassHelpers");
 const ResourceService = require("./ResourceService");
 const FileService = require("../../Services/FileService");
 const FileHelpers = require("../../Helpers/FileHelpers");
+const PostCssSubComponent = require("../../Components/SubComponents/Postcss");
 
 const resolvedUrlCache = new Map();
 
@@ -165,11 +166,14 @@ module.exports = function customSassLoader(sassSource) {
 		}
 	})
 		.then((result) => {
-
+			// Postprocess the css using post-css
+			return PostCssSubComponent.applyPostProcessing(result.css.toString(), context);
+		})
+		.then(result => {
 			// Store contents to bridge if required
 			if (useCssLoaderBridge) {
 				const bridge = require("./CssLoaderBridge");
-				bridge.setDefinitionForStylesheet(this.resource, result.css.toString(), cssLoaderBridgeUrls);
+				bridge.setDefinitionForStylesheet(this.resource, result.css, cssLoaderBridgeUrls);
 
 				// Empty string -> Save overhead
 				callback(null, ".foo{};");
@@ -177,7 +181,7 @@ module.exports = function customSassLoader(sassSource) {
 			}
 
 			// Resolve ajax request
-			callback(null, result.css.toString());
+			callback(null, result.css);
 
 		})
 		.catch(err => {

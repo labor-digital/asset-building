@@ -23,6 +23,7 @@ when it comes to webpack, you can extend this library using its lightwight
 * Transpiling Es6 Js and typescript sources to es5 ([ts-loader](https://github.com/TypeStrong/ts-loader))
 * Linting javascript ([eslint-loader](https://github.com/webpack-contrib/eslint-loader))
 * Minify js files when using "build" ([uglifyjs-webpack-plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin))
+* Automatically add css-prefixes for older browsers: ([Autoprefixer](https://github.com/postcss/autoprefixer))
 * Creation of source-maps for js files
 
 **Included webpack modules and plugins * Builder Version 2.0**  

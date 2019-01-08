@@ -13,6 +13,7 @@
   "author": "LABOR GmbH",
   "license": "MIT",
   "dependencies": {
+    "autoprefixer": "^9.4.4",
     "babel-eslint": "^9.0.0",
     "chalk": "^2.4.1",
     "chokidar": "^2.0.4",
@@ -35,6 +36,7 @@
     "mini-css-extract-plugin": "^0.4.3",
     "node-sass": "^4.9.3",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
+    "postcss-loader": "^3.0.0",
     "progress-bar-webpack-plugin": "^1.11.0",
     "sass-loader": "^7.1.0",
     "ts-loader": "^5.1.1",

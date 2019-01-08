@@ -24,7 +24,7 @@ module.exports = class SassLoader {
 		context.webpackConfig.module.rules.push(
 			context.callPluginMethod("filterLoaderConfig", [
 				{
-					test: context.callPluginMethod("filterLoaderTest", [/\.s?[ac]ss$/, "sassLoader", context]),
+					test: context.callPluginMethod("filterLoaderTest", [/\.(sa|sc|c)ss$/, "sassLoader", context]),
 					use: [
 						{
 							loader: MiniCssExtractPlugin.loader,
@@ -59,7 +59,7 @@ module.exports = class SassLoader {
 		context.webpackConfig.module.rules.push(
 			context.callPluginMethod("filterLoaderConfig", [
 				{
-					test: context.callPluginMethod("filterLoaderTest", [/\.s?[ac]ss$/, "sassLoader", context]),
+					test: context.callPluginMethod("filterLoaderTest", [/\.(sa|sc|c)ss$/, "sassLoader", context]),
 					use: [
 						{
 							loader: MiniCssExtractPlugin.loader
