@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.1.1] - 2019-01-10
+### Fixed
+- Fixed an issue with postCss which lead to a console warning
+
 ## [3.1.0] - 2019-01-08
 ### Added
 - Added ["autoprefixer"](https://github.com/postcss/autoprefixer) as sass/less/css postprocessor which makes the definition of browser-prefixes obsolete

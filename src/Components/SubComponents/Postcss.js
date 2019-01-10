@@ -28,7 +28,7 @@ module.exports = class Postcss {
 	 */
 	static applyPostProcessing(css, context) {
 		const postcss = require("postcss");
-		return postcss(Postcss.getPostCssPluginList(context)).process(css);
+		return postcss(Postcss.getPostCssPluginList(context)).process(css, {from: undefined});
 	}
 
 	/**
