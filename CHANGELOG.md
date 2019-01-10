@@ -2,6 +2,7 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.1.2] - 2019-01-10
 ### Changed
 - Changed the way how the customSassLoader passes it's result around the webpack css post processor to incorporate other loaders like vue-loader...
 
