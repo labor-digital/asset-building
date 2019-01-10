@@ -47,6 +47,7 @@ module.exports = function(context){
 				// Check if we have a definition for this file
 				let definition = CssLoaderBridge.getDefinitionForStylesheet(options.from);
 				if (typeof definition !== "undefined") {
+					definition.source = inputSource;
 					// Reroute directly to the callback
 					callback(null, definition);
 					return;

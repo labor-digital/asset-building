@@ -13,7 +13,7 @@ module.exports = class fontLoader {
 		context.webpackConfig.module.rules.push(
 			context.callPluginMethod("filterLoaderConfig", [
 				{
-					test: context.callPluginMethod("filterLoaderTest", [/\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/, "fontLoader", context]),
+					test: context.callPluginMethod("filterLoaderTest", [/\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/, "fontLoader", context]),
 					use: [
 						{
 							loader: "file-loader",

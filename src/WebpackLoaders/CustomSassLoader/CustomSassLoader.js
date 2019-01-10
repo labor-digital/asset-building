@@ -40,7 +40,7 @@ module.exports = function customSassLoader(sassSource) {
 	// Check if source is empty
 	if (sassSource.trim().length === 0) {
 		// Skip the whole ordeal
-		callback("");
+		callback(null, "");
 		return;
 	}
 
@@ -173,10 +173,10 @@ module.exports = function customSassLoader(sassSource) {
 			// Store contents to bridge if required
 			if (useCssLoaderBridge) {
 				const bridge = require("./CssLoaderBridge");
-				bridge.setDefinitionForStylesheet(this.resource, result.css, cssLoaderBridgeUrls);
+				bridge.setDefinitionForStylesheet(this.resource, cssLoaderBridgeUrls);
 
 				// Empty string -> Save overhead
-				callback(null, ".foo{};");
+				callback(null, result.css);
 				return;
 			}
 

@@ -6,12 +6,12 @@ const storage = new Map();
 
 module.exports = class CssLoaderBridge {
 
-	static setDefinitionForStylesheet(stylesheet, source, urlItems, importItems){
+	static setDefinitionForStylesheet(stylesheet, urlItems, importItems){
 		if(typeof urlItems === 'undefined' || !Array.isArray(urlItems)) urlItems = [];
 		if(typeof importItems === 'undefined' || !Array.isArray(importItems)) importItems = [];
 
 		storage.set(stylesheet, {
-			'source': source,
+			'source': "",
 			'map': undefined,
 			'exports': {},
 			'importItems': importItems,

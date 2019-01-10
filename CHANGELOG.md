@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Changed
+- Changed the way how the customSassLoader passes it's result around the webpack css post processor to incorporate other loaders like vue-loader...
+
+### Fixed
+- Fixed an issue in customSassLoader which lead to a crash when an empty sass file was compiled
+- Added otf to font list 
+
 ## [3.1.1] - 2019-01-10
 ### Fixed
 - Fixed an issue with postCss which lead to a console warning
