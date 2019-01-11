@@ -20,8 +20,6 @@ module.exports = class CopyPlugin {
 			// Validate input
 			if (typeof config.from === "undefined")
 				throw new Error("Your copy configuration does not define a \"from\" key!");
-			if (typeof config.to === "undefined")
-				throw new Error("Your copy configuration does not define a \"to\" key!");
 
 			// Add context if required
 			if (typeof config.context === "undefined") config.context = context.dir.current;
