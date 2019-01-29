@@ -168,8 +168,12 @@ module.exports = function () {
 };
 ```
 
+## filterWarningsToIgnore(regexList, context);
+Can be used to configure the list of regexes that will be used in WebpackFilterWarningsPlugin
+
 ## browserListFilter(browserList, context)
 PostCss uses a [Browserlist](https://github.com/browserslist/browserslist#best-practices) to determine which plugin it should use and how. By default our script uses "> 1%, last 10 versions". You can use this hook to change the default.
+
 ## postCssPluginFilter(plugins, context)
 Is used to filter and modify the list of postCss plugins (by default only autoprefixer)
 

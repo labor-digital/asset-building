@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.1.4] - 2019-01-29
+### Added
+- Added WebpackFilterWarningsPlugin to allow our script to remove warnings we don't care for
+which will cause the script to fail, tho.
+
+### Changed
+- Updates dependencies to the latest versions
+
 ## [3.1.3] - 2019-01-11
 ### Fixed
 - Removed requirement of "to" configuration when defining a copy configuration

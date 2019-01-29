@@ -44,6 +44,7 @@ module.exports = class WebpackConfigBuilder {
 				"CleanOutputDirPlugin.js",
 				"MinChunkSizePlugin.js",
 
+				"FilterWarningsPlugin.js",
 				"DevOnly.js",
 				"ProdOnly.js",
 				"HtmlPlugin.js"
