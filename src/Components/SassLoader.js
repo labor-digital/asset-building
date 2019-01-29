@@ -42,17 +42,13 @@ module.exports = class SassLoader {
 							loader: path.resolve(context.dir.controller, "./WebpackLoaders/CustomSassLoader/CustomSassLoader.js"),
 							options: {
 								currentAppConfig: context.currentAppConfig,
-								context,
-								useCssLoaderBridge: true
+								context
 							}
 						}
 					]
 				},
 				"sassLoader", context
 			]));
-
-		// Hack to speed up the css-loader compilation
-		require("../WebpackLoaders/CustomSassLoader/CssLoaderProcessCssWrapper")(context);
 	}
 
 	static _applyLegacy(context) {

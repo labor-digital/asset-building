@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.1.5] - 2019-01-29
+### Changed
+- Removed custom sass loader's css-loader bridge, as the latest version of css-loader is no longer incredibly slow when it comes to resolving urls...
+
 ## [3.1.4] - 2019-01-29
 ### Added
 - Added WebpackFilterWarningsPlugin to allow our script to remove warnings we don't care for

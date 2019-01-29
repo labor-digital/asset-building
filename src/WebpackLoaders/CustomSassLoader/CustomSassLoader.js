@@ -29,10 +29,10 @@ module.exports = function customSassLoader(sassSource) {
 	// Make sure the extension is ok for us
 	const validExtensions = ["css", "sass", "scss"];
 	let ext = FileHelpers.getFileExtension(stylesheetPath);
-	if(validExtensions.indexOf(ext) === -1){
+	if (validExtensions.indexOf(ext) === -1) {
 		// This is not a valid file extension, try to rewrite the stylesheet path
 		let alternativeExt = context.callPluginMethod("customSassLoaderFileExtensionFallback", [ext, stylesheetPath, this.resourceQuery, sassSource, context]);
-		if(alternativeExt === ext)
+		if (alternativeExt === ext)
 			throw new Error("Error while parsing a file called: \"" + stylesheetPath + "\" the file's extension does not look like to be sass compatible!");
 		stylesheetPath += "." + alternativeExt;
 	}
@@ -43,11 +43,6 @@ module.exports = function customSassLoader(sassSource) {
 		callback(null, "");
 		return;
 	}
-
-	// True if we should use the internal css loader bridge to speed up css compiling
-	const useCssLoaderBridge = this.query.useCssLoaderBridge;
-	let cssLoaderBridgeUrls = [];
-	let urlCounter = 0;
 
 	new Promise((resolve, reject) => {
 
@@ -77,12 +72,6 @@ module.exports = function customSassLoader(sassSource) {
 			try {
 
 				function makeReplacementFor(cacheKey) {
-					if (useCssLoaderBridge) {
-						let url = resolvedUrlCache.get(cacheKey).getValue().replace(/^"|"$/g, "");
-						if (url.match(/^[\w\d]/)) url = "./" + url;
-						cssLoaderBridgeUrls.push({"url": url});
-						return new sass.types.String("___CSS_LOADER_BRIDGE_URL___" + urlCounter++ + "___");
-					}
 					return resolvedUrlCache.get(cacheKey);
 				}
 
@@ -136,7 +125,7 @@ module.exports = function customSassLoader(sassSource) {
 								let resolvedPath = path.resolve(path.dirname(file), url);
 								if (fs.existsSync(resolvedPath)) {
 									resolvedPath = path.relative(urlRelativeRoot, resolvedPath).replace(/\\/g, "/");
-									resolvedUrlCache.set(cacheKey, sass.types.String("\"" + resolvedPath + queryString + "\""));
+									resolvedUrlCache.set(cacheKey, sass.types.String("\"./" + resolvedPath + queryString + "\""));
 									return makeReplacementFor(cacheKey);
 								}
 							}
@@ -170,28 +159,12 @@ module.exports = function customSassLoader(sassSource) {
 			return PostCssSubComponent.applyPostProcessing(result.css.toString(), context);
 		})
 		.then(result => {
-			// Store contents to bridge if required
-			if (useCssLoaderBridge) {
-				const bridge = require("./CssLoaderBridge");
-				bridge.setDefinitionForStylesheet(this.resource, cssLoaderBridgeUrls);
-
-				// Empty string -> Save overhead
-				callback(null, result.css);
-				return;
-			}
-
-			// Resolve ajax request
 			callback(null, result.css);
-
 		})
 		.catch(err => {
 			// Flush all caches to make sure the error can always be resolved by user input
 			ResourceService.flush();
 			FileService.flush();
-			if (useCssLoaderBridge) {
-				const bridge = require("./CssLoaderBridge");
-				bridge.flush();
-			}
 
 			err.hideStack = true;
 			if (err.file) {
