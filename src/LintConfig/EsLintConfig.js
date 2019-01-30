@@ -54,7 +54,11 @@ module.exports = class EsLintConfig {
 			"FormData:true",
 			"Promise:true",
 			"Map:true",
-			"Set:true"
+			"Set:true",
+			"Date:true",
+			"File:true",
+			"XMLHttpRequest:true",
+			"ActiveXObject:true"
 		];
 		this.rules = {
 			"comma-dangle": ["error", "never"],

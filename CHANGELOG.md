@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.1.6] - 2019-01-30
+### Added
+- Added additional eslint objects to avoid errors
+
 ## [3.1.5] - 2019-01-29
 ### Changed
 - Removed custom sass loader's css-loader bridge, as the latest version of css-loader is no longer incredibly slow when it comes to resolving urls...
