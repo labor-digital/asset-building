@@ -10,7 +10,7 @@ The filepaths have to be relative to your package.json.
 By default the script will assume you are writing es6 or Typescript and
 transpile it down to es5, so it is compatible to IE10 and higher. 
 
-If the "build" mode is used the scripts will be minified and linted using eslint.
+If the "build" mode is used the scripts will be minified.
 
 Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
 ```

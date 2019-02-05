@@ -21,7 +21,6 @@ when it comes to webpack, you can extend this library using its lightwight
 * Extract css files ([mini-css-extract-plugin](https://github.com/webpack-contrib/mini-css-extract-plugin))
 * Minify css files when using "build" ([optimize-css-assets-webpack-plugin](https://github.com/NMFR/optimize-css-assets-webpack-plugin))
 * Transpiling Es6 Js and typescript sources to es5 ([ts-loader](https://github.com/TypeStrong/ts-loader))
-* Linting javascript ([eslint-loader](https://github.com/webpack-contrib/eslint-loader))
 * Minify js files when using "build" ([uglifyjs-webpack-plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin))
 * Automatically add css-prefixes for older browsers: ([Autoprefixer](https://github.com/postcss/autoprefixer))
 * Creation of source-maps for js files
@@ -36,7 +35,6 @@ when it comes to webpack, you can extend this library using its lightwight
 * A HTML templating plugin ([Html Webpack Plugin](https://github.com/jantimon/html-webpack-plugin))
 * I implemented a custom sass loader to speed up module based sass compiling
 * You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
-* A custom component loader to keep component compiling lightning fast
 
 ## Installation
 * Use our private npm registry!
@@ -169,103 +167,53 @@ use the typechecker anyway define that using the
 "labor -> js -> useTypeChecker" or "labor -> apps -> useTypeChecker" options, 
 depending on your builder version.
 
-## Component Loader
-**Only interesting if you are using builder version 2.0**  
-When you are working with the concept of "web components" you will probably end up
-with a directory structure similar to:
-```
-
-|componentA
-| |componentA.js
-| |componentA.scss
-| |assets
-| | |myImage.jpg
-|componentB
-| |...
-|app.js
-```
-
-In your "componentA.js" you will have something like:
-```javascript
-import "./componentA.sass"
-console.log('something with javascript');
-```
-
-In your "app.js" you will have stuff like:
-```javascript
-import "./componentA/componentA.js";
-import "./componentB/componentB.js";
-//...
-```
-
-Internally webpack will not compile all your .sass/.less files in their own context,
-means there is no interaction between the compiler instances. Which leads to really
-long execution times. Because every time all your mixins and vars you use
-as resources have to be parsed anew, to end up in the same css file anyway. 
-
-Component loader tries to minimize the overhead of compiling css superscripts
-as separate files but combines all styles of a "set of components" into a single
-file which is than compiled only once, without hitting your performance.
-
-To keep the components agnostic to your applications infrastructure I tried to
-create a loader which does not interfere with your components but only your app.
-When you start using the component loader go to your "app.js" and change the following:
-```javascript
-// Comment this out
-// import "./components/componentA/componentA.js";
-// import "./components/componentA/componentB.js";
-
-// Add this
-import "@components";
-```
-
-The component loader will now detect that all components should be added
-and compiled as a bundle. It will traverse the **current directory** and look
-into its child-directories. **If there is a file that matches the child-directory name**
-it will be used as an entry file. Possible extensions are "ts, tsx, js, sass, scss, less, css",
-the first matching extension wins. Which means, your component does not have a javascript
-file to begin with, if there is a file like: "componentC/componentC.sass" 
-this file will be used as entry point.
-
-If a javascript file is used as entrypoint the component loader will scan it
-for stylesheet dependencies. In our "componentA.js" it would find (import "./componentA.sass")
-which then is extracted and added to the list of stylesheets to be compiled as bundle.
-
-You have nothing to worry about from here on, because everything should be taken
-care of automagically. 
-
-To exclude specific components you can use a construct like:
-```javascript
-import "@components@exclude:componentA,componentD"
-```
-
-**But what about...**
-
-* dynamic imports of stylesheets? Dynamic imports will be ignored.
-* my web-components where I need the css inside my javascript? 
-Only generic imports that do not alias the content will be stripped by the component loader.
-
 ## CSS Superscript resources
 **Only interesting if you are using builder version 2.0**  
-**!!CURRENTLY ONLY WORKS FOR SASS/SCSS!!**  
-As you learned in the **Component Loader** section all css superscript sources
-will be compiled separate from each other, even when using component loader
-you might end up with multiple compilers (for example when using dynamic imports).
 
-But where do your mixins / variables end up? That is a good question, that is often
-ignored when it comes to webpack documentation. 
+One problem one fines him/herself confronted with, when using components instead of monolitic css/sass/less is: All your styles will be compiled encapsulated from each other. Meaning you would have to register all your mixins/variables in every stylesheet you create. While not a real dealbreaker it is (in my opinion) a hassel and not really intuitive.
 
-To solve this I added a so called "Resource handling". Which means you can put all
-your resources (mixins, vars, and so on) to a file which is called exactly the same
-ass your app entry point but has a "-resources.(sass/scss/less)" extension.
-For example: Entrypoint: app.js; Resources for Sass: app-resources.sass in the
-same directory as app.js
+To solve this, there are already loaders like [sass-resources-loader](https://github.com/shakacode/sass-resources-loader), but they all require configuration in the webpack file, which is (again in my opinion) even less intuitive. So I wrote a simple implementation
+of a resource loader which follows "Convetion over configuration".
 
-What happends if you add such a resource file is, that the compile will automatically
-insert the content of this file to the beginning of all your other files 
-of the same type.
+The convention is: 
+* Include (if present) a file called Resources.(sass/scss/less/css) in the same directory as your app's entrypoint.
+* Follow the path from the entrypoint's directory down until you end at the current stylesheet.
+* Include every Resources.(sass/scss/less/css) file you find on your way. 
 
-**NOTE** This currently works only for sass/scss files, because I didn't need
-it anywhere else. If you are interested of using builder version 2.0 and this
-is a neckbreaker for your, just ask and I will implement that feature for less
-as well :)
+As an example:
+```
+|Components
+| |Resources.sass
+| |ComponentA
+| | |Resources.scss
+| | |ComponentA.js
+| | |ComponentA.scss
+| | |Assets
+| | | |myImage.jpg
+| |ComponentB
+| | |Resources.less
+| | |ComponentB.js
+| | |ComponentB.less
+| | |Assets
+| | | |myImage.jpg
+|Entrypont.js
+|Resources.sass
+|GlobalStyle
+```
+
+For "ComponentA" the loader will then automatically import the following files, 
+at the top of componentA.scss:
+* /Resources.sass
+* /Components/Resources.sass
+* /Components/ComponentA/Resources.scss (mind the extension)
+
+For "ComponentB" the loader will only import:
+* /Components/ComponentB/Resources.less
+
+because there are no other resource files matching the file's extension (less).
+
+_A word of caution:_
+* Do not include anything that will be actually rendered in CSS, because it will be added to every file the resource loader touches.
+* When importing other sass/less files from inside your Resources.sass you your path's should be relative to the current file
+* If you are rendering source maps for your css files, this loader will mess up your line numbers!
+* This is currently not tested with .less files - but it SHOULD work out of the box...

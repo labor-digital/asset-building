@@ -2,6 +2,7 @@
  * Created by Martin Neundorfer on 14.12.2018.
  * For LABOR.digital
  */
+const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const Postcss = require("./SubComponents/Postcss");
 
@@ -38,6 +39,14 @@ module.exports = class LessLoader {
 						Postcss.makeConfig(context),
 						{
 							loader: "less-loader"
+						},
+						{
+							loader: path.resolve(context.dir.controller, "./WebpackLoaders/ResourceLoader/ResourceLoader.js"),
+							options: {
+								currentDir: context.dir.current,
+								entry: context.currentAppConfig.entry,
+								ext: ["less", "css"]
+							}
 						}
 					]
 				},

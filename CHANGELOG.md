@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.0] - 2019-02-05
+### Added
+- Created a new, dedicated "ResourceLoader" for css superscript global imports
+
+### Changed
+- Stripped out the ResourceLoader from CustomSassLoader
+- Updated documentation for Resource loader
+- Rewrote custom sass loader to be a lot slimmer, faster and better integrated into webpacks build process
+
+### REMOVED
+- BREAKING CHANGE: Removed the component loader
+- Removed eslint completely
+- Removed a lot of old chunk/helpers that was no longer required
+
 ## [3.1.6] - 2019-01-30
 ### Added
 - Added additional eslint objects to avoid errors

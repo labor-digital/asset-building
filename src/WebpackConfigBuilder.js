@@ -32,7 +32,6 @@ module.exports = class WebpackConfigBuilder {
 
 				"TsJsPreLoaders.js",
 				"TypescriptLoader.js",
-				"EsLint.js",
 				"JsCompat.js",
 
 				"LessLoader.js",

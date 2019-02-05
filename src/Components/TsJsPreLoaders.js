@@ -36,13 +36,6 @@ module.exports = class TsJsPreLoaders {
 			});
 		}
 
-		// Component loader
-		if (context.builderVersion !== 1 && context.currentAppConfig.componentLoader !== false) {
-			loaders.push({
-				"loader": path.resolve(context.dir.controller, "./WebpackLoaders/ComponentLoader/ComponentLoader.js")
-			});
-		}
-
 		// Plugin loaders
 		loaders = context.callPluginMethod("filterJsPreLoaders", [loaders, context]);
 

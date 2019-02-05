@@ -18,7 +18,7 @@ module.exports = class fontLoader {
 						{
 							loader: "file-loader",
 							options: {
-								name: "[name]-[hash].[ext]",
+								name: context.isProd ? "[name]-[hash].[ext]" : "[path][name].[ext]",
 								outputPath: "assets/"
 							}
 						}

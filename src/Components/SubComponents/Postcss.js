@@ -20,18 +20,6 @@ module.exports = class Postcss {
 	}
 
 	/**
-	 * Applies the post css post processing to a given css content.
-	 * This is used in the custom sass loader
-	 * @param {string} css The content of the css file to process
-	 * @param {module.ConfigBuilderContext} context
-	 * @return {Promise} The lazy result object
-	 */
-	static applyPostProcessing(css, context) {
-		const postcss = require("postcss");
-		return postcss(Postcss.getPostCssPluginList(context)).process(css, {from: undefined});
-	}
-
-	/**
 	 * Returns the list of all required postcss plugins
 	 * @param context
 	 * @return {*}

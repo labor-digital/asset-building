@@ -1,29 +1,56 @@
 /**
- * Created by Martin Neundorfer on 13.09.2018.
+ * Created by Martin Neundorfer on 05.02.2019.
  * For LABOR.digital
  */
+const fs = require("fs");
 const path = require("path");
-const FileService = require("../../Services/FileService");
 const FileHelpers = require("../../Helpers/FileHelpers");
-const Stylesheet = require("./Stylesheet");
+module.exports = class SassFilePreCompiler {
+	/**
+	 * @param {module.SassFile} file
+	 * @param {module.SassFileResolverContext} context
+	 */
+	static apply(file, context) {
+		// Check if we have to convert sass files to scss
+		if (file.extension === "sass")
+			file.content = SassFilePreCompiler.sass2scss(file.content);
 
-const importFilenameCache = new Map();
-let guid = 0;
+		// Resolve imports
+		file.content = file.content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:[^\S\n]+)?)/gm,
+			(a, before, importPath, after) => {
+				const importFilename = SassFilePreCompiler.resolveImportFilename(
+					importPath, context.baseContext.dir.nodeModules, file.filename);
+				const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
 
-module.exports = class SassHelpers {
+				// Create wrapper
+				return `
+$customSassLoaderTmp: custom-sass-loader-open-file("${posixImportFilename}");
+@import "${posixImportFilename}";
+$customSassLoaderTmp: custom-sass-loader-close-file();
+`;
+			});
+
+		// Resolve url's
+		file.content = file.content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:[^\S\n]+)?)(\))/gm,
+			(a, before, url, after) => {
+			// Ignore data urls
+			if (url.indexOf("data: ") !== -1) return a;
+
+			// Make sure to enquote everything that does not look like it is a variable
+			if (!url.match(/[$#{}"']/)) url = "\"" + url + "\"";
+			return before + "custom-sass-loader-url-resolver(" + url + ")" + after;
+		});
+	}
 
 	/**
 	 * Resolves the path of a imported asset file relative to the parent file
-	 * @param importStatement
+	 * @param importPath
 	 * @param nodeDirectory
-	 * @param parentFile
+	 * @param currentFile
 	 * @return {*}
 	 */
-	static resolveImportFilename(importStatement, nodeDirectory, parentFile) {
-		// Try to serve from cache
-		const cacheKey = importStatement + nodeDirectory + parentFile;
-		if (importFilenameCache.has(cacheKey)) return importFilenameCache.get(cacheKey);
-		let output = importStatement;
+	static resolveImportFilename(importPath, nodeDirectory, currentFile) {
+		let output = importPath;
 
 		// Resolve node modules
 		if (output.charAt(0) === "~") {
@@ -32,126 +59,34 @@ module.exports = class SassHelpers {
 		}
 
 		// Resolve relative paths
-		const parentDirectory = path.dirname(parentFile) + path.sep;
+		const parentDirectory = path.dirname(currentFile) + path.sep;
 		if (output.charAt(0) === "." || !output.match(/[\\\/]/)) {
 			output = path.resolve(parentDirectory, output);
 		}
 
 		// Check if this was enough to find the file
-		if (FileService.fileExists(output)) return output;
+		if (fs.existsSync(output) && fs.lstatSync(output).isFile()) return output;
 
 		// Try to resolve possible sass pathes
 		const statementBasename = path.basename(output).replace(/^_+/, "").replace(/\..*?$/, "");
 		const statementDirname = path.dirname(output);
 		const statementRealPath = path.resolve(parentDirectory, statementDirname) + path.sep;
-		const parentExt = parentFile.replace(/^.*?\./, "").toLowerCase();
+		const currentExt = FileHelpers.getFileExtension(currentFile);
 		const possiblePaths = new Set();
 		possiblePaths
-			.add(statementRealPath + statementBasename + "." + parentExt)
-			.add(statementRealPath + "_" + statementBasename + "." + parentExt)
+			.add(statementRealPath + statementBasename + "." + currentExt)
+			.add(statementRealPath + "_" + statementBasename + "." + currentExt)
 			.add(statementRealPath + statementBasename + ".sass")
 			.add(statementRealPath + "_" + statementBasename + ".sass")
 			.add(statementRealPath + statementBasename + ".scss")
 			.add(statementRealPath + "_" + statementBasename + ".scss");
 
 		for (const possiblePath of possiblePaths) {
-			if (FileService.fileExists(possiblePath)) {
-				importFilenameCache.set(cacheKey, possiblePath);
-				return possiblePath;
-			}
+			if (fs.existsSync(possiblePath) && fs.lstatSync(possiblePath).isFile()) return possiblePath;
 		}
 
 		// Invalid statement
-		throw new Error("Could not resolve SASS import: \"" + importStatement + "\" in file: \"" + parentFile + "\"!");
-	}
-
-	/**
-	 * Is used to prepare a given sass file by traversing it's imports to create a callback
-	 * to our sass loader to follow the relative path of the file
-	 * @param stylesheetPath
-	 * @param nodeDirectory
-	 * @param [injectedContent] Can be used to inject the stylesheets content
-	 * @return {module.Stylesheet|*}
-	 */
-	static preParseSass(stylesheetPath, nodeDirectory, injectedContent) {
-		const resolvedFiles = new Set();
-		const fileContents = new Map();
-		const posixStylesheetPath = FileHelpers.filenameToPosix(stylesheetPath);
-
-		// Inject injected content into file service
-		if (typeof injectedContent === "string")
-			FileService.setFileContent(stylesheetPath, injectedContent);
-
-		function makeImportWrapper(filename) {
-			const importKey = "import-wrapper-" + guid++;
-			let content = `
-$customSassLoaderTmp: custom-sass-loader-open-file("${filename}");
-@import "${filename}";
-$customSassLoaderTmp: custom-sass-loader-close-file();
-`;
-			fileContents.set(importKey, content);
-			return importKey;
-		}
-
-		function parseContent(filename, content) {
-			const ext = FileHelpers.getFileExtension(filename);
-			const posixFilename = FileHelpers.filenameToPosix(filename);
-
-			if (content === null) throw new Error("Could not read contents of sass file: \"" + filename + "\"");
-
-			// Make sure that everything looks like scss
-			if (ext === "sass") content = SassHelpers.sass2scss(content);
-
-			// Resolve imports
-			content = content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:[^\S\n]+)?)/gm, (a, before, importStatement, after) => {
-				const importFilename = SassHelpers.resolveImportFilename(importStatement, nodeDirectory, filename);
-				const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
-
-				// Check if the import already happened
-				if (resolvedFiles.has(importFilename)) return "";
-
-				// Mark file as resolved
-				resolvedFiles.add(importFilename);
-
-				// Load child content and parse it
-				let childContent = FileService.getFileContent(importFilename);
-				parseContent(importFilename, childContent);
-
-				// Create import wrapper
-				return before + makeImportWrapper(posixImportFilename) + after;
-			});
-
-			// Wrap url calls to make sure they get resolved propperly
-			content = content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:[^\S\n]+)?)(\))/gm, (a, before, url, after) => {
-				// Ignore data urls
-				if (url.indexOf("data: ") !== -1) return a;
-
-				// Make sure to enquote everything that does not look like it is a variable
-				if (!url.match(/[$#{}"']/)) url = "\"" + url + "\"";
-				return before + "custom-sass-loader-url-resolver(" + url + ")" + after;
-			});
-
-			// Store the file content
-			fileContents.set(posixFilename, content);
-		}
-
-		// Load the stylesheet content
-		const sassContent = FileService.getFileContent(stylesheetPath);
-		if (sassContent === null) throw new Error("Invalid stylesheetPath to load: " + stylesheetPath);
-
-		// Add stylesheet to the watchable files
-		resolvedFiles.add(stylesheetPath);
-
-		// Parse contents and extract children
-		parseContent(stylesheetPath, sassContent);
-
-		// Create an outer wrapper to make sure url's in the basefile may be resolved as in all other files
-		const outerWrapper = "@import \"" + makeImportWrapper(posixStylesheetPath) + "\";";
-		const outerKey = "main-" + guid++;
-		fileContents.set(outerKey, outerWrapper);
-
-		// Done
-		return new Stylesheet(stylesheetPath, outerKey, fileContents, resolvedFiles);
+		throw new Error("Could not resolve SASS import: \"" + importPath + "\" in file: \"" + currentFile + "\"!");
 	}
 
 	/**
@@ -312,4 +247,3 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		return output;
 	}
 };
-

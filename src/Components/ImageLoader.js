@@ -18,13 +18,13 @@ module.exports = class ImageLoader {
 						{
 							loader: "url-loader",
 							options: {
-								name: "[name]-[hash].[ext]",
+								name: context.isProd ? "[name]-[hash].[ext]" : "[path][name].[ext]",
 								outputPath: "assets/",
 								limit: context.isProd ? 10000 : 1,
 								fallback: {
 									loader: "file-loader",
 									options: {
-										name: "[name]-[hash].[ext]"
+										name: context.isProd ? "[name]-[hash].[ext]" : "[path][name].[ext]"
 									}
 								}
 							}

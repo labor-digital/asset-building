@@ -29,7 +29,7 @@ module.exports = class FileHelpers {
 	}
 
 	static filenameToPosix(filename) {
-		return filename.replace(/\\/g, "/");
+		return FileHelpers.unifyFilename(filename).replace(/\\/g, "/");
 	}
 
 	static humanFileSize(size) {

@@ -88,8 +88,6 @@ Is called after a component with the given "key" is applied to the config but be
 Can be used to filter the regular expression that is used for a loader's test
 Type defines the loader that currently gets it's config filtered. Is called for every loader that the library injects
 Types are (not ordered):
-- jsLintLoader
-- tsLintLoader
 - fontLoader
 - htmlLoader
 - imageLoader
@@ -117,20 +115,12 @@ Types are (not ordered):
 ## filterExcludePattern(pattern, request, basePattern, context)
 Can be used to change the exclude pattern for some webpack loaders.
 The **pattern** is either undefined or a regex like basePattern.
-The **request** defines which loader requests the exclude pattern. Options are: "typescript", "tsJsPreLoaders" and "esLint", 
+The **request** defines which loader requests the exclude pattern. Options are: "typescript", "tsJsPreLoaders", 
 named after the components they are used in.
 The **basePattern** is used by default and is a regex like: ``/node_modules(?![\\/\\\\]@labor[\\/\\\\])/``,
 
 ## filterTypescriptOptions(tsLoaderOptions, context)
 This hook can be used to change ts-loader options.
-```javascript
-module.exports = function () {
-    this.filterEslintOptions = function(tsLoaderOptions, context){
-        tsLoaderOptions.transpileOnly = false
-        return tsLoaderOptions;
-    };
-};
-```
 
 ## filterJsPolyfills(polyfills, context)
 This hook can be used to change which core-js polyfills shall be included in the package.
@@ -150,20 +140,6 @@ module.exports = function () {
     this.filterJsPreLoaders = function(jsPreLoaders, context){
     	jsPreLoaders.push(require($MY_LOADER));
         return jsPreLoaders
-    };
-};
-```
-
-## filterEslintOptions(eslintOptions, context, type)
-This hook can be used to add or remove eslint options before the module is created.
-The function is called twice. Once for the "js-lint" and once for the "ts-lint" instance.
-To determine which instance should be configured currently use the **type** parameter.
-Possible values are: **javascript | typescript**
-```javascript
-module.exports = function () {
-    this.filterEslintOptions = function(eslintOptions, context, type){
-        eslintOptions.rules['no-console'] = 1
-        return eslintOptions;
     };
 };
 ```

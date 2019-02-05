@@ -4,6 +4,7 @@
  */
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const Postcss = require("./SubComponents/Postcss");
 
 module.exports = class SassLoader {
 	/**
@@ -38,11 +39,20 @@ module.exports = class SassLoader {
 								import: true
 							}
 						},
+						Postcss.makeConfig(context),
 						{
 							loader: path.resolve(context.dir.controller, "./WebpackLoaders/CustomSassLoader/CustomSassLoader.js"),
 							options: {
 								currentAppConfig: context.currentAppConfig,
 								context
+							}
+						},
+						{
+							loader: path.resolve(context.dir.controller, "./WebpackLoaders/ResourceLoader/ResourceLoader.js"),
+							options: {
+								currentDir: context.dir.current,
+								entry: context.currentAppConfig.entry,
+								ext: ["sass", "scss", "css"]
 							}
 						}
 					]
