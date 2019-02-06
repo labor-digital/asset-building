@@ -2,6 +2,7 @@
  * Created by Martin Neundorfer on 14.12.2018.
  * For LABOR.digital
  */
+const chalk = require("chalk");
 const path = require("path");
 const Module = require("module");
 

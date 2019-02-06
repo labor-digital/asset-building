@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.1] - 2019-02-06
+### Fixed
+- Fixed an issue in MiscFixes.js where chalk was not required correctly
+- Fixed an issue in customSassLoader when working with vue files where the file extension was not correctly added based on the style's lang attribute
+
+### Changed
+- Changed the way how assets are named when watching the files to prevent memory leaks
+
 ## [3.2.0] - 2019-02-05
 ### Added
 - Created a new, dedicated "ResourceLoader" for css superscript global imports

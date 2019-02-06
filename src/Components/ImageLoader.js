@@ -2,6 +2,7 @@
  * Created by Martin Neundorfer on 14.12.2018.
  * For LABOR.digital
  */
+const MiscHelpers = require("../Helpers/MiscHelpers");
 module.exports = class ImageLoader {
 	/**
 	 * Applies this configuration component to the current context
@@ -18,13 +19,21 @@ module.exports = class ImageLoader {
 						{
 							loader: "url-loader",
 							options: {
-								name: context.isProd ? "[name]-[hash].[ext]" : "[path][name].[ext]",
+								name: (file) => {
+									if(context.isProd) return "[name]-[hash].[ext]";
+									// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
+									return "[name]-" + MiscHelpers.md5(file) + ".[ext]";
+								},
 								outputPath: "assets/",
 								limit: context.isProd ? 10000 : 1,
 								fallback: {
 									loader: "file-loader",
 									options: {
-										name: context.isProd ? "[name]-[hash].[ext]" : "[path][name].[ext]"
+										name: (file) => {
+											if(context.isProd) return "[name]-[hash].[ext]";
+											// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
+											return "[name]-" + MiscHelpers.md5(file) + ".[ext]";
+										},
 									}
 								}
 							}

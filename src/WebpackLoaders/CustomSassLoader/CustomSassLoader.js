@@ -16,7 +16,7 @@ module.exports = function customSassLoader(sassSource) {
 	try {
 		// Prepare the compiler context
 		const context = new SassFileResolverContext(this.query.context, this);
-		const file = SassFileResolver.getFile(this.resourcePath, sassSource, context);
+		const file = SassFileResolver.getFile(context.baseFile, sassSource, context);
 
 		// Defines the path to use when resolving files
 		context.path.push(file.filename);
