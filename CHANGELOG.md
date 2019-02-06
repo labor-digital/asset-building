@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.2] - 2019-02-06
+### Changed
+- Converted all dependency versions to absolute numbers
+- Updates typescript 
+
 ## [3.2.1] - 2019-02-06
 ### Fixed
 - Fixed an issue in MiscFixes.js where chalk was not required correctly
