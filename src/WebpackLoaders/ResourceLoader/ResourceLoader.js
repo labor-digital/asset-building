@@ -19,8 +19,26 @@ module.exports = function ResourceLoader(source) {
 
 	// Prepare file locations
 	let stylesheetPath = FileHelpers.unifyFilename(FileHelpers.stripOffQuery(this.resourcePath));
-	const rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
+	let rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
 	const possibleResourceLocations = [];
+
+	// Register root resources
+	this.query.ext.forEach(ext => {
+		const possiblePath = path.resolve(rootPath) + path.sep + "Resources." + ext;
+		possibleResourceLocations.push(possiblePath);
+	});
+
+	// Check if we have to search upwards for resources in our root path
+	if(stylesheetPath.indexOf(rootPath) === -1){
+		const rootParts = rootPath.split(path.sep);
+		while(rootParts.length > 0){
+			rootParts.pop();
+			if(stylesheetPath.indexOf(rootParts.join(path.sep) + path.sep) === 0){
+				rootPath = rootParts.join(path.sep) + path.sep;
+				break;
+			}
+		}
+	}
 
 	// Add resources up to the root directory
 	if (stylesheetPath.indexOf(rootPath) === 0) {
@@ -32,8 +50,9 @@ module.exports = function ResourceLoader(source) {
 		pathParts.forEach(part => {
 			localPath += part + path.sep;
 			this.query.ext.forEach(ext => {
-				possibleResourceLocations.push(
-					path.resolve(rootPath + localPath) + path.sep + "Resources." + ext);
+				const possiblePath = path.resolve(rootPath + localPath) + path.sep + "Resources." + ext;
+				if(possibleResourceLocations.indexOf(possiblePath) !== -1) return;
+				possibleResourceLocations.push(possiblePath);
 			});
 		});
 	}
@@ -46,7 +65,7 @@ module.exports = function ResourceLoader(source) {
 		callback(null, source);
 		return;
 	}
-
+	
 	// Make wrapper to import the required files
 	const wrapper = [];
 	existingResourceLocations.forEach(file => {

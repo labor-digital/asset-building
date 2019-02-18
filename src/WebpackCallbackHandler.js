@@ -136,6 +136,9 @@ module.exports = class WebpackCallbackHandler {
 				});
 			}
 
+			// Call hooks
+			context.callPluginMethod("callbackBeforeGitAdd", [context]);
+
 			// Make sure everything is added to our git when the build is complete
 			if (!isWatch && context.currentAppConfig.disableGitAdd !== true) WebpackCallbackHandler._autoAddOutputToGit(child, context);
 		});

@@ -69,9 +69,9 @@ module.exports = class WebpackConfigBuilder {
 				let enabled = context.callPluginMethod("isComponentEnabled", [true, key, context]);
 
 				// Give the last decition to the environment handler
-				if(environment !== null && typeof environment.isComponentEnabled === "function")
+				if (environment !== null && typeof environment.isComponentEnabled === "function")
 					enabled = environment.isComponentEnabled(enabled, key, context);
-				if(!enabled) return;
+				if (!enabled) return;
 
 				// Execute hooks and component
 				context.callPluginMethod("beforeComponent", [context, key]);
@@ -79,13 +79,17 @@ module.exports = class WebpackConfigBuilder {
 				context.callPluginMethod("afterComponent", [context, key]);
 
 				// Apply environment
-				if(environment !== null && typeof environment.afterComponent === "function")
+				if (environment !== null && typeof environment.afterComponent === "function")
 					environment.afterComponent(context, key);
 			});
 
 			// Apply environment
-			if(environment !== null && typeof environment.apply === "function")
+			if (environment !== null && typeof environment.apply === "function")
 				environment.apply(context);
+
+
+			// Merge with potential user defined configuration
+			WebpackConfigBuilder._mergeAdditionalConfig(context, context.currentAppConfig.webpackConfig);
 
 			// Write the configuration into the master array
 			context.callPluginMethod("filter", [context.webpackConfig, context]);
@@ -101,7 +105,7 @@ module.exports = class WebpackConfigBuilder {
 		context.environment = null;
 
 		// Merge with potential user defined configuration
-		WebpackConfigBuilder._mergeAdditionalConfig(context);
+		WebpackConfigBuilder._mergeAdditionalConfig(context, context.laborConfig.webpackConfig);
 
 	}
 
@@ -111,7 +115,7 @@ module.exports = class WebpackConfigBuilder {
 	 * @return {{name: string, mode: string, watch: boolean, entry: {}, plugins: Array, module: {rules: Array}, performance: {hints: boolean}, resolve: {modules: string[], extensions: string[]}, resolveLoader: {modules: string[]}}}
 	 * @private
 	 */
-	static _createBaseConfiguration(context){
+	static _createBaseConfiguration(context) {
 		return {
 			name: context.currentApp + "",
 			mode: context.isProd ? "production" : "development",
@@ -143,7 +147,7 @@ module.exports = class WebpackConfigBuilder {
 	 * @param {module.ConfigBuilderContext} context
 	 * @private
 	 */
-	static _getEnvironmentHandler(context){
+	static _getEnvironmentHandler(context) {
 
 		// Load possible environments
 		let environmentHandlers = new Map();
@@ -158,21 +162,22 @@ module.exports = class WebpackConfigBuilder {
 		if (context.environment === null) return null;
 
 		// Check if we can handle this environment
-		if(environmentHandlers.size === 0)
+		if (environmentHandlers.size === 0)
 			throw new Error("There are no environment handlers registered!");
 		if (!environmentHandlers.has(context.environment))
 			throw new Error("Can't handle the given environment: \"" + context.environment + "\"!");
 		let handlerFile = environmentHandlers.get(context.environment);
 		try {
 			handlerFile = require.resolve(handlerFile);
-		} catch (e) { }
-		if(typeof handlerFile !== "string" || !fs.existsSync(handlerFile))
+		} catch (e) {
+		}
+		if (typeof handlerFile !== "string" || !fs.existsSync(handlerFile))
 			throw new Error("The handler for the given environment: \"" + context.environment + "\" can not be loaded!");
 		const handler = require(handlerFile);
-		if(typeof handler !== "function")
+		if (typeof handler !== "function")
 			throw new Error("The handler for the given environment: \"" + context.environment + "\" does not return a function!");
 		const instance = new handler(context);
-		if(typeof instance.init === "function") instance.init();
+		if (typeof instance.init === "function") instance.init();
 
 		// Done
 		return instance;
@@ -181,15 +186,16 @@ module.exports = class WebpackConfigBuilder {
 	/**
 	 * Merge with potential user defined configuration
 	 * @param {module.ConfigBuilderContext} context
+	 * @param {string} customConfigFile The path to the custom webpack config, relative to the package json
 	 * @private
 	 */
-	static _mergeAdditionalConfig(context){
-		if(typeof context.laborConfig.webpackConfig !== "string") return;
+	static _mergeAdditionalConfig(context, customConfigFile) {
+		if (typeof customConfigFile !== "string") return;
 		let customWebpackConfig = null;
 		try {
-			customWebpackConfig = require(path.resolve(context.dir.current, context.laborConfig.webpackConfig));
+			customWebpackConfig = require(path.resolve(context.dir.current, customConfigFile));
 		} catch (e) {
-			throw new Error("Could not resolve the custom webpack config at: \"" + context.laborConfig.webpackConfig + "\"");
+			throw new Error("Could not resolve the custom webpack config at: \"" + path.resolve(context.dir.current, customConfigFile) + "\"");
 		}
 		if (typeof customWebpackConfig !== "function")
 			throw new Error("The custom webpack config has to be a function!");

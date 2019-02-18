@@ -198,3 +198,35 @@ which adds some additional markers of data that may be injected.
   ],
 }
 ```
+
+### app.webpackConfig
+**This works exactly the same as webpackConfig in the root of your configuration, but on a per-app basis!**
+
+There might be a time where our preconfigured webpack is not enough for your needs,
+in that case you can always alter the webpack configuration using this option.
+
+Because the webpack config is mostly a js object we need to extend it using 
+javascript as well. To do so, lets create a new file called webpack.js in your 
+project root:
+```javascript
+const merge = require('webpack-merge');
+module.exports = function(webpackConfig, context){
+	return merge(webpackConfig, {
+		// Additional configuration for webpack...
+	});
+};
+```
+
+To tell the config builder to use your configuration file, add the script
+with a path, relative to your package.json to your app configuration.
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      [...]
+      "webpackConfig": "./webpack.js"
+	}
+  ]
+}
+```

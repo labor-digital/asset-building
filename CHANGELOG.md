@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.3] - 2019-02-18
+### Added
+- Added new hook callbackBeforeGitAdd() to emit files which will be added to git automatically
+- Added the option to add custom webpack config files for each app instead only globally
+
+### Fixed
+- Fixed an issue with the resource loader where resources could not be resolved if a file was higher than the entry point in the folder structure
+
 ## [3.2.2] - 2019-02-06
 ### Changed
 - Converted all dependency versions to absolute numbers

@@ -240,5 +240,9 @@ based on the current config builder version.
 This hook is called after compilingDone and executed for each app your package has registered.
 The value behind "child" is the output of stats.children[$child]
 
+## callbackBeforeGitAdd(context)
+Is called before the webpack callback handler automatically adds the dist files to the git repository.
+So if you want to emit your own output, this is the place to do it.
+
 ## callbackDone(context)
 The last possible callback
