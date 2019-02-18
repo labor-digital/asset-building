@@ -97,6 +97,9 @@ module.exports = class LegacyAdapter {
 			if (isStyle && asset.name.match(/\.js$/)) {
 				asset.name = asset.name + ".map";
 				return;
+			} else if((path.dirname(assetLocation) !== outputLocation) || asset.name.match(/\.(css|js)(?:\.map|LICENSE)?$/) === null) {
+				// Ignore all files in sub directories or that are no css / js files
+				return;
 			} else {
 				// Replace filename with output file
 				asset.name = path.basename(appConfig["@legacy"].output);
