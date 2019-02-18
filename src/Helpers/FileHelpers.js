@@ -47,6 +47,8 @@ module.exports = class FileHelpers {
 
 		for (var i = 1; i <= path.length; i++) {
 			var segment = path.slice(0, i).join("/");
+			if(!segment)
+				continue;
 			!fs.existsSync(segment) ? fs.mkdirSync(segment) : null;
 		}
 	}

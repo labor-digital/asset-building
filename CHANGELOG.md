@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## [3.2.4] - 2019-02-18
+### Fixed
+- Fixed issue with FileHelper.mkdir when creating folders starting at root level
+
 ## [3.2.3] - 2019-02-18
 ### Added
 - Added new hook callbackBeforeGitAdd() to emit files which will be added to git automatically
