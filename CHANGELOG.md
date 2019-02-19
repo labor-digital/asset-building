@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.6] - 2019-02-19
+### Added
+- Added "iconfont-webpack-plugin" which automatically generates icon fonts out of svg files in css definitions using the font-icon: url("./myIcon.svg") notation.
+- Added a bugfix to prevent errors in iconfont-webpack-plugin when the svg image does not supply a height attribute
+- Added new copyright
+- Added code styling phpstorm config
+
 ## [3.2.5] - 2019-02-18
 ### Fixed
 - Fixed an issue with the legacyAdapter if there were assets in the output directory

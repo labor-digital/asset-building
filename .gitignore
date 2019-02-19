@@ -1,5 +1,4 @@
 node_modules
-.idea
 demo/webroot/css/*.css
 demo/webroot/css/*.map
 demo/webroot/assets/*
@@ -10,3 +9,10 @@ demo2/*
 !demo2/webroot/src
 !demo2/package.json
 !demo2/webroot/Index.html
+
+# IDEA Code Style
+.idea/*
+!.idea/copyright/
+!.idea/copyright/*
+!.idea/codeStyles/
+!.idea/codeStyles/*
