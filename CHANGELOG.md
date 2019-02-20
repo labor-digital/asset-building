@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.8] - 2019-02-20
+### Fixed
+- Fixed the issue with the legacyAdapter -> for real this time.
+- Fixed an issue with the copy config, which resulted in copying the assets in every app instead of only once
+
 ## [3.2.7] - 2019-02-20
 ### Fixed
 - Fixed the SvgFontHeightFix to work with illustrator's multi line svg tags as well

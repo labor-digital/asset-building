@@ -24,12 +24,19 @@ const fs = require("fs");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
+/**
+ * A marker to prevent every app to copy the stuff we only need to be copied once...
+ * @type {boolean}
+ */
+let isApplied = false;
 module.exports = class CopyPlugin {
 	/**
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
 	static apply(context) {
+		if (isApplied) return;
+		isApplied = true;
 		if (!Array.isArray(context.laborConfig.copy) || context.laborConfig.copy.length === 0) return;
 
 		// Add the context to all configurations

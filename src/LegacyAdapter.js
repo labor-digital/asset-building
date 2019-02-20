@@ -52,10 +52,10 @@ module.exports = class LegacyAdapter {
 		const apps = [];
 		let assetToAppConverter = function (config, isStyle) {
 			if (typeof config.entry !== "string" || config.entry.trim().length === 0)
-				throw new Error("Invalid or missing css \"entry\" at key: " + k);
+				throw new Error("Invalid or missing " + (isStyle ? "css" : "js") + " \"entry\" at key: " + k);
 			if (typeof config.output !== "string" || config.output.trim().length === 0)
-				throw new Error("Invalid or missing css \"output\" at key: " + k);
-			const setName = MiscHelpers.md5(config.entry);
+				throw new Error("Invalid or missing " + (isStyle ? "css" : "js") + " \"output\" at key: " + k);
+			const setName = "setEntry-" + MiscHelpers.md5(config.entry);
 			const entryFile = tmpDirectory + setName + ".js";
 			const outputFile = tmpDirectory + "dist" + path.sep + setName + ".js";
 			const entryFileReal = path.resolve(context.dir.current + config.entry);
@@ -64,6 +64,7 @@ module.exports = class LegacyAdapter {
 			apps.push({
 				"entry": path.relative(context.dir.current, entryFile),
 				"output": path.relative(context.dir.current, outputFile),
+				"@setName": setName,
 				"@isStyle": isStyle,
 				"@legacy": config
 			})
@@ -101,33 +102,35 @@ module.exports = class LegacyAdapter {
 		const isStyle = appConfig["@isStyle"];
 
 		// Rewrite output path
-		const outputPathReal = path.resolve(context.dir.current, appConfig["@legacy"].output);
-		const outputLocation = child.outputPath;
-		child.outputPath = path.dirname(outputPathReal);
+		const outputPath = child.outputPath;
+		child.outputPath = path.resolve(context.dir.current);
+
+		// Prepare replacements
+		const setNamePattern = new RegExp("(.*?" + MiscHelpers.escapeRegex(appConfig["@setName"]) + ")", "g");
+		const setNameReplacement = FileHelpers.getFileWithoutExtension(appConfig["@legacy"].output);
 
 		// Rewrite the assets
 		child.assets.forEach(asset => {
 			// Store asset location
-			const assetLocation = outputLocation + path.sep + asset.name;
-			const isMap = asset.name.match(/\.map$/) !== null;
+			const assetLocation = outputPath + path.sep + asset.name;
 
-			// Rewrite style-js files to "map" so we ignore them in the output
-			if (isStyle && asset.name.match(/\.js$/)) {
+			// Rewrite every asset to be relative to the current working directory
+			asset.name = asset.name.replace(setNamePattern, setNameReplacement);
+
+			// Remove all .js root files in styles
+			if(isStyle && asset.name.indexOf(setNameReplacement + ".js") === 0){
+				// Rewrite style-js files to "map" so we ignore them in the output
 				asset.name = asset.name + ".map";
 				return;
-			} else if((path.dirname(assetLocation) !== outputLocation) || asset.name.match(/\.(css|js)(?:\.map|LICENSE)?$/) === null) {
-				// Ignore all files in sub directories or that are no css / js files
-				return;
-			} else {
-				// Replace filename with output file
-				asset.name = path.basename(appConfig["@legacy"].output);
-				if (isMap) asset.name += ".map";
 			}
 
 			// Move file to real output directory
-			const destinationPath = child.outputPath + path.sep + asset.name;
-			FileHelpers.mkdir(child.outputPath);
-			fs.copyFileSync(assetLocation, destinationPath);
+			const assetLocationReal = child.outputPath + path.sep + asset.name;
+			const assetLocationDirectory = path.dirname(assetLocationReal);
+			FileHelpers.mkdir(assetLocationDirectory);
+			fs.copyFileSync(assetLocation, assetLocationReal);
+			console.log(asset.name, assetLocationReal);
+
 		});
 	}
 };
