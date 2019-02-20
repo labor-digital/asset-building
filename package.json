@@ -4,7 +4,7 @@
     "type": "git",
     "url": "git+ssh://git@bitbucket.org:labor-digital/labor-dev-assetbuilding.git"
   },
-  "version": "3.2.4",
+  "version": "3.2.6",
   "description": "Our toolbox to build webassets with webpack",
   "main": "index.js",
   "bin": {
@@ -25,6 +25,7 @@
     "html-loader": "0.5.5",
     "html-webpack-plugin": "3.2.0",
     "html-webpack-template": "6.2.0",
+    "iconfont-webpack-plugin": "3.1.0",
     "image-webpack-loader": "4.6.0",
     "imports-loader": "0.8.0",
     "less": "3.9.0",

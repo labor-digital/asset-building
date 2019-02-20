@@ -27,14 +27,15 @@ when it comes to webpack, you can extend this library using its lightwight
 
 **Included webpack modules and plugins * Builder Version 2.0**  
 
-* Import html in javascript ([html-loader](https://webpack.js.org/loaders/html-loader/))
-* Image minification when using "build" ([image-webpack-loader](https://github.com/tcoopman/image-webpack-loader))
-* Font handling ([file-loader](https://github.com/webpack-contrib/file-loader))
-* Output directory cleaning ([CleanWebpackPlugin](https://github.com/johnagan/clean-webpack-plugin))
-* Progressbar while building ([progress-bar-webpack-plugin](https://github.com/clessg/progress-bar-webpack-plugin))
-* A HTML templating plugin ([Html Webpack Plugin](https://github.com/jantimon/html-webpack-plugin))
-* I implemented a custom sass loader to speed up module based sass compiling
-* You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
+- Import html in javascript ([html-loader](https://webpack.js.org/loaders/html-loader/))
+- Image minification when using "build" ([image-webpack-loader](https://github.com/tcoopman/image-webpack-loader))
+- Font handling ([file-loader](https://github.com/webpack-contrib/file-loader))
+- Output directory cleaning ([CleanWebpackPlugin](https://github.com/johnagan/clean-webpack-plugin))
+- Progressbar while building ([progress-bar-webpack-plugin](https://github.com/clessg/progress-bar-webpack-plugin))
+- A HTML templating plugin ([Html Webpack Plugin](https://github.com/jantimon/html-webpack-plugin))
+- Automatic iconfont generation from svg images ([iconfont-webpack-plugin](https://github.com/jantimon/iconfont-webpack-plugin))
+- I implemented a custom sass loader to speed up module based sass compiling
+- You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
 
 ## Installation
 * Use our private npm registry!
@@ -217,3 +218,12 @@ _A word of caution:_
 * When importing other sass/less files from inside your Resources.sass you your path's should be relative to the current file
 * If you are rendering source maps for your css files, this loader will mess up your line numbers!
 * This is currently not tested with .less files - but it SHOULD work out of the box...
+
+## Icon Fonts from SVG
+The script will now automatically create icon fonts which are specified like this:
+```css
+a:before {
+  font-icon: url('./account.svg');
+}
+```
+For more information see: https://github.com/jantimon/iconfont-webpack-plugin
