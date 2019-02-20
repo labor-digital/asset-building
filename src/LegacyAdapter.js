@@ -129,8 +129,6 @@ module.exports = class LegacyAdapter {
 			const assetLocationDirectory = path.dirname(assetLocationReal);
 			FileHelpers.mkdir(assetLocationDirectory);
 			fs.copyFileSync(assetLocation, assetLocationReal);
-			console.log(asset.name, assetLocationReal);
-
 		});
 	}
 };
