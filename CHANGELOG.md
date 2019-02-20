@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.7] - 2019-02-20
+### Fixed
+- Fixed the SvgFontHeightFix to work with illustrator's multi line svg tags as well
+
 ## [3.2.6] - 2019-02-19
 ### Added
 - Added "iconfont-webpack-plugin" which automatically generates icon fonts out of svg files in css definitions using the font-icon: url("./myIcon.svg") notation.
