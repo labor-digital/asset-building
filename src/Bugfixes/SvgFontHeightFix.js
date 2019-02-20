@@ -36,23 +36,23 @@ module.exports = function SvgFontHeightFix() {
 					const parseSvg = /<svg[^>]+height\s*=\s*["']?(\d+)\s*(pt|px|)["']?/i.exec(source);
 					if(!parseSvg){
 						// Check if we can read the viewbox to extract the height
-						const viewbox = /<svg[^>]+viewBox\s*=\s*["']?\s?([\d.]{1,5}\s[\d.]{1,5}\s[\d.]{1,5}\s[\d.]{1,5})\s?["']?/i.exec(source);
+						const viewbox = /.*?<svg[^>]+\s?[^>]*viewBox\s*=\s*["']?\s?([\d.]{1,5}\s[\d.]{1,5}\s[\d.]{1,5}\s[\d.]{1,5})\s?["']?/im.exec(source);
 						let height = 100;
 						if(viewbox !== null && typeof viewbox[1] === "string"){
 							const viewBoxParts = viewbox[1].split(/\s+/).filter(v => v !== "");
 							if(typeof viewBoxParts[3] === "string") height = viewBoxParts[3];
 						}
-						source = source.replace(/^(<svg\s)/i, "$1height=\"" + height + "px\" ");
+						source = source.replace(/^(<svg\s)/im, "$1height=\"" + height + "px\" ");
 
 						// Check if we need a width as well
-						const parseSvgWidth = /<svg[^>]+width\s*=\s*["']?(\d+)\s*(pt|px|)["']?/i.exec(source);
+						const parseSvgWidth = /<svg[^>]+width\s*=\s*["']?(\d+)\s*(pt|px|)["']?/im.exec(source);
 						let width = 100;
 						if(!parseSvgWidth){
 							if(viewbox !== null && typeof viewbox[1] === "string"){
 								const viewBoxParts = viewbox[1].split(/\s+/).filter(v => v !== "");
 								if(typeof viewBoxParts[2] === "string") width = viewBoxParts[2];
 							}
-							source = source.replace(/^(<svg\s)/i, "$1width=\"" + width + "px\" ");
+							source = source.replace(/^(<svg\s)/im, "$1width=\"" + width + "px\" ");
 						}
 					}
 					callback(null, {toString: () => source});
