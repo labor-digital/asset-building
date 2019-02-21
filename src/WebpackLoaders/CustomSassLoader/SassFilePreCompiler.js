@@ -35,7 +35,7 @@ module.exports = class SassFilePreCompiler {
 
 		// Resolve imports
 		file.content = file.content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:[^\S\n]+)?)/gm,
-			(a, before, importPath, after) => {
+			(a, before, importPath) => {
 				const importFilename = SassFilePreCompiler.resolveImportFilename(
 					importPath, context.baseContext.dir.nodeModules, file.filename);
 				const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
@@ -56,7 +56,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 
 			// Make sure to enquote everything that does not look like it is a variable
 			if (!url.match(/[$#{}"']/)) url = "\"" + url + "\"";
-			return before + "custom-sass-loader-url-resolver(" + url + ")" + after;
+			return before + "custom-sass-loader-url-resolver(" + url + ", \"" + FileHelpers.filenameToPosix(file.filename) + "\")" + after;
 		});
 	}
 

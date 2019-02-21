@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.9] - 2019-02-21
+### Changed
+- Changed the way how the CustomSassLoader resolves it's url imports, which should now be faster and more reliable.
+
 ## [3.2.8] - 2019-02-20
 ### Fixed
 - Fixed the issue with the legacyAdapter -> for real this time.

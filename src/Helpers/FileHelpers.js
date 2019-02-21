@@ -38,7 +38,7 @@ module.exports = class FileHelpers {
 	}
 
 	static stripOffQuery(filename){
-		return filename.replace(/\?.*?$/, "")
+		return filename.replace(/[?#].*?$/, "")
 	}
 
 	static getFileWithoutExtension(filename) {

@@ -23,7 +23,7 @@
 const fs = require("fs");
 const path = require("path");
 const sass = require("node-sass");
-const resolvedUrlCache = new Map();
+const FileHelpers = require("../../Helpers/FileHelpers");
 
 const SassFileResolverContext = require("./Entities/SassFileResolverContext");
 const SassFileResolver = require("./SassFileResolver");
@@ -38,7 +38,6 @@ module.exports = function customSassLoader(sassSource) {
 
 		// Defines the path to use when resolving files
 		context.path.push(file.filename);
-		const urlRelativeRoot = path.dirname(file.filename);
 
 		const result = sass.renderSync({
 			"data": file.content,
@@ -57,10 +56,11 @@ module.exports = function customSassLoader(sassSource) {
 					context.path.pop();
 					return sass.types.Null.NULL;
 				},
-				"custom-sass-loader-url-resolver($url: \"\")": function customSassLoaderUrlResolver(url) {
+				"custom-sass-loader-url-resolver($url: \"\", $filename: \"\")": function customSassLoaderUrlResolver(url, filename, bridge) {
+
+					// Extract values
 					url = url.getValue();
-					const cacheKey = context.path[context.path.length - 1] + "-" + url;
-					if (resolvedUrlCache.has(cacheKey)) return resolvedUrlCache.get(cacheKey);
+					filename = filename.getValue();
 
 					// Check if this is a data url
 					if (url.trim().indexOf("data:") === 0)
@@ -74,25 +74,24 @@ module.exports = function customSassLoader(sassSource) {
 					const queryString = url.indexOf("?") === -1 && url.indexOf("#") === -1 ? "" : url.replace(/[^?#]*/, "");
 					if (queryString !== "") url = url.replace(/[?#].*$/, "");
 
-					// Check if the url is already readable
-					if (fs.existsSync(url)) {
-						resolvedUrlCache.set(cacheKey, new sass.types.String("\"" + url + queryString + "\""));
-						return resolvedUrlCache.get(cacheKey);
+					// Skip if the url is already readable
+					if (fs.existsSync(url)) return new sass.types.String(url + queryString);
+
+					// Resolve the url relative to the filename where it was written
+					// This will work with urls that are passed to mixins as well.
+					let urlResolved = url;
+					if(context.path.length > 0){
+						const localPath = context.path[context.path.length -1];
+						urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(localPath), url));
+						if(fs.existsSync(urlResolved)) return new sass.types.String(urlResolved + queryString);
 					}
 
-					// Try to resolve the file by walking trough the compiler path
-					for (const file of context.path) {
-						let resolvedPath = path.resolve(path.dirname(file), url);
-						if (fs.existsSync(resolvedPath)) {
-							resolvedPath = path.relative(urlRelativeRoot, resolvedPath).replace(/\\/g, "/");
-							resolvedUrlCache.set(cacheKey, sass.types.String("\"./" + resolvedPath + queryString + "\""));
-							return resolvedUrlCache.get(cacheKey);
-						}
-					}
+					// Resolve the url relative to the filename where url() is defined
+					urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(filename), url));
+					if(fs.existsSync(urlResolved)) return new sass.types.String(urlResolved + queryString);
 
-					// Nope
-					throw new Error("Could not resolve the url: \"" + url + "\" in \"" +
-						context.path[context.path.length - 1] + "\"!");
+					// Failed to resolve the file
+					return new sass.types.String(urlResolved);
 				}
 			}
 		});
