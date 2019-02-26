@@ -13,6 +13,7 @@
   "author": "LABOR GmbH",
   "license": "MIT",
   "dependencies": {
+    "acorn": "6.1.0",
     "autoprefixer": "9.4.7",
     "chalk": "2.4.2",
     "chokidar": "2.1.0",

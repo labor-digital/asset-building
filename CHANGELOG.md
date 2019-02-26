@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.10] - 2019-02-26
+### Added
+- Added acorn as dependency, to prevent a strange issue where it could not be resolved at arni's local setup.
+
 ## [3.2.9] - 2019-02-26
 ### Fixed
 - IE 11 has Problems displaying SVG's from data urls which are bigger than 4k. After that initial 4kb all shapes will be filled black. Installed the [svg-url-loader](https://github.com/bhovhannes/svg-url-loader) in addition to our normal image loader to circumvent that problem.
