@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+## [3.2.9] - 2019-02-26
+### Fixed
+- IE 11 has Problems displaying SVG's from data urls which are bigger than 4k. After that initial 4kb all shapes will be filled black. Installed the [svg-url-loader](https://github.com/bhovhannes/svg-url-loader) in addition to our normal image loader to circumvent that problem.
+- Implemented a fix from user https://github.com/Finesse to our svgFontHeightFix to allow multiple whitespaces and negative offset values when reading svg size from viewbox
+
 ## [3.2.8] - 2019-02-21
 ### Fixed
 - Fixed the issue with the legacyAdapter -> for real this time.

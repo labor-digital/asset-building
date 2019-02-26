@@ -29,58 +29,83 @@ module.exports = class ImageLoader {
 	static apply(context) {
 		if (context.builderVersion === 1) return;
 
+		// Prepare image optimization configuration
+		const imageOptimization = {
+			loader: "image-webpack-loader",
+			options: {
+				disable: !context.isProd || context.currentAppConfig.imageCompression === false,
+				mozjpeg: {
+					progressive: true,
+					quality: typeof context.currentAppConfig.imageCompressionQuality === "number" ?
+						context.currentAppConfig.imageCompressionQuality : 80,
+					dcScanOpt: 2,
+					dct: "float"
+				},
+				optipng: {
+					optimizationLevel: 5
+				},
+				pngquant: {
+					quality: typeof context.currentAppConfig.imageCompressionQuality === "number" ?
+						context.currentAppConfig.imageCompressionQuality : 80,
+					speed: 2,
+					strip: true
+				}
+			}
+		};
+
+		// Name generation which uses a weak hash in development
+		const generateName = (file) => {
+				if (context.isProd) return "[name]-[hash].[ext]";
+				// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
+				return "[name]-" + MiscHelpers.md5(file) + ".[ext]";
+			};
+
+		// Generic images
 		context.webpackConfig.module.rules.push(
 			context.callPluginMethod("filterLoaderConfig", [
 				{
-					test: context.callPluginMethod("filterLoaderTest", [/\.(png|gif|jpe?g|svg)$/, "imageLoader", context]),
+					test: context.callPluginMethod("filterLoaderTest", [/\.(png|gif|jpe?g)$/, "imageLoader", context]),
 					use: [
 						{
 							loader: "url-loader",
 							options: {
-								name: (file) => {
-									if(context.isProd) return "[name]-[hash].[ext]";
-									// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
-									return "[name]-" + MiscHelpers.md5(file) + ".[ext]";
-								},
+								name: generateName,
 								outputPath: "assets/",
 								limit: context.isProd ? 10000 : 1,
 								fallback: {
 									loader: "file-loader",
 									options: {
-										name: (file) => {
-											if(context.isProd) return "[name]-[hash].[ext]";
-											// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
-											return "[name]-" + MiscHelpers.md5(file) + ".[ext]";
-										},
+										name: generateName,
 									}
 								}
 							}
 						},
-						{
-							loader: "image-webpack-loader",
-							options: {
-								disable: !context.isProd || context.currentAppConfig.imageCompression === false,
-								mozjpeg: {
-									progressive: true,
-									quality: typeof context.currentAppConfig.imageCompressionQuality === "number" ?
-										context.currentAppConfig.imageCompressionQuality : 80,
-									dcScanOpt: 2,
-									dct: "float"
-								},
-								optipng: {
-									optimizationLevel: 5
-								},
-								pngquant: {
-									quality: typeof context.currentAppConfig.imageCompressionQuality === "number" ?
-										context.currentAppConfig.imageCompressionQuality : 80,
-									speed: 2,
-									strip: true
-								}
-							}
-						}
+						imageOptimization
 					]
 				},
 				"imageLoader", context
+			]));
+
+		// SVG images -> Fallback for IE 11
+		context.webpackConfig.module.rules.push(
+			context.callPluginMethod("filterLoaderConfig", [
+				{
+					test: context.callPluginMethod("filterLoaderTest", [/\.svg$/, "svgImageLoader", context]),
+					use: [
+						{
+							loader: "svg-url-loader",
+							options: {
+								name: generateName,
+								outputPath: "assets/",
+								limit: context.isProd ? 10000 : 1,
+								iesafe: true,
+								stripdeclarations: true
+							}
+						},
+						imageOptimization
+					]
+				},
+				"svgImageLoader", context
 			]));
 	}
 };

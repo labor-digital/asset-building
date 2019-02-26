@@ -36,22 +36,16 @@ module.exports = function SvgFontHeightFix() {
 					const parseSvg = /<svg[^>]+height\s*=\s*["']?(\d+)\s*(pt|px|)["']?/i.exec(source);
 					if(!parseSvg){
 						// Check if we can read the viewbox to extract the height
-						const viewbox = /.*?<svg[^>]+\s?[^>]*viewBox\s*=\s*["']?\s?([\d.]{1,5}\s[\d.]{1,5}\s[\d.]{1,5}\s[\d.]{1,5})\s?["']?/im.exec(source);
-						let height = 100;
-						if(viewbox !== null && typeof viewbox[1] === "string"){
-							const viewBoxParts = viewbox[1].split(/\s+/).filter(v => v !== "");
-							if(typeof viewBoxParts[3] === "string") height = viewBoxParts[3];
-						}
+						// Thanks to https://github.com/Finesse for the suggestion for negative values and multiple spaces
+						const viewbox = /<svg\s[^>]*viewBox\s*=\s*["']?\s*[\d.\-]+\s+[\d.\-]+\s+([\d.\-]+)\s+([\d.\-]+)\s*["']?/im.exec(source);
+						// viewBox[1] - icon width, viewBox[2] - icon height; viewBox = null if there is no viewBox
+						const height = viewbox && viewbox[2] || 100;
 						source = source.replace(/^(<svg\s)/im, "$1height=\"" + height + "px\" ");
 
 						// Check if we need a width as well
 						const parseSvgWidth = /<svg[^>]+width\s*=\s*["']?(\d+)\s*(pt|px|)["']?/im.exec(source);
-						let width = 100;
 						if(!parseSvgWidth){
-							if(viewbox !== null && typeof viewbox[1] === "string"){
-								const viewBoxParts = viewbox[1].split(/\s+/).filter(v => v !== "");
-								if(typeof viewBoxParts[2] === "string") width = viewBoxParts[2];
-							}
+							const width = viewbox && viewbox[1] || 100;
 							source = source.replace(/^(<svg\s)/im, "$1width=\"" + width + "px\" ");
 						}
 					}

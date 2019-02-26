@@ -91,6 +91,7 @@ Types are (not ordered):
 - fontLoader
 - htmlLoader
 - imageLoader
+- svgImageLoader
 - lessLoader
 - sassLoader
 - tsJsPreLoader
