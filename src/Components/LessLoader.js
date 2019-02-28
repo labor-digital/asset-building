@@ -49,10 +49,7 @@ module.exports = class LessLoader {
 							}
 						},
 						{
-							loader: "css-loader",
-							options: {
-								import: false
-							}
+							loader: "css-loader"
 						},
 						Postcss.makeConfig(context),
 						{
@@ -84,7 +81,6 @@ module.exports = class LessLoader {
 						{
 							loader: "css-loader",
 							options: {
-								import: false,
 								url: false
 							}
 						},
