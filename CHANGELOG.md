@@ -1,5 +1,15 @@
-# Changelog
-All notable changes to this project will be documented in this file.
+# Change Log
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [3.2.12](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.2.12%0Dv3.2.11#diff) (2019-03-27)
+
+
+### Bug Fixes
+
+* update dependencies ([fcd2f07](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/fcd2f07))
+
+
 
 ## [3.2.11] - 2019-02-26
 ### Fixed
