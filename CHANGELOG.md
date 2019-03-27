@@ -1,7 +1,6 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
 ## [3.2.11] - 2019-02-26
 ### Fixed
 - Fixed an issue with the legacy version of the less-loader which disabled the @import statement 
