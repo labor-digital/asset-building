@@ -36,6 +36,13 @@ module.exports = function customSassLoader(sassSource) {
 		const context = new SassFileResolverContext(this.query.context, this);
 		const file = SassFileResolver.getFile(context.baseFile, sassSource, context);
 
+		// Helper to create relative paths to our resolved assets,
+		// If we supply absolute path's the css-loader will ignore them
+		// @see https://github.com/webpack-contrib/css-loader/issues/750
+		const pathRelativizer = function(absolutePath) {
+			return "./" + FileHelpers.filenameToPosix(path.relative(path.dirname(file.filename), absolutePath));
+		};
+
 		// Defines the path to use when resolving files
 		context.path.push(file.filename);
 
@@ -75,7 +82,7 @@ module.exports = function customSassLoader(sassSource) {
 					if (queryString !== "") url = url.replace(/[?#].*$/, "");
 
 					// Skip if the url is already readable
-					if (fs.existsSync(url)) return new sass.types.String(url + queryString);
+					if (fs.existsSync(url)) return new sass.types.String(pathRelativizer(url) + queryString);
 
 					// Resolve the url relative to the filename where it was written
 					// This will work with urls that are passed to mixins as well.
@@ -83,12 +90,12 @@ module.exports = function customSassLoader(sassSource) {
 					if(context.path.length > 0){
 						const localPath = context.path[context.path.length -1];
 						urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(localPath), url));
-						if(fs.existsSync(urlResolved)) return new sass.types.String(urlResolved + queryString);
+						if(fs.existsSync(urlResolved)) return new sass.types.String(pathRelativizer(urlResolved) + queryString);
 					}
 
 					// Resolve the url relative to the filename where url() is defined
 					urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(filename), url));
-					if(fs.existsSync(urlResolved)) return new sass.types.String(urlResolved + queryString);
+					if(fs.existsSync(urlResolved)) return new sass.types.String(pathRelativizer(urlResolved) + queryString);
 
 					// Failed to resolve the file
 					return new sass.types.String(urlResolved);
