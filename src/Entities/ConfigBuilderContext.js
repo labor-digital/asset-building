@@ -110,6 +110,20 @@ module.exports = class ConfigBuilderContext {
 		this.plugins.forEach(plugin => {
 			if (typeof plugin[method] !== "function") return;
 			let result = plugin[method].apply(plugin, args);
+			// Handle promise results
+			if (typeof result === "object" && typeof result.then === "function" && typeof result.catch === "function") {
+				// We are in a sync context here, so we have to make the given promise synchronous as well
+				let error = false;
+				let value = undefined;
+				let done = false;
+				result.then(v => {
+					done = true;
+					value = v;
+				}).catch(e => error = e);
+				require("deasync").loopWhile(() => !done);
+				if(error !== false) throw new Error(error);
+				result = value;
+			}
 			if (typeof result !== "undefined") args[0] = result;
 		});
 		return typeof args[0] !== "undefined" ? args[0] : null;
