@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.3.2%0Dv3.3.1#diff) (2019-04-11)
+
+
+### Bug Fixes
+
+* make sure the jsonp namespace of our webpack bundles is unique even if we build the package in the pipeline ([4604a48](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/4604a48))
+
+
+
 ## [3.3.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.3.1%0Dv3.3.0#diff) (2019-04-10)
 
 
