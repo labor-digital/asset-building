@@ -155,7 +155,8 @@ module.exports = class WebpackConfigBuilder {
 				modules: Array.from(context.dir.additionalResolverPaths)
 			},
 			output: {
-				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson) + "_" + context.currentApp
+				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson + (Math.random()+"") + context.currentApp +
+					JSON.stringify(context.currentAppConfig)) + "_" + context.currentApp
 			}
 		};
 	}
