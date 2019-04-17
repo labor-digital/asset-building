@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.3](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.3.3%0Dv3.3.2#diff) (2019-04-17)
+
+
+### Bug Fixes
+
+* more speaking errors when legacy adapter fails to copy build files ([65de0d8](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/65de0d8))
+
+
+
 ## [3.3.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.3.2%0Dv3.3.1#diff) (2019-04-11)
 
 
