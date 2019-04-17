@@ -90,7 +90,7 @@ module.exports = class LegacyAdapter {
 
 	/**
 	 * Injects additional plugins to handle additional changes that are required for version 1 to
-	 * run propperly in the version 2 context
+	 * run properly in the version 2 context
 	 * @param {*} child
 	 * @param {module.ConfigBuilderContext} context
 	 */
@@ -127,8 +127,20 @@ module.exports = class LegacyAdapter {
 			// Move file to real output directory
 			const assetLocationReal = child.outputPath + path.sep + asset.name;
 			const assetLocationDirectory = path.dirname(assetLocationReal);
-			FileHelpers.mkdir(assetLocationDirectory);
-			fs.copyFileSync(assetLocation, assetLocationReal);
+			try {
+				FileHelpers.mkdir(assetLocationDirectory);
+			} catch (e) {
+				child.errors.push("LEGACY ADAPTER: Failed to create the asset output directory at: \"" + assetLocationDirectory + "\"");
+				return;
+			}
+			try {
+				fs.copyFileSync(assetLocation, assetLocationReal);
+			} catch (e) {
+				console.log("Legacy output path: \"" + outputPath + "\"", (fs.existsSync(outputPath) ? "(Exists)" : "(Does not exist!)"));
+				if(fs.existsSync(outputPath)) console.log("Legacy output contents: ", fs.readdirSync(outputPath));
+				child.errors.push("LEGACY ADAPTER: Failed to copy a temporary asset from: \"" + assetLocation + "\" to its destination at: \"" + assetLocationReal + "\"");
+				return;
+			}
 		});
 	}
 };
