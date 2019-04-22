@@ -30,7 +30,6 @@ const SassFileResolver = require("./SassFileResolver");
 
 module.exports = function customSassLoader(sassSource) {
 	const callback = this.async();
-
 	try {
 		// Prepare the compiler context
 		const context = new SassFileResolverContext(this.query.context, this);
@@ -45,14 +44,20 @@ module.exports = function customSassLoader(sassSource) {
 
 		// Defines the path to use when resolving files
 		context.path.push(file.filename);
-
+		let importError = false;
 		const result = sass.renderSync({
 			"data": file.content,
 			"sourceComments": true,
 			"outputStyle": "expanded",
 			"importer": function customSassLoaderFileImporter(url) {
-				const importFile = SassFileResolver.getFile(url, null, context);
-				return {contents: importFile.content};
+				if(importError !== false) return {contents: ""};
+				try {
+					const importFile = SassFileResolver.getFile(url, null, context);
+					return {contents: importFile.content};
+				} catch (e) {
+					importError = e;
+					return {contents: ""};
+				}
 			},
 			"functions": {
 				"custom-sass-loader-open-file($file)": function customSassLoaderOpenFile(file) {
@@ -102,6 +107,9 @@ module.exports = function customSassLoader(sassSource) {
 				}
 			}
 		});
+
+		// Check for import errors
+		if(importError !== false) throw importError;
 
 		// For debug purposes
 		// let debug = path.dirname(this.resourcePath) + path.sep + ".debug.css";
