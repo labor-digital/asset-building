@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.3.4](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.3.4%0Dv3.3.3#diff) (2019-04-22)
+
+
+### Bug Fixes
+
+* **CustomSassLoader:** handle import errors in sass loader ([ec31f39](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/ec31f39))
+
+
+
 ## [3.3.3](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.3.3%0Dv3.3.2#diff) (2019-04-17)
 
 
