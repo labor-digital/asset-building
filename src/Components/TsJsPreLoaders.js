@@ -42,13 +42,13 @@ module.exports = class TsJsPreLoaders {
 					"entry": path.resolve(context.dir.current, context.currentAppConfig.entry),
 					"polyfills": context.callPluginMethod("filterJsPolyfills", [
 						[
-							"core-js/fn/promise",
-							"core-js/fn/set",
-							"core-js/fn/map",
-							"core-js/fn/object/assign",
-							"core-js/fn/object/entries",
-							"core-js/fn/object/keys",
-							"core-js/fn/array/from"
+							"core-js/features/promise/index.js",
+							"core-js/features/set/index.js",
+							"core-js/features/map/index.js",
+							"core-js/features/object/assign.js",
+							"core-js/features/object/entries.js",
+							"core-js/features/object/keys.js",
+							"core-js/features/array/from.js"
 						].concat(additionalPolyfills), context])
 				}
 			});

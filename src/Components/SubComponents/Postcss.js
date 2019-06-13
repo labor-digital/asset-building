@@ -47,7 +47,7 @@ module.exports = class Postcss {
 		return context.callPluginMethod("postCssPluginFilter", [
 			[
 				require("autoprefixer")({
-					browsers: context.callPluginMethod("browserListFilter", ["> 1%, last 10 versions", context])
+					overrideBrowserslist: context.callPluginMethod("browserListFilter", ["> 1%, last 10 versions", context])
 				}),
 				require("iconfont-webpack-plugin")({
 					resolve: loader.resolve,

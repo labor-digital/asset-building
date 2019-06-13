@@ -21,7 +21,7 @@
  * For LABOR.digital
  */
 const path = require("path");
-const CleanWebpackPlugin = require("clean-webpack-plugin");
+const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 module.exports = class CleanOutputDirPlugin {
 	/**
 	 * Applies this configuration component to the current context
@@ -35,15 +35,22 @@ module.exports = class CleanOutputDirPlugin {
 
 		// Add plugin to clean the output directory when the app is compiled
 		// But make sure to keep all sources which have been defined in there
-		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift();
+		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift()
+			.replace(/^[.\\\/]+/g, "");
+		const cleanOnceBeforeBuildPatterns = ["**/*"];
+		if(sourceToExclude.length > 0){
+			cleanOnceBeforeBuildPatterns.push("!" + sourceToExclude);
+			cleanOnceBeforeBuildPatterns.push("!" + sourceToExclude + "/**/*");
+		}
+		const options = {
+			verbose: true,
+			cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
+		};
 		context.webpackConfig.plugins.push(new CleanWebpackPlugin(
 			... context.callPluginMethod("filterPluginConfig", [
-				[[path.basename(outputDirectory)], {
-					root: path.dirname(outputDirectory),
-					exclude: sourceToExclude.length > 0 ? [sourceToExclude, sourceToExclude + "/"] : undefined,
-					verbose: true
-				}],
+				[options],
 				"cleanOutputDirPlugin", context]
 		)));
 	}
+
 };
