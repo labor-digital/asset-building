@@ -52,6 +52,10 @@ module.exports = class ContextFactory {
 		ContextFactory._plugInLegacyAdapterIfRequired(context);
 		context.callPluginMethod("filterLaborConfig", [context.laborConfig, context]);
 
+		// Check if there are registered apps
+		if (!Array.isArray(context.laborConfig.apps) || context.laborConfig.apps.length === 0)
+			throw new Error("Whoops! It looks like you did not define any apps. Did you configure the package.json correctly?");
+
 		// Done
 		return context;
 	}
@@ -73,9 +77,9 @@ module.exports = class ContextFactory {
 
 					// Add additional lookup path for all plugin sources
 					let parts = path.dirname(path.resolve(basePath, v)).split(path.sep);
-					while (parts.length > 0){
+					while (parts.length > 0) {
 						const pl = parts.join(path.sep) + path.sep + "node_modules" + path.sep;
-						if(fs.existsSync(pl)){
+						if (fs.existsSync(pl)) {
 							dir.additionalResolverPaths.add(pl);
 							break;
 						}
