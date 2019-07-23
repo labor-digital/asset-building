@@ -95,7 +95,7 @@ module.exports = class WebpackCallbackHandler {
 				const isMap = asset.name.match(/\.map$/);
 				const isHotUpdate = asset.name.match(/\.hot-update\./);
 				const chunkIsMain = typeof asset.chunks[0] === "string" && asset.chunks[0].indexOf("main") === 0;
-				const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0
+				const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0;
 				const useAsset = !isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain);
 
 				if (!useAsset) {
