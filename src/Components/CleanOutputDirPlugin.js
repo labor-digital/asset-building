@@ -27,8 +27,8 @@ module.exports = class CleanOutputDirPlugin {
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
-	static apply(context){
-		if(context.builderVersion === 1 || context.currentAppConfig.keepOutputDirectory === true) return;
+	static apply(context) {
+		if (context.builderVersion === 1 || context.currentAppConfig.keepOutputDirectory === true) return;
 
 		const inputDirectory = path.dirname(context.currentAppConfig.entry);
 		const outputDirectory = context.webpackConfig.output.path;
@@ -38,19 +38,20 @@ module.exports = class CleanOutputDirPlugin {
 		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift()
 			.replace(/^[.\\\/]+/g, "");
 		const cleanOnceBeforeBuildPatterns = ["**/*"];
-		if(sourceToExclude.length > 0){
+		if (sourceToExclude.length > 0) {
 			cleanOnceBeforeBuildPatterns.push("!" + sourceToExclude);
 			cleanOnceBeforeBuildPatterns.push("!" + sourceToExclude + "/**/*");
 		}
 		const options = {
 			verbose: true,
+			cleanStaleWebpackAssets: false,
 			cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
 		};
 		context.webpackConfig.plugins.push(new CleanWebpackPlugin(
-			... context.callPluginMethod("filterPluginConfig", [
+			...context.callPluginMethod("filterPluginConfig", [
 				[options],
 				"cleanOutputDirPlugin", context]
-		)));
+			)));
 	}
 
 };
