@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [3.5.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.5.0%0Dv3.4.0#diff) (2019-07-23)
+
+
+### Bug Fixes
+
+* add missing semicolon ([e090934](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/e090934))
+* add speaking error message when there are no configurations in the package.json ([22d008f](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/22d008f))
+* don't remove webpack files while watch is running ([4da6084](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/4da6084))
+
+
+### Features
+
+* update dependencies to latest versions ([d45626f](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/d45626f))
+
+
+
 # [3.4.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.4.0%0Dv3.3.4#diff) (2019-06-13)
 
 
