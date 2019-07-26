@@ -24,6 +24,7 @@ when it comes to webpack, you can extend this library using its lightwight
 * Minify js files when using "build" ([uglifyjs-webpack-plugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin))
 * Automatically add css-prefixes for older browsers: ([Autoprefixer](https://github.com/postcss/autoprefixer))
 * Creation of source-maps for js files
+* Chunk/Bundle analyzing when using "analyze" ([webpack-bundle-analyzer](https://www.npmjs.com/package/webpack-bundle-analyzer)
 
 **Included webpack modules and plugins * Builder Version 2.0**  
 
@@ -45,7 +46,8 @@ when it comes to webpack, you can extend this library using its lightwight
 ```
   "scripts": {
     "build": "labor-asset-building build",
-    "watch": "labor-asset-building watch"
+    "watch": "labor-asset-building watch",
+    "analyze": "labor-asset-building analyze"
   }
 ```
 * Done! :-)
@@ -227,3 +229,6 @@ a:before {
 }
 ```
 For more information see: https://github.com/jantimon/iconfont-webpack-plugin
+
+## Analyze your chunks
+When you are working with multiple chunks you will at some point in time want to take a look on what's in those files. We use webpack-bundle-analyzer internally to provide you with that inside. To analyze your chunks call `npm run analyze` and the report will show up in your default browser, after the build finished. 

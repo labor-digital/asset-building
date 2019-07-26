@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.02.05 at 17:45
+ * Last modified: 2019.07.26 at 16:21
  */
 const merge = require("webpack-merge");
-module.exports = class DevOnly {
+module.exports = class Analyze {
 	/**
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
 	static apply(context) {
-		if (context.isProd) return;
+		if (context.mode !== "analyze") return;
+		context.laborConfig.keepAlive = true;
+		const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 		context.webpackConfig = merge(context.webpackConfig, {
-			output: {
-				pathinfo: false
-			},
-			optimization: {
-				removeAvailableModules: false,
-				removeEmptyChunks: false,
-				splitChunks: false
-			}
+			profile: true,
+			plugins: [
+				new BundleAnalyzerPlugin({})
+			]
 		});
+		context.webpackConfig.profile = true;
 	}
 };

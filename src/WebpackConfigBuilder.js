@@ -64,11 +64,12 @@ module.exports = class WebpackConfigBuilder {
 				"FilterWarningsPlugin.js",
 				"DevOnly.js",
 				"ProdOnly.js",
+				"Analyze.js",
 				"HtmlPlugin.js"
 			], componentPath, context
 		]).forEach(file => {
 			const key = file.replace(/\.js$/, "").trim();
-			components.set(key, require(componentPath + file))
+			components.set(key, require(componentPath + file));
 		});
 
 		// Create a webpack config for each app
@@ -155,7 +156,7 @@ module.exports = class WebpackConfigBuilder {
 				modules: Array.from(context.dir.additionalResolverPaths)
 			},
 			output: {
-				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson + (Math.random()+"") + context.currentApp +
+				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson + (Math.random() + "") + context.currentApp +
 					JSON.stringify(context.currentAppConfig)) + "_" + context.currentApp
 			}
 		};

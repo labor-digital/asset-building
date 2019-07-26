@@ -105,7 +105,7 @@ module.exports = class ContextFactory {
 	static _findMode(context) {
 
 		// Check if mode was given mode
-		const modes = context.callPluginMethod("getModes", [["watch", "build"]]);
+		const modes = context.callPluginMethod("getModes", [["watch", "build", "analyze"]]);
 		let mode = typeof process.argv[2] === "undefined" ? "" : process.argv[2];
 		mode = context.callPluginMethod("getMode", [mode, modes, context]);
 		if (mode === "") throw new Error("You did not transfer a mode parameter (e.g. build, watch) to the call!");
@@ -118,7 +118,7 @@ module.exports = class ContextFactory {
 		context.mode = mode;
 
 		// Check if we are in production
-		context.isProd = context.callPluginMethod("isProd", [mode === "build", mode]);
+		context.isProd = context.callPluginMethod("isProd", [mode === "build" || mode === "analyze", mode]);
 	}
 
 	/**
