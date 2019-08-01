@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.7.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.7.1%0Dv3.7.0#diff) (2019-08-01)
+
+
+### Bug Fixes
+
+* **WebpackResolver:** add ./ to list of possible resolver path's ([0823ff5](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/0823ff5))
+
+
+
 # [3.7.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.7.0%0Dv3.6.0#diff) (2019-08-01)
 
 
