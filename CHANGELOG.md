@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [3.6.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.6.0%0Dv3.5.0#diff) (2019-07-26)
+
+
+### Features
+
+* add bundle analyzing using npm run analyze ([6bce65c](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/6bce65c))
+
+
+
 # [3.5.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.5.0%0Dv3.4.0#diff) (2019-07-23)
 
 
