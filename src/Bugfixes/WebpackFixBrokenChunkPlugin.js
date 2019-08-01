@@ -15,11 +15,6 @@
  *
  * Last modified: 2018.10.19 at 18:27
  */
-
-/**
- * Created by Martin Neundorfer on 07.09.2018.
- * For LABOR.digital
- */
 /**
  * This plugin is currently required because of a strange bug, which occures if:
  * - Dynamic imports are used
@@ -37,7 +32,7 @@ module.exports = class WebpackFixBrokenChunkPlugin {
 	apply(compiler) {
 		compiler.hooks.compilation.tap("WebpackFixBrokenChunkPlugin", compilation => {
 			compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (_, chunk, hash, chunkIdVar) {
-				_ += '\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== \'function\') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n'
+				_ += "\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== 'function') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n";
 				return _;
 			});
 		});

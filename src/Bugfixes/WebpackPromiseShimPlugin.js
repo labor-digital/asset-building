@@ -17,10 +17,6 @@
  */
 
 /**
- * Created by Martin Neundorfer on 07.09.2018.
- * For LABOR.digital
- */
-/**
  * This module plugin makes sure that every package can use dynamic imports,
  * without an additional polyfill, as we provide a polyfill for promises.
  * @type {module.WebpackPromiseShimPlugin}
