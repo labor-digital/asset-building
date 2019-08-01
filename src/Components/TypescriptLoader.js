@@ -15,11 +15,6 @@
  *
  * Last modified: 2018.12.20 at 16:17
  */
-
-/**
- * Created by Martin Neundorfer on 14.12.2018.
- * For LABOR.digital
- */
 const path = require("path");
 module.exports = class TypescriptLoader {
 	/**
@@ -37,7 +32,7 @@ module.exports = class TypescriptLoader {
 		context.webpackConfig.module.rules.push(
 			context.callPluginMethod("filterLoaderConfig", [
 				{
-					test: context.callPluginMethod("filterLoaderTest", [/\.js$|\.ts$|\.tsx$/, "typescriptLoader", context]),
+					test: context.callPluginMethod("filterLoaderTest", [/\.js$|\.jsx$|\.ts$|\.tsx$/, "typescriptLoader", context]),
 					exclude: excludePattern === null ? undefined : excludePattern,
 					use: [
 						{
@@ -53,7 +48,8 @@ module.exports = class TypescriptLoader {
 										"allowJs": true,
 										"target": "es5",
 										"moduleResolution": "node",
-										"module": "esnext"
+										"module": "esnext",
+										"jsx": "react"
 									}
 								},
 								context

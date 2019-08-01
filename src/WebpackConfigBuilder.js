@@ -150,7 +150,7 @@ module.exports = class WebpackConfigBuilder {
 			},
 			resolve: {
 				modules: Array.from(context.dir.additionalResolverPaths),
-				extensions: [".ts", ".tsx", ".js", ".json"]
+				extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
 			},
 			resolveLoader: {
 				modules: Array.from(context.dir.additionalResolverPaths)
