@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.9.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.9.1%0Dv3.9.0#diff) (2019-08-07)
+
+
+### Reverts
+
+* remove iterator polyfill as it does not work as expected ([3eba250](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/3eba250))
+
+
+
 # [3.9.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.9.0%0Dv3.8.0#diff) (2019-08-07)
 
 
