@@ -49,6 +49,7 @@ module.exports = class TsJsPreLoaders {
 							"core-js/features/object/entries.js",
 							"core-js/features/object/keys.js",
 							"core-js/features/array/from.js",
+							"core-js/features/array/iterator.js",
 							"core-js/features/symbol/index.js"
 						].concat(additionalPolyfills), context])
 				}
