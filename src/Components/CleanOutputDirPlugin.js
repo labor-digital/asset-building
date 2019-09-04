@@ -25,9 +25,10 @@ const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 module.exports = class CleanOutputDirPlugin {
 	/**
 	 * Applies this configuration component to the current context
-	 * @param {module.ConfigBuilderContext} context
+	 * @param {ConfigBuilderContext} context
 	 */
 	static apply(context) {
+		if (!context.isProd) return;
 		if (context.builderVersion === 1 || context.currentAppConfig.keepOutputDirectory === true) return;
 
 		const inputDirectory = path.dirname(context.currentAppConfig.entry);
