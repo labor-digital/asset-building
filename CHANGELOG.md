@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [3.10.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.10.0%0Dv3.9.1#diff) (2019-09-10)
+
+
+### Bug Fixes
+
+* now using terser-webpack-plugin instead of uglifyJS to address some es6 errors ([3f31891](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/3f31891))
+
+
+### Features
+
+* webpackConfig can now be an obejct of webpack-settings as well, added webpackConfig to individual js nodes for version 1, added a warningIgnorePattern to ignore certain warnings during the build to prevent an exit code 1 ([676bb8e](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/676bb8e))
+
+
+
 ## [3.9.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.9.1%0Dv3.9.0#diff) (2019-08-07)
 
 
