@@ -230,3 +230,37 @@ with a path, relative to your package.json to your app configuration.
   ]
 }
 ```
+
+But in some cases we only need to set or overwrite some webpack config settings.
+In this case we can write this additional settings as object. 
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      [...]
+      "webpackConfig": {
+        "target": "node",
+        "output": {
+          "libraryTarget": "umd"
+        }
+      }
+	}
+  ]
+}
+```
+
+### app.warningIgnorePattern
+You now have the option to suppress warnings during the build via the warningIgnorePattern, which is a RegExp. 
+This is especially useful if you have certain warnings raising in a build and you don´t want the asset-building to exit with code 1.
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      [...]
+      "warningIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
+	}
+  ]
+}
+```

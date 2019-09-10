@@ -112,6 +112,16 @@ module.exports = class WebpackCallbackHandler {
 				console.log(("  + " + ignoredChunks + " hidden files (maps, chunks, assets, and so on)").padStart(assetColLength) + "  " +
 					FileHelpers.humanFileSize(ignoredSize).padStart(sizeColLength));
 
+			// Check if we need to remove some warning due to the warningIgnorePattern
+			if (child.warnings.length > 0 && typeof context.currentAppConfig.warningIgnorePattern === "string") {
+				const finalWarnings = [];
+				child.warnings.forEach(entry => {
+					if(!entry.match(new RegExp(context.currentAppConfig.warningIgnorePattern.replace(/(^\/|\/$)/))))
+						finalWarnings.push(entry);
+				});
+				child.warnings = finalWarnings;
+			}
+
 			// Check if there are warnings
 			if (child.warnings.length > 0) {
 				exitCode = 1;

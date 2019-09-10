@@ -64,10 +64,12 @@ module.exports = class LegacyAdapter {
 			apps.push({
 				"entry": path.relative(context.dir.current, entryFile),
 				"output": path.relative(context.dir.current, outputFile),
+				"warningIgnorePattern": config.warningIgnorePattern,
+				"webpackConfig": config.webpackConfig,
 				"@setName": setName,
 				"@isStyle": isStyle,
 				"@legacy": config
-			})
+			});
 		};
 		if (hasCss) context.laborConfig.css.forEach(config => assetToAppConverter(config, true));
 		if (hasJs) context.laborConfig.js.forEach(config => assetToAppConverter(config, false));

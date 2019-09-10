@@ -20,6 +20,7 @@
  * Created by Martin Neundorfer on 14.12.2018.
  * For LABOR.digital
  */
+const merge = require("webpack-merge");
 const fs = require("fs");
 const path = require("path");
 const MiscHelpers = require("./Helpers/MiscHelpers");
@@ -206,16 +207,23 @@ module.exports = class WebpackConfigBuilder {
 	/**
 	 * Merge with potential user defined configuration
 	 * @param {module.ConfigBuilderContext} context
-	 * @param {string} customConfigFile The path to the custom webpack config, relative to the package json
+	 * @param {string|object} customConfig The path to the custom webpack config, relative to the package json or an object with additional settings
 	 * @private
 	 */
-	static _mergeAdditionalConfig(context, customConfigFile) {
-		if (typeof customConfigFile !== "string") return;
+	static _mergeAdditionalConfig(context, customConfig) {
+		// If the customConfig is an array we can directly merge it into the existing webpackConfig
+		if (typeof customConfig === "object" && !Array.isArray(customConfig)) {
+			context.webpackConfig = merge(context.webpackConfig, customConfig);
+			return;
+		}
+
+		if (typeof customConfig !== "string") return;
+
 		let customWebpackConfig = null;
 		try {
-			customWebpackConfig = require(path.resolve(context.dir.current, customConfigFile));
+			customWebpackConfig = require(path.resolve(context.dir.current, customConfig));
 		} catch (e) {
-			throw new Error("Could not resolve the custom webpack config at: \"" + path.resolve(context.dir.current, customConfigFile) + "\"");
+			throw new Error("Could not resolve the custom webpack config at: \"" + path.resolve(context.dir.current, customConfig) + "\"");
 		}
 		if (typeof customWebpackConfig !== "function")
 			throw new Error("The custom webpack config has to be a function!");

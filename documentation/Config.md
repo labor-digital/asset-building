@@ -84,8 +84,8 @@ node require(). More information can be found in the **Plugins** section.
 There might be a time where our preconfigured webpack is not enough for your needs,
 in that case you can always alter the webpack configuration using this option.
 
-Because the webpack config is mostly a js object we need to extend it using 
-javascript as well. To do so, lets create a new file called webpack.js in your 
+Because the webpack config is mostly a js object we will extend it using 
+javascript in most cases. To do so, lets create a new file called webpack.js in your 
 project root:
 ```javascript
 const merge = require('webpack-merge');
@@ -113,3 +113,17 @@ callback will receive the current configuration and can alter it.
 * context: The current config builder context. See **Config Builder Context**
 
 **Important**: The function has to return the altered webpack config!
+
+But in some cases we only need to set or overwrite some webpack config settings.
+In this case we can write this additional settings as object. 
+```
+"labor": {
+    "webpackConfig": {
+    	"target": "node",
+    	"output": {
+    		"libraryTarget": "umd"
+    	}
+    }
+}
+```
+
