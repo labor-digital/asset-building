@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.10.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.10.1%0Dv3.10.0#diff) (2019-09-12)
+
+
+### Bug Fixes
+
+* changed the wrapping for version 1 legacy scripts to version 2 scripts to be able to build as library ([7c69516](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/7c69516))
+
+
+
 # [3.10.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.10.0%0Dv3.9.1#diff) (2019-09-10)
 
 
