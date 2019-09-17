@@ -9,6 +9,8 @@ import all sources in a single "app" source file.
 
 For this reason you create an app with an entrypoint and specify it's output 
 directory / file name. 
+
+You can also set an optional displayname of each app for the output
 ```
 "labor": {
   "builderVersion": 2,
@@ -16,6 +18,7 @@ directory / file name.
     {
       "entry": "./src/app.js",
       "output": "./dist/bundle.js",
+      "displayname": "Your App name here"
     }
   ],
 }

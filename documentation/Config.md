@@ -46,8 +46,12 @@ Apart from that everything is straight forward.
 Say what (from) is copied, where (to) and you should be good to go. 
 If you want to exclude some files you can always use "ignore" for that. 
 Keep in mind that both, "from" and "ignore" support glob values. 
-If you don't want to flatten everything into a directory set "flatten: true" 
-and you are set.
+If you don't want to flatten everything into a directory set "flatten: false" 
+and you are set.  
+Normally files are copied after all other build steps. Via "first: true" you can set
+a copy-operation to be processed before the other build-steps.  
+Sometimes you have copy-tasks, which should be executed if it´s a build and not in a watch.
+Set "inBuildOnly: true" in such a case.
 ```
 "labor": {
     "copy": [
@@ -59,7 +63,9 @@ and you are set.
             ],
             "to": "webroot/assets",
             "ignore": ["*.jpg", "assets/a/c"],
-            "flatten": false
+            "flatten": false,
+            "first": false,
+            "inBuildOnly": false
         }
     ]
 }
