@@ -87,7 +87,7 @@ module.exports = class WebpackConfigBuilder {
 				if(typeof context.laborConfig.copy[i]['inBuildOnly'] !== 'undefined' && context.laborConfig.copy[i]['inBuildOnly'] && isWatch)
 					continue;
 
-				if(typeof context.laborConfig.copy[i]['inBuildOnly'] !== 'undefined' && context.laborConfig.copy[i]['inBuildOnly'])
+				if(typeof context.laborConfig.copy[i]['first'] !== 'undefined' && context.laborConfig.copy[i]['first'])
 					copyOrders['first'] = true;
 				else
 					copyOrders['last'] = true;
