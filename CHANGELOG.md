@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.11.1%0Dv3.11.0#diff) (2019-09-20)
+
+
+### Bug Fixes
+
+* Fixing first flag in copy ([6232798](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/6232798))
+
+
+
 # [3.11.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.11.0%0Dv3.10.1#diff) (2019-09-17)
 
 
