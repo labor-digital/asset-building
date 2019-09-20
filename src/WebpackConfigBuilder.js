@@ -79,6 +79,7 @@ module.exports = class WebpackConfigBuilder {
 		FileHelpers.mkdir(tmpDirectory);
 
 		// Create App-Nodes for Copy-First and Copy-Last but only if we need them (check the copy-node in the laborConfig for that)
+		// We also need to check the inBuildOnly flag
 		const isWatch = context.mode === "watch";
 		const setName = "setCopy-" + MiscHelpers.md5(Date.now().toString());
 		const copyOrders = {};
