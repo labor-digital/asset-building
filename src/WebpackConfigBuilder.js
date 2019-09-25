@@ -176,7 +176,7 @@ module.exports = class WebpackConfigBuilder {
 
 	/**
 	 * Prepares the basic webpack configuration for each app
-	 * @param {module.ConfigBuilderContext} context
+	 * @param {ConfigBuilderContext} context
 	 * @return {{name: string, mode: string, watch: boolean, entry: {}, plugins: Array, module: {rules: Array}, performance: {hints: boolean}, resolve: {modules: string[], extensions: string[]}, resolveLoader: {modules: string[]}}}
 	 * @private
 	 */
@@ -202,7 +202,7 @@ module.exports = class WebpackConfigBuilder {
 				modules: Array.from(context.dir.additionalResolverPaths)
 			},
 			output: {
-				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson + (Math.random() + "") + context.currentApp +
+				jsonpFunction: "labor_webpack_" + MiscHelpers.md5(context.dir.packageJson + ((context.isProd ? Math.random() : "") + "") + context.currentApp +
 					JSON.stringify(context.currentAppConfig)) + "_" + context.currentApp
 			}
 		};

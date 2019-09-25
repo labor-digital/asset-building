@@ -27,7 +27,7 @@ There are also some additional configuration options you might want to use,
 those can be specified for each app.
 
 ### app.publicPath & app.publicPathDev
-To make sure your path's can be resolved propperly on your webserver you may use 
+To make sure your path's can be resolved properly on your webserver you may use 
 "publicPath" to define the url/directory which leads to the output files. 
 
 If your path on your local machine is different from your productive publicPath 
