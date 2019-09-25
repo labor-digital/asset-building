@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [3.12.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.12.0%0Dv3.11.2#diff) (2019-09-25)
+
+
+### Bug Fixes
+
+* disable output directory cleaning for development ([afbf750](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/afbf750))
+
+
+### Features
+
+* update some dependencies to their latest minor versions ([8c6f9de](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/8c6f9de))
+
+
+
 ## [3.11.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.11.2%0Dv3.11.1#diff) (2019-09-20)
 
 
