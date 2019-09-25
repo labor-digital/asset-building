@@ -20,8 +20,10 @@
  * Created by Martin Neundorfer on 14.12.2018.
  * For LABOR.digital
  */
+const merge = require("webpack-merge");
 const fs = require("fs");
 const path = require("path");
+const FileHelpers = require("./Helpers/FileHelpers");
 const MiscHelpers = require("./Helpers/MiscHelpers");
 const ProgressBarPlugin = require("progress-bar-webpack-plugin");
 
@@ -72,11 +74,57 @@ module.exports = class WebpackConfigBuilder {
 			components.set(key, require(componentPath + file));
 		});
 
+		// Create a work directory
+		const tmpDirectory = context.dir.nodeModules + ".cache" + path.sep + "labor-legacy-code-cache" + path.sep;
+		FileHelpers.mkdir(tmpDirectory);
+
+		// Create App-Nodes for Copy-First and Copy-Last but only if we need them (check the copy-node in the laborConfig for that)
+		// We also need to check the inBuildOnly flag
+		const isWatch = context.mode === "watch";
+		const setName = "setCopy-" + MiscHelpers.md5(Date.now().toString());
+		const copyOrders = {};
+		if(Array.isArray(context.laborConfig.copy) && context.laborConfig.copy.length >= 0)
+			for(let i=0; i<context.laborConfig.copy.length; i++) {
+				if(typeof context.laborConfig.copy[i]['inBuildOnly'] !== 'undefined' && context.laborConfig.copy[i]['inBuildOnly'] && isWatch)
+					continue;
+
+				if(typeof context.laborConfig.copy[i]['first'] !== 'undefined' && context.laborConfig.copy[i]['first'])
+					copyOrders['first'] = true;
+				else
+					copyOrders['last'] = true;
+			}
+		for(let iCopy in copyOrders)
+		{
+			fs.writeFileSync(tmpDirectory + setName + "-" + iCopy + ".js", "let a=0;");
+			let app = {
+				"entry": path.relative(context.dir.current, tmpDirectory + setName + "-" + iCopy + ".js"),
+				"output": path.relative(context.dir.current, setName + "-" + iCopy + ".js"),
+				"warningIgnorePattern": null,
+				"webpackConfig": null,
+				"disableGitAdd": true,
+				"@setName": setName,
+				"@isStyle": false,
+				"@isCopy": true,
+				"@copyOrder": iCopy
+			};
+			if(iCopy == 'first')
+				context.laborConfig.apps.unshift(app);
+			else
+				context.laborConfig.apps.push(app);
+		}
+
 		// Create a webpack config for each app
+		let appIdx = 0;
+		let copyIdx = 0;
 		for (let i = 0; i < context.laborConfig.apps.length; i++) {
 			// Set up the current app context
 			context.currentApp = i;
 			context.currentAppConfig = context.laborConfig.apps[i];
+			let isCopy = typeof context.currentAppConfig['@isCopy'] !== 'undefined' && context.currentAppConfig['@isCopy'];
+			appIdx += (isCopy ? 0 : 1);
+			copyIdx += (isCopy ? 1 : 0);
+			if(typeof context.currentAppConfig.displayname === 'undefined')
+				context.currentAppConfig.displayname = isCopy ? "COPY-" + copyIdx : "APP-" + appIdx;
 			context.webpackConfig = WebpackConfigBuilder._createBaseConfiguration(context);
 
 			// Load the environment handler
@@ -106,7 +154,6 @@ module.exports = class WebpackConfigBuilder {
 			if (environment !== null && typeof environment.apply === "function")
 				environment.apply(context);
 
-
 			// Merge with potential user defined configuration
 			WebpackConfigBuilder._mergeAdditionalConfig(context, context.currentAppConfig.webpackConfig);
 
@@ -125,7 +172,6 @@ module.exports = class WebpackConfigBuilder {
 
 		// Merge with potential user defined configuration
 		WebpackConfigBuilder._mergeAdditionalConfig(context, context.laborConfig.webpackConfig);
-
 	}
 
 	/**
@@ -206,16 +252,23 @@ module.exports = class WebpackConfigBuilder {
 	/**
 	 * Merge with potential user defined configuration
 	 * @param {module.ConfigBuilderContext} context
-	 * @param {string} customConfigFile The path to the custom webpack config, relative to the package json
+	 * @param {string|object} customConfig The path to the custom webpack config, relative to the package json or an object with additional settings
 	 * @private
 	 */
-	static _mergeAdditionalConfig(context, customConfigFile) {
-		if (typeof customConfigFile !== "string") return;
+	static _mergeAdditionalConfig(context, customConfig) {
+		// If the customConfig is an array we can directly merge it into the existing webpackConfig
+		if (typeof customConfig === "object" && !Array.isArray(customConfig)) {
+			context.webpackConfig = merge(context.webpackConfig, customConfig);
+			return;
+		}
+
+		if (typeof customConfig !== "string") return;
+
 		let customWebpackConfig = null;
 		try {
-			customWebpackConfig = require(path.resolve(context.dir.current, customConfigFile));
+			customWebpackConfig = require(path.resolve(context.dir.current, customConfig));
 		} catch (e) {
-			throw new Error("Could not resolve the custom webpack config at: \"" + path.resolve(context.dir.current, customConfigFile) + "\"");
+			throw new Error("Could not resolve the custom webpack config at: \"" + path.resolve(context.dir.current, customConfig) + "\"");
 		}
 		if (typeof customWebpackConfig !== "function")
 			throw new Error("The custom webpack config has to be a function!");

@@ -2,6 +2,65 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.11.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.11.2%0Dv3.11.1#diff) (2019-09-20)
+
+
+### Bug Fixes
+
+* Adding some code doc ([9116ddd](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/9116ddd))
+
+
+
+## [3.11.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.11.1%0Dv3.11.0#diff) (2019-09-20)
+
+
+### Bug Fixes
+
+* Fixing first flag in copy ([6232798](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/6232798))
+
+
+
+# [3.11.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.11.0%0Dv3.10.1#diff) (2019-09-17)
+
+
+### Features
+
+* new copy-logic. You´re now able to control, when a yop is processed ([90b9e68](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/90b9e68))
+
+
+
+## [3.10.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.10.1%0Dv3.10.0#diff) (2019-09-12)
+
+
+### Bug Fixes
+
+* changed the wrapping for version 1 legacy scripts to version 2 scripts to be able to build as library ([7c69516](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/7c69516))
+
+
+
+# [3.10.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.10.0%0Dv3.9.1#diff) (2019-09-10)
+
+
+### Bug Fixes
+
+* now using terser-webpack-plugin instead of uglifyJS to address some es6 errors ([3f31891](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/3f31891))
+
+
+### Features
+
+* webpackConfig can now be an obejct of webpack-settings as well, added webpackConfig to individual js nodes for version 1, added a warningIgnorePattern to ignore certain warnings during the build to prevent an exit code 1 ([676bb8e](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/676bb8e))
+
+
+
+## [3.9.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.9.1%0Dv3.9.0#diff) (2019-08-07)
+
+
+### Reverts
+
+* remove iterator polyfill as it does not work as expected ([3eba250](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/3eba250))
+
+
+
 # [3.9.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.9.0%0Dv3.8.0#diff) (2019-08-07)
 
 

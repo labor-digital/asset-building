@@ -13,12 +13,21 @@ transpile it down to es5, so it is compatible to IE10 and higher.
 If the "build" mode is used the scripts will be minified.
 
 Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
+
+Additionally you can add a custom webpackConfig here as well. See the root webpackConfig for further details.
+
+Furthermore you now have the option to suppress warnings during the build via the warningIgnorePattern, which is a RegExp. 
+This is especially useful if you have certain warnings raising in a build and you don´t want the asset-building to exit with code 1.
 ```
 "labor": {
   "js": [
     {
       "entry": "./webroot/js/application.js",
-      "output": "webroot/js/bundle.js"
+      "output": "webroot/js/bundle.js",
+      "webpackConfig": {
+        "target": "node"
+      },
+      "warningIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
     }
   ]
 }

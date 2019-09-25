@@ -86,17 +86,18 @@ module.exports = class WebpackCallbackHandler {
 			// Render the asset list
 			let time = child.time > 5000 ? Math.round(child.time / 100) / 10 + "s" : child.time + "ms";
 			times.push(time);
-			console.log("APP-" + context.currentApp + " | Time: " + time);
+			console.log(context.currentAppConfig.displayname + " | Time: " + time);
 			console.log("Asset".padStart(assetColLength, " ") + "  " + "Size".padStart(sizeColLength));
 			let ignoredChunks = 0;
 			let ignoredSize = 0;
+			const isCopy = typeof context.currentAppConfig["@isCopy"] !== 'undefined' && context.currentAppConfig["@isCopy"];
 			child.assets.forEach(asset => {
 				// console.log(' - > ', asset.name, asset.chunks, asset.chunkNames);
 				const isMap = asset.name.match(/\.map$/);
 				const isHotUpdate = asset.name.match(/\.hot-update\./);
 				const chunkIsMain = typeof asset.chunks[0] === "string" && asset.chunks[0].indexOf("main") === 0;
 				const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0;
-				const useAsset = !isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain);
+				const useAsset = (!isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain)) || isCopy;
 
 				if (!useAsset) {
 					ignoredChunks++;
@@ -111,6 +112,16 @@ module.exports = class WebpackCallbackHandler {
 			if (ignoredChunks !== 0)
 				console.log(("  + " + ignoredChunks + " hidden files (maps, chunks, assets, and so on)").padStart(assetColLength) + "  " +
 					FileHelpers.humanFileSize(ignoredSize).padStart(sizeColLength));
+
+			// Check if we need to remove some warning due to the warningIgnorePattern
+			if (child.warnings.length > 0 && typeof context.currentAppConfig.warningIgnorePattern === "string") {
+				const finalWarnings = [];
+				child.warnings.forEach(entry => {
+					if(!entry.match(new RegExp(context.currentAppConfig.warningIgnorePattern.replace(/(^\/|\/$)/))))
+						finalWarnings.push(entry);
+				});
+				child.warnings = finalWarnings;
+			}
 
 			// Check if there are warnings
 			if (child.warnings.length > 0) {

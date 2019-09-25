@@ -23,24 +23,48 @@
 const fs = require("fs");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const FileHelpers = require("../Helpers/FileHelpers");
+const MiscHelpers = require("../Helpers/MiscHelpers");
 
-/**
- * A marker to prevent every app to copy the stuff we only need to be copied once...
- * @type {boolean}
- */
-let isApplied = false;
+let afterFilterPluginApplied = false;
+
 module.exports = class CopyPlugin {
 	/**
 	 * Applies this configuration component to the current context
 	 * @param {module.ConfigBuilderContext} context
 	 */
 	static apply(context) {
-		if (isApplied) return;
-		isApplied = true;
 		if (!Array.isArray(context.laborConfig.copy) || context.laborConfig.copy.length === 0) return;
 
-		// Add the context to all configurations
+		let isCopy = typeof context.currentAppConfig['@isCopy'] !== 'undefined' && context.currentAppConfig['@isCopy'];
+		let isFirst = typeof context.currentAppConfig['@copyOrder'] !== 'undefined' && context.currentAppConfig['@copyOrder'] === 'first';
+		let isWatch = context.mode === "watch";
+
+		if(!isCopy)	return;
+
+		if(!afterFilterPluginApplied) {
+			context.plugins.push({compilingDone: this._compilingDone});
+			afterFilterPluginApplied = true;
+		}
+
+		let copyToAdd = [];
+
 		context.laborConfig.copy.forEach(config => {
+			let inFirst = typeof config['first'] !== 'undefined' && config['first'];
+			if(isFirst ^ inFirst)
+				return;
+
+			let copyInBuildOnly = typeof config['inBuildOnly'] !== 'undefined' && config['inBuildOnly'];
+			if(copyInBuildOnly && isWatch)
+				return;
+
+			copyToAdd.push(config);
+		});
+
+		if(!copyToAdd.length)	return;
+
+		// Add the context to all configurations
+		copyToAdd.forEach(config => {
 
 			// Validate input
 			if (typeof config.from === "undefined")
@@ -56,14 +80,14 @@ module.exports = class CopyPlugin {
 				config.from.forEach(v => {
 					var newConfig = JSON.parse(jsonConfig);
 					newConfig.from = v;
-					context.laborConfig.copy.push(newConfig);
+					copyToAdd.push(newConfig);
 				});
 				config.from = thisValue;
 			}
 		});
 
 		// Make sure we can resolve node modules
-		context.laborConfig.copy.forEach(config => {
+		copyToAdd.forEach(config => {
 			// Remove all glob related stuff from the path
 			let fromDirectory = path.dirname(config.from.replace(/\*.*?$/, ""));
 			let fromPrefix = "";
@@ -80,9 +104,45 @@ module.exports = class CopyPlugin {
 		// Add copy plugin
 		context.webpackConfig.plugins.push(new CopyWebpackPlugin(
 			context.callPluginMethod("filterPluginConfig", [
-				context.laborConfig.copy,
+				copyToAdd,
 				"copyPlugin", context
-			])
+			]),
+			{ copyUnmodified: true }
 		));
+	}
+
+	static _compilingDone(statsJson, context) {
+		// Run trough all children
+		statsJson.children.forEach(child => {
+			// Prepare the context for app based execution
+			let currentApp = parseInt(child.name);
+			let currentAppConfig = context.laborConfig.apps[currentApp];
+
+			if(typeof currentAppConfig['@isCopy'] === 'undefined' || !currentAppConfig['@isCopy'])
+				return;
+
+			const outputPath = child.outputPath;
+
+			// Filter the js output files
+			const setNamePattern = new RegExp("(.*?" + MiscHelpers.escapeRegex(currentAppConfig["@setName"]) + ")", "g");
+			const childAssetsToRemove = child.assets.filter((child) => {
+				return child.name.match(setNamePattern) !== null;
+			});
+			child.assets = child.assets.filter((child) => {
+				return child.name.match(setNamePattern) === null;
+			});
+
+			// Rewrite the assets
+			for(let i=0; i<childAssetsToRemove.length; i++)
+			{
+				const assetLocation = outputPath + path.sep + childAssetsToRemove[i].name;
+				try {
+					fs.unlinkSync(assetLocation);
+				} catch (e) {
+					child.errors.push("CopyPlugin->_compilingDone: Failed to unlink tmp file: \"" + assetLocation + "\"");
+					return;
+				}
+			}
+		});
 	}
 };

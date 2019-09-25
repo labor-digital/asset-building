@@ -46,8 +46,12 @@ Apart from that everything is straight forward.
 Say what (from) is copied, where (to) and you should be good to go. 
 If you want to exclude some files you can always use "ignore" for that. 
 Keep in mind that both, "from" and "ignore" support glob values. 
-If you don't want to flatten everything into a directory set "flatten: true" 
-and you are set.
+If you don't want to flatten everything into a directory set "flatten: false" 
+and you are set.  
+Normally files are copied after all other build steps. Via "first: true" you can set
+a copy-operation to be processed before the other build-steps.  
+Sometimes you have copy-tasks, which should be executed if it´s a build and not in a watch.
+Set "inBuildOnly: true" in such a case.
 ```
 "labor": {
     "copy": [
@@ -59,7 +63,9 @@ and you are set.
             ],
             "to": "webroot/assets",
             "ignore": ["*.jpg", "assets/a/c"],
-            "flatten": false
+            "flatten": false,
+            "first": false,
+            "inBuildOnly": false
         }
     ]
 }
@@ -84,8 +90,8 @@ node require(). More information can be found in the **Plugins** section.
 There might be a time where our preconfigured webpack is not enough for your needs,
 in that case you can always alter the webpack configuration using this option.
 
-Because the webpack config is mostly a js object we need to extend it using 
-javascript as well. To do so, lets create a new file called webpack.js in your 
+Because the webpack config is mostly a js object we will extend it using 
+javascript in most cases. To do so, lets create a new file called webpack.js in your 
 project root:
 ```javascript
 const merge = require('webpack-merge');
@@ -113,3 +119,17 @@ callback will receive the current configuration and can alter it.
 * context: The current config builder context. See **Config Builder Context**
 
 **Important**: The function has to return the altered webpack config!
+
+But in some cases we only need to set or overwrite some webpack config settings.
+In this case we can write this additional settings as object. 
+```
+"labor": {
+    "webpackConfig": {
+    	"target": "node",
+    	"output": {
+    		"libraryTarget": "umd"
+    	}
+    }
+}
+```
+

@@ -9,6 +9,8 @@ import all sources in a single "app" source file.
 
 For this reason you create an app with an entrypoint and specify it's output 
 directory / file name. 
+
+You can also set an optional displayname of each app for the output
 ```
 "labor": {
   "builderVersion": 2,
@@ -16,6 +18,7 @@ directory / file name.
     {
       "entry": "./src/app.js",
       "output": "./dist/bundle.js",
+      "displayname": "Your App name here"
     }
   ],
 }
@@ -226,6 +229,40 @@ with a path, relative to your package.json to your app configuration.
     {
       [...]
       "webpackConfig": "./webpack.js"
+	}
+  ]
+}
+```
+
+But in some cases we only need to set or overwrite some webpack config settings.
+In this case we can write this additional settings as object. 
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      [...]
+      "webpackConfig": {
+        "target": "node",
+        "output": {
+          "libraryTarget": "umd"
+        }
+      }
+	}
+  ]
+}
+```
+
+### app.warningIgnorePattern
+You now have the option to suppress warnings during the build via the warningIgnorePattern, which is a RegExp. 
+This is especially useful if you have certain warnings raising in a build and you don´t want the asset-building to exit with code 1.
+```
+"labor": {
+  "builderVersion": 2,
+  "apps": [
+    {
+      [...]
+      "warningIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
 	}
   ]
 }

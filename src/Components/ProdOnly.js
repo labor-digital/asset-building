@@ -23,6 +23,7 @@
 const merge = require("webpack-merge");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = class ProdOnly {
 	/**
@@ -37,21 +38,20 @@ module.exports = class ProdOnly {
 				minimize: true,
 				minimizer: [
 					// JS Uglyfier
-					new UglifyJsPlugin({
-							cache: true,
-							parallel: true,
-							sourceMap: true,
-							extractComments: true,
-							uglifyOptions: {
-								mangle: true,
-								ecma: 5,
-								toplevel: true,
-								compress: {
-									typeofs: false
-								}
+					new TerserPlugin({
+						cache: true,
+						parallel: true,
+						sourceMap: true,
+						extractComments: true,
+						terserOptions: {
+							// ecma: 5,
+							mangle: true,
+							toplevel: true,
+							compress: {
+								typeofs: false
 							}
 						}
-					),
+					}),
 					// CSS Uglyfier
 					new OptimizeCssAssetsPlugin({
 						cssProcessorOptions: {
