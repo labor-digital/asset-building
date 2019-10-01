@@ -28,49 +28,6 @@ this is about. If you want to use version 2.0 just specify it using:
 }
 ```
 
-### copy
-There are a lot of usecases where you have to automatically copy files from a 
-destination to a output directory. You can have multiple copy-jobs for a 
-single project, so make sure that your "copy" node is an array of 
-configuration objects.
-
-This option is build on top of the "copy-webpack-plugin". Take a look at their 
-[Documentation](https://github.com/webpack-contrib/copy-webpack-plugin) for how to 
-use it in detail. In this example we will only take a look at the defaults and the 
-minor syntaxchange we made.
-
-**The change**: by default you can only copy files from a single source into an 
-output directory. I changed it so that "from" can also work with arrays of sources.
-Apart from that everything is straight forward. 
-
-Say what (from) is copied, where (to) and you should be good to go. 
-If you want to exclude some files you can always use "ignore" for that. 
-Keep in mind that both, "from" and "ignore" support glob values. 
-If you don't want to flatten everything into a directory set "flatten: false" 
-and you are set.  
-Normally files are copied after all other build steps. Via "first: true" you can set
-a copy-operation to be processed before the other build-steps.  
-Sometimes you have copy-tasks, which should be executed if it´s a build and not in a watch.
-Set "inBuildOnly: true" in such a case.
-```
-"labor": {
-    "copy": [
-        {
-            "from": [
-                "assets/a/*",
-                "./assets/b/**/b2.png",
-                "./assets/**/asset.png"
-            ],
-            "to": "webroot/assets",
-            "ignore": ["*.jpg", "assets/a/c"],
-            "flatten": false,
-            "first": false,
-            "inBuildOnly": false
-        }
-    ]
-}
-```
-
 ### plugins
 With the given set of tools you should be able to do the same stuff you did with our 
 old gulpfile without problems. But if you want to dive deeper, or want to edit 

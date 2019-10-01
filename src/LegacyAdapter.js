@@ -80,10 +80,13 @@ module.exports = class LegacyAdapter {
 
 		// Remap keys from global into the apps we create
 		["polyfills", "minChunkSize", "useTypeChecker", "jsCompat", "keepOutputDirectory", "environment", "disableGitAdd"].forEach(field => {
-			if(typeof context.laborConfig[field] === "undefined") return;
+			if (typeof context.laborConfig[field] === "undefined") return;
 			apps.forEach(app => app[field] = context.laborConfig[field]);
 			delete context.laborConfig[field];
 		});
+
+		// Create the copy apps if required
+		LegacyAdapter.createCopyAppNodes(context, tmpDirectory);
 
 		// Inject new apps entry
 		if (!Array.isArray(context.laborConfig.apps)) context.laborConfig.apps = [];
@@ -120,7 +123,7 @@ module.exports = class LegacyAdapter {
 			asset.name = asset.name.replace(setNamePattern, setNameReplacement);
 
 			// Remove all .js root files in styles
-			if(isStyle && asset.name.indexOf(setNameReplacement + ".js") === 0){
+			if (isStyle && asset.name.indexOf(setNameReplacement + ".js") === 0) {
 				// Rewrite style-js files to "map" so we ignore them in the output
 				asset.name = asset.name + ".map";
 				return;
@@ -139,10 +142,52 @@ module.exports = class LegacyAdapter {
 				fs.copyFileSync(assetLocation, assetLocationReal);
 			} catch (e) {
 				console.log("Legacy output path: \"" + outputPath + "\"", (fs.existsSync(outputPath) ? "(Exists)" : "(Does not exist!)"));
-				if(fs.existsSync(outputPath)) console.log("Legacy output contents: ", fs.readdirSync(outputPath));
+				if (fs.existsSync(outputPath)) console.log("Legacy output contents: ", fs.readdirSync(outputPath));
 				child.errors.push("LEGACY ADAPTER: Failed to copy a temporary asset from: \"" + assetLocation + "\" to its destination at: \"" + assetLocationReal + "\"");
 				return;
 			}
 		});
+	}
+
+	/**
+	 * Creates the dummy apps for the copy plugin
+	 * @param context
+	 * @param tmpDirectory
+	 */
+	static createCopyAppNodes(context, tmpDirectory) {
+		// Check if we got work to do
+		if (!Array.isArray(context.laborConfig.copy)) return;
+
+		// Create list storage
+		const firstCopyList = [];
+		const lastCopyList = [];
+
+		// Gather the copy configuration entries
+		context.laborConfig.copy.forEach((config) => {
+			if (config.first === true) firstCopyList.push(config);
+			else lastCopyList.push(config);
+		});
+
+		// Create the dummy apps if required
+		const appCreator = function (copyType, copyList) {
+			const setName = "setCopy-" + MiscHelpers.md5(Date.now().toString());
+			fs.writeFileSync(tmpDirectory + setName + "-" + copyType + ".js", "let a=0;");
+			return {
+				"entry": path.relative(context.dir.current, tmpDirectory + setName + "-" + copyType + ".js"),
+				"output": path.relative(context.dir.current, setName + "-" + copyType + ".js"),
+				"displayname": "COPY-" + copyType,
+				"warningIgnorePattern": null,
+				"webpackConfig": null,
+				"disableGitAdd": true,
+				"@setName": setName,
+				"@isStyle": false,
+				"copy": copyList
+			};
+		};
+
+		// Add the configuration to the app stack
+		if (firstCopyList.length > 0) context.laborConfig.apps.unshift(appCreator("first", firstCopyList));
+		if (lastCopyList.length > 0) context.laborConfig.apps.push(appCreator("last", lastCopyList));
+
 	}
 };
