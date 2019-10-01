@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [3.13.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.13.0%0Dv3.12.0#diff) (2019-10-01)
+
+
+### Features
+
+* copy configurations are now an "per-app" config object when builderVersion 2 is used. The legacy adapter creates automatic copy nodes to support the "first" and "last" flags ([9d9656b](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/9d9656b))
+
+
+
 # [3.12.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.12.0%0Dv3.11.2#diff) (2019-09-25)
 
 
