@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.0.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.0.0%0Dv3.13.0#diff) (2019-10-09)
+
+
+### Bug Fixes
+
+* fix minor definition problem in compiler callback ([9990c18](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/9990c18))
+
+
+### Features
+
+* major rewrite of the application ([973e36a](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/973e36a))
+
+
+### BREAKING CHANGES
+
+* new API and general incompatibility with the previous
+version
+
+
+
 # [3.13.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v3.13.0%0Dv3.12.0#diff) (2019-10-01)
 
 
