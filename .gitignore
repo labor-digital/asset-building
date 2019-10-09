@@ -5,10 +5,10 @@ demo/webroot/assets/*
 !.keep
 demo/webroot/js/*.js
 demo/webroot/js/*.map
-demo2/*
-!demo2/webroot/src
-!demo2/package.json
-!demo2/webroot/Index.html
+demo2/webroot/frontend/dist/*
+
+# Don't commit compiled sources
+dist
 
 # IDEA Code Style
 .idea/*

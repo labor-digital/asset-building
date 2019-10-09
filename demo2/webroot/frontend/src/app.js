@@ -15,13 +15,12 @@
  *
  * Last modified: 2018.09.20 at 19:27
  */
-
+console.log("hallo");
+// Import all components
+import "./Components/Components.js";
 /**
  * Created by Martin Neundorfer on 10.09.2018.
  * For LABOR.digital
  */
 // Import globals
-import './Globals/Globals.sass';
-
-// Import all components
-import './Components/Components.js'
+import "./Globals/Globals.sass";

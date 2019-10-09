@@ -21,5 +21,5 @@
  * For LABOR.digital
  */
 interface Object {
-	entries (object):Array;
+	entries(object): Array<any>;
 }

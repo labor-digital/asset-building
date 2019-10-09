@@ -1,25 +1,33 @@
 {
-  "name": "demo",
-  "version": "1.0.0",
-  "description": "A demoproject to show how the buildprocess works",
-  "scripts": {
-    "build": "labor-asset-building build",
-    "watch": "labor-asset-building watch"
-  },
-  "keywords": [],
-  "author": "LABOR GmbH",
-  "license": "MIT",
-  "devDependencies": {
-    "labor-asset-building": "file:.."
-  },
-  "labor": {
-    "builderVersion": 2,
-    "apps": [
-      {
-        "entry": "./webroot/frontend/src/app.js",
-        "output": "./webroot/frontend/bundle.js",
-        "minChunkSize": 0
-      }
-    ]
-  }
+	"name": "demo",
+	"version": "1.0.0",
+	"description": "A demoproject to show how the buildprocess works",
+	"scripts": {
+		"build": "labor-asset-building build",
+		"watch": "labor-asset-building watch",
+		"analyze": "labor-asset-building analyze"
+	},
+	"keywords": [],
+	"author": "LABOR GmbH",
+	"license": "MIT",
+	"devDependencies": {
+		"@labor/labor-asset-building": "file:.."
+	},
+	"labor": {
+		"builderVersion": 2,
+		"apps": [
+			{
+				"entry": "./webroot/frontend/src/app.js",
+				"output": "./webroot/frontend/dist/bundle.js",
+				"minChunkSize": 0,
+				"webpackConfig": true,
+				"extensions": [
+					"./webroot/frontend/extensions"
+				]
+			}
+		],
+		"extensions": [
+			"./webroot/frontend/extensions"
+		]
+	}
 }

@@ -28,65 +28,39 @@ this is about. If you want to use version 2.0 just specify it using:
 }
 ```
 
-### plugins
-With the given set of tools you should be able to do the same stuff you did with our 
-old gulpfile without problems. But if you want to dive deeper, or want to edit 
-the webpack config manually. You can also write a (really simple) plugin.
-The list of defined plugins is an Array of pathes which will be resolved as 
-node require(). More information can be found in the **Plugins** section.
+### runWorkersSequential
+By default the build processes / app definitions will be called async and in parallel. Which leads to much
+faster build times as webpack runs on separate threads.
+
+If you want the worker to run sequential (finish app 1, then start app 2, finish app 2 then start app 3...),
+you can set this to TRUE. This is TRUE by default for builderVersion 1 and FALSE by default for version 2.
 ```
 "labor": {
-    "plugins": [
-        "./demoPlugins/DemoPlugin.js",
-        "@labor/your-packge/plugins/MyPlugin"
+    [...],
+    "runWorkersSequential": TRUE
+}
+```
+
+### extensions
+With the given set of tools you should be able to do the same stuff you did with our 
+old gulpfile without problems. But if you want to dive deeper, or want to edit 
+the webpack config manually you can use either the "webpackConfig" option or
+create an extension that can use the provided hooks to alter the configuration.
+
+Extensions are mend to create reusable extensions to the asset builder that may 
+require their own webpack plugins or loaders, while the "webpackConfig" option
+is intended an "per-project" alternative that requires no further understanding of the
+structure. 
+
+Extensions can supplied either as "global" extension in the labor root, or as
+a "per-app" extension if you using builderVersion 2.
+
+For more information take look at the **Extension.md** file.
+```
+"labor": {
+    "extensions": [
+        "./extensions/MyDemoExtension.js",
+        "@labor/your-packge/asset-building"
     ]
 }
 ```
-
-### webpackConfig
-There might be a time where our preconfigured webpack is not enough for your needs,
-in that case you can always alter the webpack configuration using this option.
-
-Because the webpack config is mostly a js object we will extend it using 
-javascript in most cases. To do so, lets create a new file called webpack.js in your 
-project root:
-```javascript
-const merge = require('webpack-merge');
-module.exports = function(webpackConfig, context){
-	return merge(webpackConfig, {
-		// Additional configuration for webpack...
-	});
-};
-```
-
-To tell the config builder to use your configuration file, add the script
-with a path, relative to your package.json to your labor configuration.
-```
-"labor": {
-    "webpackConfig": "./webpack.js"
-}
-```
-
-Now, when the configuration was prepared by the config builder the defined
-callback will receive the current configuration and can alter it.
-
-**Parameters**
-
-* webpackConfig: The prepared webpack configuration
-* context: The current config builder context. See **Config Builder Context**
-
-**Important**: The function has to return the altered webpack config!
-
-But in some cases we only need to set or overwrite some webpack config settings.
-In this case we can write this additional settings as object. 
-```
-"labor": {
-    "webpackConfig": {
-    	"target": "node",
-    	"output": {
-    		"libraryTarget": "umd"
-    	}
-    }
-}
-```
-

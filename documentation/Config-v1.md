@@ -156,13 +156,42 @@ Sourcemaps of your files will automatically created at OUTPUT_FILE.map.
 }
 ```
 
-## environment
-The concept of environments was introduced in package version 3 and can be seen as additional configuration based on the framework you work with.
-For example if you use vue.js you need the vue-loader to use single-file-components. To preconfigure the overhead there is an environment for that
-which does the additional configuration for you.
-Currently only "vuejs" is supported, but you can add environments using plugins.
+### webpackConfig
+There might be a time where our preconfigured webpack is not enough for your needs,
+in that case you can always alter the webpack configuration using this option.
+
+Because the webpack config is mostly a js object we need to extend it using 
+javascript as well. To do so, lets create a new file called webpack.config.js in your 
+project root:
+```javascript
+const merge = require('webpack-merge');
+module.exports = function(context){
+	context.webpackConfig = merge(context.webpackConfig, {
+		// Additional configuration for webpack...
+	});
+};
+```
+
+To tell the config builder to use your configuration file, add the script
+with a path, relative to your package.json to your app configuration. Or, if you
+follow the convention by calling the file webpack.config.js you can simply set the parameter to true.
 ```
 "labor": {
-  "environment": "vuejs"
+  [...],
+  "webpackConfig": TRUE
+}
+```
+
+But in some cases we only need to set or overwrite some webpack config settings.
+In this case we can write this additional settings as object. 
+```
+"labor": {
+  [...]
+  "webpackConfig": {
+    "target": "node",
+    "output": {
+      "libraryTarget": "umd"
+    }
+  }
 }
 ```

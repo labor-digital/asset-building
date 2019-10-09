@@ -45,6 +45,10 @@
       <option name="USE_CHAINED_CALLS_GROUP_INDENTS" value="true" />
       <option name="IMPORT_SORT_MODULE_NAME" value="true" />
     </TypeScriptCodeStyleSettings>
+    <yaml>
+      <option name="SEQUENCE_ON_NEW_LINE" value="true" />
+      <option name="BLOCK_MAPPING_ON_NEW_LINE" value="true" />
+    </yaml>
     <codeStyleSettings language="Blade">
       <indentOptions>
         <option name="USE_TAB_CHARACTER" value="true" />

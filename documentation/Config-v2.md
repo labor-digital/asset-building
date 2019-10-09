@@ -26,6 +26,19 @@ You can also set an optional displayname of each app for the output
 There are also some additional configuration options you might want to use,
 those can be specified for each app.
 
+### app.disabled
+If this is set to true, the app will not be build. This is useful if you want to
+temporarily disable an app from being build without removing the definition
+from the package.json
+
+### app.verboseResult
+If this option is set to true the webpack result will not hide child files it emitted
+but print everything to the screen. -> This can lead to quite long outputs!
+
+### app.appName
+This can be used to define a visible name for your application, that makes it easier to identify in console outputs. 
+The name is also given to webpack as "appName".
+
 ### app.publicPath & app.publicPathDev
 To make sure your path's can be resolved properly on your webserver you may use 
 "publicPath" to define the url/directory which leads to the output files. 
@@ -50,7 +63,8 @@ use "publicPathDev" too (publicPath is used for "build",
 As stated in the section **Typescript, ES6 and Polyfills** you
 may also define polyfills that should be provided for your application. Those
 will be added to the default polyfills which are always provided.
-You may set this option to false to disalbe all polyfills
+
+You may set this option to FALSE to disable all polyfills
 ```
 "labor": {
   "apps": [
@@ -65,9 +79,7 @@ You may set this option to false to disalbe all polyfills
 ### app.useTypeChecker
 By default we use ts-loader's "transpileOnly" option
 to save a lot of time while compiling your scripts. If you want to use
-the typescript-typechecker set this option to true. *Note from the author: 
-Did you came by the other option js.useTypeChecker and I told yhou this would take a
-while? Yeah, typescript is still compiling... So get another cup of coffee...*
+the typescript-typechecker set this option to true.
 ```
 "labor": {
   "js": [
@@ -147,7 +159,7 @@ If you don't want your output directory to be flushed, set this option to true.
 
 ### app.disableGitAdd
 By default your files in the output-directory will automatically be added to your git when you execute the "build" command. 
-This is done for your convineance and to prevent errors. If you don't want to add all emitted files automatially, set this to true
+This is done for your convenience and to prevent errors. If you don't want to add all emitted files automatially, set this to true
 ```
 "labor": {
   "builderVersion": 2,
@@ -203,32 +215,31 @@ which adds some additional markers of data that may be injected.
 ```
 
 ### app.webpackConfig
-**This works exactly the same as webpackConfig in the root of your configuration, but on a per-app basis!**
-
 There might be a time where our preconfigured webpack is not enough for your needs,
 in that case you can always alter the webpack configuration using this option.
 
 Because the webpack config is mostly a js object we need to extend it using 
-javascript as well. To do so, lets create a new file called webpack.js in your 
+javascript as well. To do so, lets create a new file called webpack.config.js in your 
 project root:
 ```javascript
 const merge = require('webpack-merge');
-module.exports = function(webpackConfig, context){
-	return merge(webpackConfig, {
+module.exports = function(context){
+	context.webpackConfig = merge(context.webpackConfig, {
 		// Additional configuration for webpack...
 	});
 };
 ```
 
 To tell the config builder to use your configuration file, add the script
-with a path, relative to your package.json to your app configuration.
+with a path, relative to your package.json to your app configuration. Or, if you
+follow the convention by calling the file webpack.config.js you can simply set the parameter to true.
 ```
 "labor": {
   "builderVersion": 2,
   "apps": [
     {
       [...]
-      "webpackConfig": "./webpack.js"
+      "webpackConfig": TRUE
 	}
   ]
 }
@@ -253,9 +264,12 @@ In this case we can write this additional settings as object.
 }
 ```
 
-### app.warningIgnorePattern
+### app.warningsIgnorePattern
 You now have the option to suppress warnings during the build via the warningIgnorePattern, which is a RegExp. 
 This is especially useful if you have certain warnings raising in a build and you don´t want the asset-building to exit with code 1.
+
+This can be either a string, or an array of strings. If you set this using an extension script
+you can also set it to an array of regex expressions!
 ```
 "labor": {
   "builderVersion": 2,
@@ -307,6 +321,24 @@ Set "inBuildOnly: true" in such a case.
               "flatten": false,
               "inBuildOnly": false
           }
+      ]
+    }
+  ]
+}
+```
+
+### app.extensions
+In addition to "global" extension (see **Config.md** and **Extensions.md**) you can also register
+extensions that are only active for a specific app and therefore a single webpack process.
+
+For more information take look at the **Extension.md** file.
+```
+"labor": {
+  "apps": [
+    {
+      "extensions": [
+          "./extensions/MyDemoExtension.js",
+          "@labor/your-packge/asset-building"
       ]
     }
   ]
