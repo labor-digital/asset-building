@@ -146,10 +146,10 @@ export class DefaultCompilerCallback {
 				}
 
 				// Start async handling
-				return Promise.resolve(null as any)
+				return Promise.resolve(0)
 					.then(() => {
 						// Allow filtering
-						if (isWatch) return Promise.resolve(true);
+						if (isWatch) return;
 						return context.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_GIT_ADD, {context});
 					})
 					.then(() => {
@@ -187,7 +187,7 @@ export class DefaultCompilerCallback {
 						// Prepare the output string
 						if (isArray(args.output)) args.output = args.output.join("\r\n");
 						console.log(args.output);
-						return args.exitCode > 0 || args.exitWorker ? args.exitCode : -1;
+						return Promise.resolve(args.exitCode > 0 || args.exitWorker ? args.exitCode : -1);
 					});
 			});
 	}
