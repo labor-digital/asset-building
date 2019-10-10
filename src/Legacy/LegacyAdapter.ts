@@ -65,7 +65,7 @@ export class LegacyAdapter {
 				appName: "Legacy-App-" + (isStyle ? "css" : "js") + " - " + key,
 				entry: path.relative(coreContext.sourcePath, entryFile),
 				output: path.relative(coreContext.sourcePath, outputFile),
-				warningIgnorePattern: config.warningIgnorePattern,
+				warningsIgnorePattern: config.warningsIgnorePattern,
 				webpackConfig: config.webpackConfig,
 				_legacySetName: setName,
 				_legacyStyle: isStyle,
@@ -82,7 +82,7 @@ export class LegacyAdapter {
 		delete coreContext.laborConfig.css;
 
 		// Remap keys from global into the apps we create
-		forEach(["webpackConfig", "polyfills", "minChunkSize", "useTypeChecker", "jsCompat", "keepOutputDirectory", "disableGitAdd"], field => {
+		forEach(["verboseResult", "webpackConfig", "polyfills", "minChunkSize", "useTypeChecker", "jsCompat", "keepOutputDirectory", "disableGitAdd"], field => {
 			if (typeof coreContext.laborConfig[field] === "undefined") return;
 			forEach(apps, (app: AppDefinitionInterface) => {
 				app[field] = coreContext.laborConfig[field];

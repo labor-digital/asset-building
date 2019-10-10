@@ -17,8 +17,8 @@
 	"author": "LABOR GmbH",
 	"license": "MIT",
 	"dependencies": {
-		"@labor/helferlein": "3.10.0",
-		"@types/webpack": "4.39.2",
+		"@labor/helferlein": "3.10.2",
+		"@types/webpack": "4.39.3",
 		"acorn": "7.1.0",
 		"autoprefixer": "9.6.4",
 		"chalk": "2.4.2",
