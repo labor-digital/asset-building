@@ -28,15 +28,16 @@ import Loader = webpack.loader.Loader;
 
 const customSassLoader: Loader = function (source: string) {
 	const callback = this.async();
+	const that = this;
 	const errorHandler = function (e) {
 		e.hideStack = true;
 		if (e.file) {
-			if (e.file === "stdin") e.file = this.resourcePath;
+			if (e.file === "stdin") e.file = that.resourcePath;
 			else e.file = path.normalize(e.file);
 			e.message = e.message.replace(/\s*Current dir:\s*/, "") +
 				"      in " + e.file + " (line " + e.line + ", column " + e.column + ")";
 		}
-		callback(e);
+		callback(e, "", null);
 	};
 	try {
 		// Prepare the compiler context
@@ -133,7 +134,7 @@ const customSassLoader: Loader = function (source: string) {
 				});
 
 			callback(null, result.css, null);
-		}).catch(e => errorHandler);
+		}).catch(e => errorHandler(e));
 
 	} catch (e) {
 		errorHandler(e);
