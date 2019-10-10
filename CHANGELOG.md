@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.0.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.0.2%0Dv4.0.1#diff) (2019-10-10)
+
+
+### Bug Fixes
+
+* update to latest package versions + add verboseResult to assetBuilder v1 config ([c00fb4e](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/c00fb4e))
+
+
+
 ## [4.0.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.0.1%0Dv4.0.0#diff) (2019-10-10)
 
 
