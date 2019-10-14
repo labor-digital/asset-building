@@ -72,7 +72,7 @@ export class CompilerFactory {
 								const compiler: Function = args.compiler;
 								const context: WorkerContext = args.context;
 								const c = compiler(context.webpackConfig, args.callback);
-								resolve(c);
+								resolve(c.compiler);
 							});
 						});
 					});
