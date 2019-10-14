@@ -33,7 +33,19 @@ import {CoreContext} from "./CoreContext";
 import {CoreFixes} from "./CoreFixes";
 import {WorkerContext} from "./WorkerContext";
 
+let fixesApplied = false;
+
 export class Bootstrap {
+
+	/**
+	 * True if we don't spawn workers, but should handle the request in a single context
+	 * This is used in the CompilerFactory class
+	 */
+	protected _asSingleProcess: boolean;
+
+	public constructor(asSingleProcess?: boolean) {
+		this._asSingleProcess = asSingleProcess === true;
+	}
 
 	/**
 	 * Initializes the core context object for the main process,
@@ -44,7 +56,7 @@ export class Bootstrap {
 	 */
 	public initMainProcess(assetBuilderPackageJson: PlainObject, cwd: string, dirName: string): Promise<CoreContext> {
 		// Render our fancy intro
-		this.fancyIntro(assetBuilderPackageJson.version);
+		if (!this._asSingleProcess) this.fancyIntro(assetBuilderPackageJson.version);
 
 		// Create the core context object
 		const coreContext = new CoreContext(cwd, dirName);
@@ -79,27 +91,29 @@ export class Bootstrap {
 		coreContext.extensionLoader = new ExtensionLoader();
 
 		// Register shutdown event
-		const shutdownHandler = function () {
-			console.log("Starting main process shutdown...");
-			coreContext.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
-				.then(() => {
-					console.log("Good bye!");
-					process.exit(0);
+		if (!this._asSingleProcess) {
+			const shutdownHandler = function () {
+				console.log("Starting main process shutdown...");
+				coreContext.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
+					.then(() => {
+						console.log("Good bye!");
+						process.exit(0);
+					});
+			};
+			process.on("SIGTERM", shutdownHandler);
+			process.on("SIGINT", shutdownHandler);
+			// Windows override to detect the kill command
+			if (process.platform === "win32") {
+				const rl = require("readline").createInterface({
+					input: process.stdin,
+					output: process.stdout
 				});
-		};
-		process.on("SIGTERM", shutdownHandler);
-		process.on("SIGINT", shutdownHandler);
-		// Windows override to detect the kill command
-		if (process.platform === "win32") {
-			const rl = require("readline").createInterface({
-				input: process.stdin,
-				output: process.stdout
-			});
 
-			rl.on("SIGINT", function () {
-				// @ts-ignore
-				process.emit("SIGINT");
-			});
+				rl.on("SIGINT", function () {
+					// @ts-ignore
+					process.emit("SIGINT");
+				});
+			}
 		}
 
 		// Load the global extensions
@@ -148,18 +162,23 @@ export class Bootstrap {
 		const workerContext = new WorkerContext(coreContext, app);
 		coreContext.extensionLoader = new ExtensionLoader();
 
-		this.applyEnvironmentFixes(coreContext);
-		// Register shutdown event
-		const shutdownHandler = function () {
-			console.log("Starting worker process shutdown...");
-			coreContext.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
-				.then(() => process.exit(0));
-		};
-		process.on("SIGTERM", shutdownHandler);
-		process.on("SIGINT", shutdownHandler);
+		if (!this._asSingleProcess) {
+			this.applyEnvironmentFixes(coreContext);
+
+			// Register shutdown event
+			const shutdownHandler = function () {
+				console.log("Starting worker process shutdown...");
+				coreContext.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
+					.then(() => process.exit(0));
+			};
+			process.on("SIGTERM", shutdownHandler);
+			process.on("SIGINT", shutdownHandler);
+		}
 
 		// Load the extensions
-		return coreContext.extensionLoader.loadExtensionsFromDefinition("global", coreContext, coreContext.laborConfig)
+		return (this._asSingleProcess ?
+			Promise.resolve() :
+			coreContext.extensionLoader.loadExtensionsFromDefinition("global", coreContext, coreContext.laborConfig))
 			.then(() => coreContext.extensionLoader.loadExtensionsFromDefinition("app", workerContext, app))
 			// Build the app definition
 			.then(() => this.applyAppSchema(app, workerContext))
@@ -183,6 +202,8 @@ export class Bootstrap {
 	 * @param coreContext
 	 */
 	protected applyEnvironmentFixes(coreContext: CoreContext) {
+		if (fixesApplied) return;
+		fixesApplied = true;
 		CoreFixes.eventsJsUncaughtErrorFix();
 		CoreFixes.resolveFilenameFix(coreContext);
 	}
