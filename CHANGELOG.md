@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.1.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.1.1%0Dv4.1.0#diff) (2019-10-14)
+
+
+### Bug Fixes
+
+* return correct compiler instance in compilerFactory ([644d59f](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/644d59f))
+
+
+
 # [4.1.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.1.0%0Dv4.0.2#diff) (2019-10-14)
 
 
