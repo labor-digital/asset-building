@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.1.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.1.0%0Dv4.0.2#diff) (2019-10-14)
+
+
+### Features
+
+* add "CompilerFactory" class to create the instance of a webpack compiler using a node API ([54b610c](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/54b610c))
+
+
+
 ## [4.0.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.0.2%0Dv4.0.1#diff) (2019-10-10)
 
 
