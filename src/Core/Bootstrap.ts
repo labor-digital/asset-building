@@ -39,7 +39,7 @@ export class Bootstrap {
 
 	/**
 	 * True if we don't spawn workers, but should handle the request in a single context
-	 * This is used in the CompilerFactory class
+	 * This is used in the ExpressFactory class
 	 */
 	protected _asSingleProcess: boolean;
 
