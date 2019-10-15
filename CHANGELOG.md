@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.3.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.3.1%0Dv4.3.0#diff) (2019-10-15)
+
+
+### Bug Fixes
+
+* re-add the missing console.log at the end of the default compiler callback ([6504797](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/6504797))
+
+
+
 # [4.3.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.3.0%0Dv4.2.0#diff) (2019-10-15)
 
 
