@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.2.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.2.0%0Dv4.1.1#diff) (2019-10-15)
+
+
+### Features
+
+* replaces "CompilerFactory" with ExpressContext and expressAssetBuildingPlugin for a better API in the extensions ([af5e2cf](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/af5e2cf))
+
+
+
 ## [4.1.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.1.1%0Dv4.1.0#diff) (2019-10-14)
 
 
