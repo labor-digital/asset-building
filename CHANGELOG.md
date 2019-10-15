@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.3.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.3.0%0Dv4.2.0#diff) (2019-10-15)
+
+
+### Features
+
+* multiple adjustments to implement the express runner better into the core of the asset builder ([d940989](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/d940989))
+
+
+
 # [4.2.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.2.0%0Dv4.1.1#diff) (2019-10-15)
 
 
