@@ -46,9 +46,11 @@ export enum AssetBuilderEventList {
 	APPLY_EXTENSION_WEBPACK_CONFIG = "assetBuilder__applyExtensionWebpackConfig",
 	FILTER_WEBPACK_CONFIG = "assetBuilder__filterWebpackConfig",
 	FILTER_WEBPACK_COMPILER = "assetBuilder__filterWebpackCompiler",
+	WEBPACK_COMPILER = "assetBuilder__webpackCompiler",
 	COMPILING_DONE = "assetBuilder__compilingDone",
 	BEFORE_GIT_ADD = "assetBuilder__beforeGitAdd",
 	CALLBACK_DONE = "assetBuilder__callbackDone",
+	PROCESS_CREATED = "assetBuilder__processManager--processCreated",
 
 	// Additional loader events
 	SASS_LOADER_FILE_EXTENSION_FALLBACK = "customSassLoader__fileExtensionFallback",

@@ -28,7 +28,7 @@ export default class ExpressContext {
 	 * Defines the type of this context
 	 */
 	public type: "express";
-
+	
 	/**
 	 * The app id we should build for this context
 	 */
@@ -72,6 +72,7 @@ export default class ExpressContext {
 	public compiler?: Compiler;
 
 	public constructor(appId: number, expressApp: Application, isProd: boolean, packageJsonDirectory: string) {
+		this.type = "express";
 		this.appId = appId;
 		this.expressApp = expressApp;
 		this.isProd = isProd;

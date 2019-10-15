@@ -26,6 +26,7 @@ import {CoreContext} from "../Core/CoreContext";
 import {WorkerContext} from "../Core/WorkerContext";
 import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
 import {WebpackConfigGenerator} from "../Webpack/ConfigGeneration/WebpackConfigGenerator";
+import {ExpressAssetBuildingPluginOptions} from "./expressAssetBuildingPlugin";
 
 export default class ExpressFactory {
 	/**
@@ -39,12 +40,12 @@ export default class ExpressFactory {
 	protected _coreContext?: CoreContext;
 
 	/**
-	 * The cwd which point's to the package.json directory
+	 * The asset builder options
 	 */
-	protected _packageJsonDirectory: string;
+	protected _options: ExpressAssetBuildingPluginOptions;
 
-	public constructor(packageJsonDirectory: string) {
-		this._packageJsonDirectory = packageJsonDirectory;
+	public constructor(options: ExpressAssetBuildingPluginOptions) {
+		this._options = options;
 	}
 
 	/**
@@ -62,7 +63,7 @@ export default class ExpressFactory {
 	public getCoreContext(): Promise<CoreContext> {
 		if (!isUndefined(this._coreContext)) return Promise.resolve(this._coreContext);
 		return this.getBootstrap()
-			.initMainProcess(require("../../package.json"), this._packageJsonDirectory, require("path").basename(__dirname))
+			.initMainProcess(require("../../package.json"), this._options.packageJsonDirectory, require("path").dirname(__dirname), this._options.mode)
 			.then(context => {
 				this._coreContext = context;
 				return context;
@@ -80,6 +81,7 @@ export default class ExpressFactory {
 			if (isNumber(app)) {
 				const appId = app as number;
 				app = context.laborConfig.apps[appId];
+				app.id = appId;
 				if (isUndefined(app)) return Promise.reject(new Error("Could not find an app with id/index: " + appId));
 			} else {
 				app = app as AppDefinitionInterface;

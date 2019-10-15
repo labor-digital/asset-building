@@ -30,6 +30,11 @@ export class CoreContext {
 	public type: "core";
 
 	/**
+	 * This is true if the asset builder is running in express/single process mode
+	 */
+	public isExpress: boolean;
+	
+	/**
 	 * If this is true the workers will be spawn in sequential order instead of being called as parallel processes
 	 */
 	public runWorkersSequential: boolean;
@@ -106,6 +111,7 @@ export class CoreContext {
 	public laborConfig: LaborConfigInterface;
 
 	constructor(cwd: string, assetBuilderPath: string) {
+		this.isExpress = false;
 		this.type = "core";
 		this.runWorkersSequential = false;
 		this.builderVersion = 1;
@@ -142,7 +148,9 @@ export class CoreContext {
 			workDirectoryPath: this.workDirectoryPath,
 			coreContextFilePath: this.coreContextFilePath,
 			additionalResolverPaths: asArray(this.additionalResolverPaths),
-			laborConfig: this.laborConfig
+			laborConfig: this.laborConfig,
+			runWorkersSequential: this.runWorkersSequential,
+			isExpress: this.isExpress
 		});
 	}
 

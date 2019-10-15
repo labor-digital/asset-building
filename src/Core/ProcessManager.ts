@@ -136,6 +136,13 @@ export class ProcessManager {
 			console.log("Spawned worker process: " + app.id + " (" + worker.pid + ")");
 			let stopped = false;
 
+			// Allow custom actions on the worker
+			coreContext.eventEmitter.emit(AssetBuilderEventList.PROCESS_CREATED, {
+				process: worker,
+				app: app,
+				context: coreContext
+			});
+
 			// Register shutdown handler for this worker
 			this.shutdownList.push(() => {
 				return new Promise(resolve1 => {

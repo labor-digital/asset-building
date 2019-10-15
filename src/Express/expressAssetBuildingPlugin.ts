@@ -16,31 +16,51 @@
  * Last modified: 2019.10.15 at 09:03
  */
 
+import {isPlainObject} from "@labor/helferlein/lib/Types/isPlainObject";
 import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
 import {Application} from "express";
 import ExpressContext from "./ExpressContext";
 import ExpressFactory from "./ExpressFactory";
+
+export interface ExpressAssetBuildingPluginOptions {
+	/**
+	 * The numeric index of the "apps" array in the package.json we should build.
+	 */
+	appId?: number;
+
+	/**
+	 * The path to the package json to read the "labor" config from
+	 */
+	packageJsonDirectory?: string;
+
+	/**
+	 * The mode to run the asset builder in.
+	 * This would normally be defined using the CLI parameters
+	 */
+	mode?: string;
+}
 
 /**
  * Use this function to create an express context object that can be used by asset-builder extensions to run
  * apply build process relevant middlewares to the express app.
  *
  * @param expressApp
- * @param appId
- * @param packageJsonDirectory
+ * @param options
  */
-module.exports = function expressAssetBuildingPlugin(expressApp: Application, appId?: number, packageJsonDirectory?: string): Promise<ExpressContext> {
+module.exports = function expressAssetBuildingPlugin(expressApp: Application, options?: ExpressAssetBuildingPluginOptions): Promise<ExpressContext> {
 	const isProd = process.env.NODE_ENV !== "development";
-	if (isUndefined(appId)) appId = 0;
-	if (isUndefined(packageJsonDirectory)) packageJsonDirectory = process.cwd();
-	const context = new ExpressContext(appId, expressApp, isProd, packageJsonDirectory);
-	context.factory = new ExpressFactory(packageJsonDirectory);
+	if (!isPlainObject(options)) options = {};
+	if (isUndefined(options.mode)) options.mode = "build";
+	if (isUndefined(options.appId)) options.appId = 0;
+	if (isUndefined(options.packageJsonDirectory)) options.packageJsonDirectory = process.cwd();
+	const context = new ExpressContext(options.appId, expressApp, isProd, options.packageJsonDirectory);
+	context.factory = new ExpressFactory(options);
 
 	// Be done if we are in production context
 	if (isProd) return Promise.resolve(context);
 
 	// Create the worker process
-	return context.factory.getWebpackCompiler(appId).then(compiler => {
+	return context.factory.getWebpackCompiler(options.appId).then(compiler => {
 		context.compiler = compiler;
 		context.parentContext = (compiler as any).assetBuilderContext;
 		return context;

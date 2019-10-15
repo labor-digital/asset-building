@@ -47,7 +47,7 @@ export class CoreFixes {
 					_realEmit.apply(this, arguments);
 				} catch (e) {
 					console.error(Chalk.redBright("An internal error occurred, we should be able to recover, tho!"));
-					console.error(Chalk.redBright(e.Error));
+					console.error(Chalk.redBright(e.stack));
 				}
 			};
 		} catch (e) {

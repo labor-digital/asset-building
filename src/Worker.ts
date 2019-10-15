@@ -57,7 +57,12 @@ function init(message) {
 				}).then(args => {
 					const compiler: Function = args.compiler;
 					const context: WorkerContext = args.context;
-					compiler(context.webpackConfig, args.callback);
+					const webpackCompiler = compiler(context.webpackConfig, args.callback);
+					context.eventEmitter.emit(AssetBuilderEventList.WEBPACK_COMPILER, {
+						compilerDefinition: compiler,
+						context,
+						webpackCompiler
+					});
 				}).catch(reject);
 			});
 		})

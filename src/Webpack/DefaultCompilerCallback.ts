@@ -186,7 +186,6 @@ export class DefaultCompilerCallback {
 					.then(args => {
 						// Prepare the output string
 						if (isArray(args.output)) args.output = args.output.join("\r\n");
-						console.log(args.output);
 						return Promise.resolve(args.exitCode > 0 || args.exitWorker ? args.exitCode : -1);
 					});
 			});

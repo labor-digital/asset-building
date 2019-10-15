@@ -21,6 +21,7 @@ import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
 import makeOptions from "@labor/helferlein/lib/Misc/makeOptions";
 import {isArray} from "@labor/helferlein/lib/Types/isArray";
 import {isBool} from "@labor/helferlein/lib/Types/isBool";
+import {isString} from "@labor/helferlein/lib/Types/isString";
 import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
 import fs from "fs";
 import path from "path";
@@ -38,13 +39,12 @@ let fixesApplied = false;
 export class Bootstrap {
 
 	/**
-	 * True if we don't spawn workers, but should handle the request in a single context
-	 * This is used in the ExpressFactory class
+	 * This is true if the asset builder is running in express/single process mode
 	 */
-	protected _asSingleProcess: boolean;
+	protected _isExpress: boolean;
 
-	public constructor(asSingleProcess?: boolean) {
-		this._asSingleProcess = asSingleProcess === true;
+	public constructor(expressMode?: boolean) {
+		this._isExpress = expressMode === true;
 	}
 
 	/**
@@ -53,13 +53,15 @@ export class Bootstrap {
 	 * @param assetBuilderPackageJson
 	 * @param cwd
 	 * @param dirName
+	 * @param mode
 	 */
-	public initMainProcess(assetBuilderPackageJson: PlainObject, cwd: string, dirName: string): Promise<CoreContext> {
+	public initMainProcess(assetBuilderPackageJson: PlainObject, cwd: string, dirName: string, mode?: string): Promise<CoreContext> {
 		// Render our fancy intro
-		if (!this._asSingleProcess) this.fancyIntro(assetBuilderPackageJson.version);
+		if (!this._isExpress) this.fancyIntro(assetBuilderPackageJson.version);
 
 		// Create the core context object
 		const coreContext = new CoreContext(cwd, dirName);
+		coreContext.isExpress = this._isExpress;
 		this.applyEnvironmentFixes(coreContext);
 
 		// Check if we are in the correct directory
@@ -91,7 +93,7 @@ export class Bootstrap {
 		coreContext.extensionLoader = new ExtensionLoader();
 
 		// Register shutdown event
-		if (!this._asSingleProcess) {
+		if (!this._isExpress) {
 			const shutdownHandler = function () {
 				console.log("Starting main process shutdown...");
 				coreContext.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
@@ -131,7 +133,7 @@ export class Bootstrap {
 
 				// Apply additional configuration steps
 				return this
-					.findMode(coreContext)
+					.findMode(coreContext, mode)
 					.then(coreContext => this.applyLegacyAdapterIfRequired(coreContext))
 					.then(coreContext => this.applyDummyAppIfRequired(coreContext));
 			})
@@ -162,7 +164,7 @@ export class Bootstrap {
 		const workerContext = new WorkerContext(coreContext, app);
 		coreContext.extensionLoader = new ExtensionLoader();
 
-		if (!this._asSingleProcess) {
+		if (!this._isExpress) {
 			this.applyEnvironmentFixes(coreContext);
 
 			// Register shutdown event
@@ -176,7 +178,7 @@ export class Bootstrap {
 		}
 
 		// Load the extensions
-		return (this._asSingleProcess ?
+		return (this._isExpress ?
 			Promise.resolve() :
 			coreContext.extensionLoader.loadExtensionsFromDefinition("global", coreContext, coreContext.laborConfig))
 			.then(() => coreContext.extensionLoader.loadExtensionsFromDefinition("app", workerContext, app))
@@ -211,13 +213,14 @@ export class Bootstrap {
 	/**
 	 * Finds and validates the given mode we should build the config for
 	 * @param coreContext
+	 * @param givenMode
 	 */
-	protected findMode(coreContext: CoreContext): Promise<CoreContext> {
+	protected findMode(coreContext: CoreContext, givenMode?: string): Promise<CoreContext> {
 		return coreContext.eventEmitter.emitHook(AssetBuilderEventList.GET_MODES, {
 			modes: ["watch", "build", "analyze"]
 		}).then((args) => {
 			const modes = args.modes;
-			let mode = typeof process.argv[2] === "undefined" ? "" : process.argv[2];
+			let mode = isString(givenMode) ? givenMode : (typeof process.argv[2] === "undefined" ? "" : process.argv[2]);
 			return coreContext.eventEmitter.emitHook(AssetBuilderEventList.GET_MODE, {
 					mode: mode,
 					context: coreContext,
