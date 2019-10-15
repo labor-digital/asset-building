@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.4.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.4.0%0Dv4.3.1#diff) (2019-10-15)
+
+
+### Features
+
+* automatically enable polling in watch mode when the asset-builder runs in a docker context ([1ef2fd9](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/1ef2fd9))
+
+
+
 ## [4.3.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.3.1%0Dv4.3.0#diff) (2019-10-15)
 
 
