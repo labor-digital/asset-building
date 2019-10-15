@@ -21,6 +21,7 @@ import {isFunction} from "@labor/helferlein/lib/Types/isFunction";
 import {isPlainObject} from "@labor/helferlein/lib/Types/isPlainObject";
 import {isString} from "@labor/helferlein/lib/Types/isString";
 import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import isDocker from "is-docker";
 import path from "path";
 import merge from "webpack-merge";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
@@ -95,7 +96,18 @@ export class WebpackConfigGenerator {
 			.then(context => {
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_CONFIG, {
 					context
-				}).then(() => context);
+				}).then(() => {
+
+					// Check if we are running in docker and having to watch for changes -> Enable polling
+					if (context.webpackConfig.watch && isDocker()) {
+						if (isUndefined(context.webpackConfig.watchOptions))
+							context.webpackConfig.watchOptions = {};
+						context.webpackConfig.watchOptions.poll = 600;
+					}
+
+					// Done
+					return context;
+				});
 			});
 	}
 
