@@ -44,11 +44,12 @@ export class CoreFixes {
 			const _realEmit = EventEmitter.prototype.emit;
 			EventEmitter.prototype.emit = function (type) {
 				try {
-					_realEmit.apply(this, arguments);
+					return _realEmit.apply(this, arguments);
 				} catch (e) {
 					console.error(Chalk.redBright("An internal error occurred, we should be able to recover, tho!"));
 					console.error(Chalk.redBright(e.stack));
 				}
+				return this;
 			};
 		} catch (e) {
 			// Ignore silently
