@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.4.2%0Dv4.4.1#diff) (2019-10-23)
+
+
+### Bug Fixes
+
+* **CoreFixes:** add correct error output to the event bugfix ([e0ae589](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/e0ae589))
+
+
+
 ## [4.4.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.4.1%0Dv4.4.0#diff) (2019-10-22)
 
 
