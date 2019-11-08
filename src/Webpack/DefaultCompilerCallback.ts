@@ -85,7 +85,7 @@ export class DefaultCompilerCallback {
 					// output.push(' - > ', asset.name, asset.chunks, asset.chunkNames);
 					const isMap = asset.name.match(/\.map$/);
 					const isHotUpdate = asset.name.match(/\.hot-update\./);
-					const chunkIsMain = typeof asset.chunks[0] === "string" && asset.chunks[0].indexOf("main") === 0;
+					const chunkIsMain = typeof asset.chunks[0] === "string" && (asset.chunks[0] as string).indexOf("main") === 0;
 					const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0;
 					const useAsset = (context.app.verboseResult || !isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain)) || isCopy;
 
