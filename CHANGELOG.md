@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.4.3](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.4.3%0Dv4.4.2#diff) (2019-10-31)
+
+
+### Bug Fixes
+
+* **DefaultCompilerCallback:** add BEWARE! message to the output array instead of dumping it to the screen directly ([9c98eb2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/9c98eb2))
+
+
+
 ## [4.4.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.4.2%0Dv4.4.1#diff) (2019-10-23)
 
 
