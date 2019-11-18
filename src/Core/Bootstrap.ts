@@ -86,6 +86,7 @@ export class Bootstrap {
 			coreContext.builderVersion === 1;
 
 		// Clean the work directory
+		FileHelpers.mkdir(coreContext.workDirectoryPath);
 		FileHelpers.flushDirectory(coreContext.workDirectoryPath);
 
 		// Create the context service classes
@@ -160,6 +161,7 @@ export class Bootstrap {
 
 		// Warm up the core context and create worker context
 		const coreContext = CoreContext.fromJson(message.context);
+		coreContext.process = "worker";
 		coreContext.eventEmitter = EventBus.getEmitter();
 		const workerContext = new WorkerContext(coreContext, app);
 		coreContext.extensionLoader = new ExtensionLoader();

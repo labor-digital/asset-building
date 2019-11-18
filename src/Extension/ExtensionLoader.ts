@@ -69,7 +69,10 @@ export class ExtensionLoader {
 		forEach(extensionPaths, (extensionPath: string) => {
 			const extension = this.resolveExtensionPath(context, extensionPath);
 			// Ignore if this extension is already known
-			if (this.extensions.indexOf(extension) !== -1) return;
+			if (this.extensions.indexOf(extension) !== -1) {
+				console.log("Skipped to load already known extension: " + extension);
+				return;
+			}
 			extensions.push(extension);
 			context.eventEmitter.bind(AssetBuilderEventList.EXTENSION_LOADING, () => {
 				return extension(context, scope);

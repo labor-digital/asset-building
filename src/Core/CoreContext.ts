@@ -24,6 +24,12 @@ import {ExtensionLoader} from "../Extension/ExtensionLoader";
 import {LaborConfigInterface} from "../Interfaces/LaborConfigInterface";
 
 export class CoreContext {
+
+	/**
+	 * Defines if the current process is the main process or a worker
+	 */
+	public process: "main" | "worker";
+
 	/**
 	 * Defines the type of this context
 	 */
@@ -33,7 +39,7 @@ export class CoreContext {
 	 * This is true if the asset builder is running in express/single process mode
 	 */
 	public isExpress: boolean;
-	
+
 	/**
 	 * If this is true the workers will be spawn in sequential order instead of being called as parallel processes
 	 */
@@ -113,6 +119,7 @@ export class CoreContext {
 	constructor(cwd: string, assetBuilderPath: string) {
 		this.isExpress = false;
 		this.type = "core";
+		this.process = "main";
 		this.runWorkersSequential = false;
 		this.builderVersion = 1;
 		this.sourcePath = cwd.replace(/\\\/$/g, "") + path.sep;
