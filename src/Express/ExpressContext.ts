@@ -22,6 +22,7 @@ import {Application} from "express";
 import {Compiler} from "webpack";
 import {WorkerContext} from "../Core/WorkerContext";
 import ExpressFactory from "./ExpressFactory";
+import express from "express";
 
 export default class ExpressContext {
 	/**
@@ -78,5 +79,16 @@ export default class ExpressContext {
 		this.isProd = isProd;
 		this.packageJsonDirectory = packageJsonDirectory;
 		this.eventEmitter = EventBus.getEmitter();
+	}
+
+	/**
+	 * Helper function to register public assets using the static express middleware!
+	 * @param directory
+	 */
+	public registerPublicAssets(directory: string) {
+		this.expressApp.use(express.static("public", {
+			etag: false,
+			maxAge: 15 * 60 * 1000
+		}));
 	}
 }
