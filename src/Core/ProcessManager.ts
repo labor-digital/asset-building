@@ -173,7 +173,7 @@ export class ProcessManager {
 			// Wait for a response!
 			if (coreContext.runWorkersSequential) {
 				worker.on("message", message => {
-					if (isPlainObject(message) && message.WEBPACK_DONE === true)
+					if (isPlainObject(message) && (message as any).WEBPACK_DONE === true)
 						coreContext.eventEmitter.emit(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE);
 					else
 						console.log("worker responded with message", message);
