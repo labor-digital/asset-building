@@ -25,7 +25,7 @@ import {ConfiguratorInterface} from "./ConfiguratorInterface";
 export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
 		if (!context.isProd) return Promise.resolve(context);
-		if (!context.app.keepOutputDirectory) return Promise.resolve(context);
+		if (context.app.keepOutputDirectory) return Promise.resolve(context);
 
 		const inputDirectory = path.dirname(context.app.entry);
 		const outputDirectory = context.webpackConfig.output.path;

@@ -17,17 +17,17 @@
 	"author": "LABOR GmbH",
 	"license": "MIT",
 	"dependencies": {
-		"@labor/helferlein": "3.12.0",
+		"@labor/helferlein": "3.15.1",
 		"@types/express": "4.17.2",
-		"@types/webpack": "4.41.0",
+		"@types/webpack": "4.41.2",
 		"acorn": "7.1.0",
 		"autoprefixer": "9.7.3",
 		"chalk": "3.0.0",
 		"chokidar": "3.3.1",
 		"clean-webpack-plugin": "3.0.0",
 		"copy-webpack-plugin": "5.1.1",
-		"core-js": "3.6.0",
-		"css-loader": "3.4.0",
+		"core-js": "3.6.2",
+		"css-loader": "3.4.2",
 		"exports-loader": "0.7.0",
 		"file-loader": "5.0.2",
 		"html-loader": "0.5.5",
@@ -44,18 +44,18 @@
 		"optimize-css-assets-webpack-plugin": "5.0.3",
 		"postcss-loader": "3.0.0",
 		"progress-bar-webpack-plugin": "1.12.1",
-		"sass-loader": "8.0.0",
+		"sass-loader": "8.0.1",
 		"svg-url-loader": "3.0.3",
-		"terser-webpack-plugin": "2.3.1",
+		"terser-webpack-plugin": "2.3.2",
 		"ts-loader": "6.2.1",
 		"typescript": "3.7.4",
 		"url-loader": "3.0.0",
-		"webpack": "4.41.4",
+		"webpack": "4.41.5",
 		"webpack-bundle-analyzer": "3.6.0",
 		"webpack-filter-warnings-plugin": "1.2.1",
 		"webpack-merge": "4.2.2"
 	},
 	"devDependencies": {
-		"@types/node": "13.1.0"
+		"@types/node": "13.1.6"
 	}
 }
