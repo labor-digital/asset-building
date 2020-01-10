@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.7.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.7.0%0Dv4.6.0#diff) (2019-12-23)
+
+
+### Bug Fixes
+
+* **ProcessManager:** fix typescript issue ([cea920c](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/cea920c))
+
+
+### Features
+
+* **Express:** add registerPublicAssets helper to express context ([cab764d](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/cab764d))
+* update all dependencies ([b879dca](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/b879dca))
+
+
+
 # [4.6.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.6.0%0Dv4.5.0#diff) (2019-11-18)
 
 
