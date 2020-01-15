@@ -83,12 +83,17 @@ export default class ExpressContext {
 
 	/**
 	 * Helper function to register public assets using the static express middleware!
-	 * @param directory
+	 * @param directory The directory you want to make public, relative to the project root
+	 * @param route An optional route that is used to provide the static files
 	 */
-	public registerPublicAssets(directory: string) {
-		this.expressApp.use(express.static(directory, {
+	public registerPublicAssets(directory: string, route?:string) {
+		const stat = express.static(directory, {
 			etag: false,
 			maxAge: 15 * 60 * 1000
-		}));
+		});
+		if(typeof route === "string")
+			this.expressApp.use(route, stat);
+		else
+			this.expressApp.use(stat);
 	}
 }
