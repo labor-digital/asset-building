@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.7.2%0Dv4.7.1#diff) (2020-01-15)
+
+
+### Bug Fixes
+
+* **ExpressContext:** fix registerPublicAssets not making the correct directory public ([ac4627b](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/ac4627b))
+
+
+
 ## [4.7.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.7.1%0Dv4.7.0#diff) (2020-01-10)
 
 
