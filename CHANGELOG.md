@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.7.1](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.7.1%0Dv4.7.0#diff) (2020-01-10)
+
+
+### Bug Fixes
+
+* **CleanOutputPlugin:** make sure the clean output plugin is running ([83e5a5c](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/83e5a5c))
+
+
+
 # [4.7.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.7.0%0Dv4.6.0#diff) (2019-12-23)
 
 
