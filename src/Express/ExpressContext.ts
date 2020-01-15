@@ -86,7 +86,7 @@ export default class ExpressContext {
 	 * @param directory
 	 */
 	public registerPublicAssets(directory: string) {
-		this.expressApp.use(express.static("public", {
+		this.expressApp.use(express.static(directory, {
 			etag: false,
 			maxAge: 15 * 60 * 1000
 		}));
