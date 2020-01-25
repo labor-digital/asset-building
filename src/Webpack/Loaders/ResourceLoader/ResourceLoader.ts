@@ -38,6 +38,9 @@ const resourceLoader: Loader = function (source: string) {
 	let rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
 	const possibleResourceLocations = [];
 
+	// Ignore css files
+	if(FileHelpers.getFileExtension(stylesheetPath) === "css") return callback(null, source);
+
 	// Register root resources
 	this.query.ext.forEach(ext => {
 		const possiblePath = path.resolve(rootPath) + path.sep + "Resources." + ext;
