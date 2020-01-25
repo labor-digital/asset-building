@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [4.8.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.8.0%0Dv4.7.2#diff) (2020-01-15)
+
+
+### Features
+
+* **ExpressContext:** add option to add a route for a static directory ([2498317](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/commits/2498317))
+
+
+
 ## [4.7.2](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.7.2%0Dv4.7.1#diff) (2020-01-15)
 
 
