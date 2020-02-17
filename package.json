@@ -4,7 +4,7 @@
 		"type": "git",
 		"url": "git+ssh://git@github.com:labor-digital/asset-building.git"
 	},
-	"version": "4.9.0",
+	"version": "4.9.1",
 	"description": "LABOR - toolbox to build webassets with webpack",
 	"main": "./dist/Index.js",
 	"bin": {
