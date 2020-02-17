@@ -1,6 +1,18 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+## [4.9.0](https://github.com/labor-digital/asset-building/compare/v4.8.0...v4.9.0) (2020-02-17)
+
+
+### Features
+
+* preparations to move the code to public repository ([745b62b](https://github.com/labor-digital/asset-building/commit/745b62b77f6271cdd93db56f14d0a71b0c800f80))
+
+
+### Bug Fixes
+
+* ignore css files when handling files with customSass and resource loaders ([514e161](https://github.com/labor-digital/asset-building/commit/514e1610c87ff2c5ed2d0fb986918d9c7111cf37))
 
 # [4.8.0](https://bitbucket.org/labor-digital/labor-dev-assetbuilding/branches/compare/v4.8.0%0Dv4.7.2#diff) (2020-01-15)
 
