@@ -16,13 +16,13 @@
  * Last modified: 2019.10.05 at 17:23
  */
 
-import {EventBus} from "@labor/helferlein/lib/Events/EventBus";
-import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
-import makeOptions from "@labor/helferlein/lib/Misc/makeOptions";
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
-import {isBool} from "@labor/helferlein/lib/Types/isBool";
-import {isString} from "@labor/helferlein/lib/Types/isString";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import makeOptions from "@labor-digital/helferlein/lib/Misc/makeOptions";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {isBool} from "@labor-digital/helferlein/lib/Types/isBool";
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import fs from "fs";
 import path from "path";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";
@@ -76,7 +76,7 @@ export class Bootstrap {
 
 		// Find the builder version
 		coreContext.builderVersion = isUndefined(coreContext.laborConfig.builderVersion) ?
-			1 : parseInt(coreContext.laborConfig.builderVersion + "");
+			2 : parseInt(coreContext.laborConfig.builderVersion + "");
 		if (coreContext.builderVersion !== 1 && coreContext.builderVersion !== 2)
 			return Promise.reject(new Error("An invalid builder version was given!"));
 

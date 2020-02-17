@@ -1,11 +1,11 @@
 {
-	"name": "@labor/asset-building",
+	"name": "@labor-digital/asset-building",
 	"repository": {
 		"type": "git",
-		"url": "git+ssh://git@bitbucket.org:labor-digital/labor-dev-assetbuilding.git"
+		"url": "git+ssh://git@github.com:labor-digital/asset-building.git"
 	},
 	"version": "4.8.0",
-	"description": "Our toolbox to build webassets with webpack",
+	"description": "LABOR - toolbox to build webassets with webpack",
 	"main": "./dist/Index.js",
 	"bin": {
 		"labor-asset-building": "./dist/Index.js"
@@ -17,7 +17,7 @@
 	"author": "LABOR GmbH",
 	"license": "MIT",
 	"dependencies": {
-		"@labor/helferlein": "3.15.1",
+		"@labor-digital/helferlein": "3.17.2",
 		"@types/express": "4.17.2",
 		"@types/webpack": "4.41.2",
 		"acorn": "7.1.0",

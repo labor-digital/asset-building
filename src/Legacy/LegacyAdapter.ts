@@ -16,11 +16,11 @@
  * Last modified: 2019.10.04 at 22:49
  */
 
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
-import {md5} from "@labor/helferlein/lib/Misc/md5";
-import {escapeRegex} from "@labor/helferlein/lib/Strings/escapeRegex";
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
+import {escapeRegex} from "@labor-digital/helferlein/lib/Strings/escapeRegex";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import fs from "fs";
 import path from "path";
 // noinspection ES6UnusedImports

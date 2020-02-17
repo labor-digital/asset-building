@@ -16,13 +16,13 @@
  * Last modified: 2019.10.04 at 20:05
  */
 
-import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
-import {isFunction} from "@labor/helferlein/lib/Types/isFunction";
-import {isNull} from "@labor/helferlein/lib/Types/isNull";
-import {isPlainObject} from "@labor/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
+import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import fs from "fs";
 import path from "path";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";

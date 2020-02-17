@@ -16,12 +16,12 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {EventEmitter} from "@labor/helferlein/lib/Events/EventEmitter";
-import {asArray} from "@labor/helferlein/lib/FormatAndConvert/asArray";
-import {filter} from "@labor/helferlein/lib/Lists/filter";
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
-import {isPlainObject} from "@labor/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
+import {asArray} from "@labor-digital/helferlein/lib/FormatAndConvert/asArray";
+import {filter} from "@labor-digital/helferlein/lib/Lists/filter";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import Chalk from "chalk";
 import childProcess from "child_process";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";

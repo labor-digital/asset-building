@@ -16,8 +16,8 @@
  * Last modified: 2019.10.05 at 21:44
  */
 
-import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
-import {md5} from "@labor/helferlein/lib/Misc/md5";
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
 import {AssetBuilderConfiguratorIdentifiers} from "../../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";

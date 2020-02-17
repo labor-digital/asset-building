@@ -16,8 +16,8 @@
  * Last modified: 2019.10.15 at 09:03
  */
 
-import {isPlainObject} from "@labor/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import {Application} from "express";
 import ExpressContext from "./ExpressContext";
 import ExpressFactory from "./ExpressFactory";

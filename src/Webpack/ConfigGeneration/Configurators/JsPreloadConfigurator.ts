@@ -16,8 +16,8 @@
  * Last modified: 2019.10.05 at 20:50
  */
 
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
-import {isObject} from "@labor/helferlein/lib/Types/isObject";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";

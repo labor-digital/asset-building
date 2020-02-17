@@ -15,8 +15,8 @@
  *
  * Last modified: 2019.02.20 at 19:04
  */
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
-import {isNull} from "@labor/helferlein/lib/Types/isNull";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
 import fs from "fs";
 import path from "path";
 import {FileHelpers} from "../../../Helpers/FileHelpers";

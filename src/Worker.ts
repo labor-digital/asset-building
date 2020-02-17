@@ -16,11 +16,11 @@
  * Last modified: 2019.10.05 at 17:02
  */
 
-import {EventBus} from "@labor/helferlein/lib/Events/EventBus";
-import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
-import {isNull} from "@labor/helferlein/lib/Types/isNull";
-import {isObject} from "@labor/helferlein/lib/Types/isObject";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
+import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import Chalk from "chalk";
 import webpack from "webpack";
 import {AssetBuilderEventList} from "./AssetBuilderEventList";

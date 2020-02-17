@@ -16,9 +16,9 @@
  * Last modified: 2019.10.15 at 09:40
  */
 
-import {isNull} from "@labor/helferlein/lib/Types/isNull";
-import {isNumber} from "@labor/helferlein/lib/Types/isNumber";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
+import {isNumber} from "@labor-digital/helferlein/lib/Types/isNumber";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import webpack, {Compiler, Configuration} from "webpack";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";
 import {Bootstrap} from "../Core/Bootstrap";

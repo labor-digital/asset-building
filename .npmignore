@@ -1,3 +1,7 @@
 node_modules
 .idea
 src
+tsconfig.json
+flushLib.js
+.github
+.gitignore

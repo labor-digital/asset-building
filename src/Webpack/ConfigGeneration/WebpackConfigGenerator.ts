@@ -17,10 +17,10 @@
  */
 
 
-import {isFunction} from "@labor/helferlein/lib/Types/isFunction";
-import {isPlainObject} from "@labor/helferlein/lib/Types/isPlainObject";
-import {isString} from "@labor/helferlein/lib/Types/isString";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import isDocker from "is-docker";
 import path from "path";
 import merge from "webpack-merge";

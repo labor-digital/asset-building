@@ -60,7 +60,7 @@ export class CoreFixes {
 	 * We need this fix, because we are a special kind of noodle...
 	 * My plan was to encapsulate as much node dependencies into the asset-building package as possible,
 	 * so we can stay up to date easily... The problem is, that all dependencies will be installed
-	 * inside node_modules directory of @labor/asset-building instead of the project's node_module directory.
+	 * inside node_modules directory of @labor-digital/asset-building instead of the project's node_module directory.
 	 *
 	 * With that in mind, the REAL problem is, that stuff like eslint will ONLY look into the project's
 	 * node_module directory and not into our internal directory when it looks up plugins / parsers.

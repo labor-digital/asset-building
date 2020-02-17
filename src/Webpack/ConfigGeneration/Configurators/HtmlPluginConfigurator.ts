@@ -16,7 +16,7 @@
  * Last modified: 2019.10.06 at 16:37
  */
 
-import {isNull} from "@labor/helferlein/lib/Types/isNull";
+import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";

@@ -15,8 +15,8 @@
  *
  * Last modified: 2019.10.05 at 18:28
  */
-import {EventEmitter} from "@labor/helferlein/lib/Events/EventEmitter";
-import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
+import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 import {Configuration} from "webpack";
 import {ExtensionLoader} from "../Extension/ExtensionLoader";
 import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";

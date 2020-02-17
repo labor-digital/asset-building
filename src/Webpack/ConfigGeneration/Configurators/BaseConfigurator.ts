@@ -16,9 +16,9 @@
  * Last modified: 2019.10.05 at 20:06
  */
 
-import {asArray} from "@labor/helferlein/lib/FormatAndConvert/asArray";
-import {md5} from "@labor/helferlein/lib/Misc/md5";
-import {inflectToUnderscore} from "@labor/helferlein/lib/Strings/Inflector/inflectToUnderscore";
+import {asArray} from "@labor-digital/helferlein/lib/FormatAndConvert/asArray";
+import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
+import {inflectToUnderscore} from "@labor-digital/helferlein/lib/Strings/Inflector/inflectToUnderscore";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 

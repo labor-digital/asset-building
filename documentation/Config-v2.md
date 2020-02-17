@@ -338,7 +338,7 @@ For more information take look at the **Extension.md** file.
     {
       "extensions": [
           "./extensions/MyDemoExtension.js",
-          "@labor/your-packge/asset-building"
+          "@labor-digital/your-packge/asset-building"
       ]
     }
   ]

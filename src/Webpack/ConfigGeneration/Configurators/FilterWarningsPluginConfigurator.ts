@@ -16,9 +16,9 @@
  * Last modified: 2019.10.06 at 15:55
  */
 
-import {map} from "@labor/helferlein/lib/Lists/map";
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
-import {isString} from "@labor/helferlein/lib/Types/isString";
+import {map} from "@labor-digital/helferlein/lib/Lists/map";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import WebpackFilterWarningsPlugin from "webpack-filter-warnings-plugin";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";

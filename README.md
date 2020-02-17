@@ -1,14 +1,10 @@
-# LABOR Asset Building
-This package is designed to replace our old build approach using "gulp" 
-which used webpack just as a extension to build better encapsulated js scripts. 
-In contrast to the old approach this package fully embraces webpack for all
-transpiling processes. Be it js, css, sass, or even your assets. 
+# LABOR - Asset Building
+This package is our internal asset builder setup. It fully embraces webpack for all
+transpiling processes. Be it js, css, sass, or even your images. The package is a completely configured drop-in solution with minimal configuration requirements but a lot of options if you need them.
 
-There are some adjustments to make if you want to migrate your old project but I 
-tried to make it as easy as possible for you. For additional information, take a 
-look at: **Conversion of old projects**.
+At it's core this library sets up webpack with a bunch of already preconfigured plugins that should make this a general purpose library for all your needs.
 
-As a general rule of thumb: All configuration is now done within your package.json 
+As a general rule of thumb: All configuration is done within your package.json 
 file in a node called: "labor". The default configuration is rather simple and
 should be more or less agnostic to webpack. If you want more configuration options
 when it comes to webpack, you can extend this library using its lightwight 
@@ -41,7 +37,9 @@ when it comes to webpack, you can extend this library using its lightwight
 ## Installation
 * Use our private npm registry!
 * Install the npm dependency
-`` npm install --save-dev @labor/asset-building ``
+```
+npm install --save-dev @labor-digital/asset-building
+```
 * Add the following part to your package.json:
 ```
   "scripts": {
@@ -52,48 +50,30 @@ when it comes to webpack, you can extend this library using its lightwight
 ```
 * Done! :-)
 
+## Basic usage
+For a basic usage example either take a look at the "demo" directories or create a new 
+"App.ts" file next to your package.json, add "console.log("Hello world");" as content and alter
+your package.json like so:
+```
+"labor": {
+    "apps": [
+        {
+            "entry": "./App.ts",
+            "output": "./dist/bundle.js",
+        }
+    ]
+}
+```
+
+Start the watcher with "npm run watch" and the script should do it's magic :)
+
 ## Documentation, Options and additional information
 To keep this document somewhat short additional documentation is now available in
 the "documentation" directory!
 
-## Conversion of old projects
-To convert your old projects is probably a rather big step, but in most cases
-it will be worth it. In contrast to the old "gulp" approach this package aims to
-provide a "meta-configuration" which is agnostic to the real implementation
-of the package generation. So instead of the problems in gulp where we could never
-update our sources without a rewrite of our configuration, you can easily update
-the asset-builder package and use the latest version.
-
-Anyway, befor you start to convert your projects it is highly recommended
-to check out the rest of this documentation, as it will explain a lot by itself.
-
-In addition to that:
-
-* When you are converting the "jsConfig":
- 	* copy the value `jsConfig -> baseDir`,
- 	add "/application.js" behind it and paste it as `js -> entry`.
-	* copy the value `jsConfig -> distDir` add "bundle.js" behind it 
-	and paste it as `js -> output`
-	* When porting from a gulpfile v2.0.8 or higher "jsConfig" will 
-	be named "webpackConfig".
-	* When porting from a gulpfile less than v2.0.8 there additional
-	changes will be required, because you need to introduce node-imports,
-	as they will no longer be auto-resolved
-	* Make sure you remove no longer needed files, like: first.js, last.js, base.framework.js, base.last.js and jQuery-3.2.1.js
-* When you are converting the "cssConfig":
- 	* copy the value `cssConfig -> baseDir`,
- 	add "/application.(sass/less/scss)" behind it and paste it as `css -> entry`.
- 	* copy the value `cssConfig -> distDir` add `cssConfig -> distName` in addition of ".css" 
- 	behind it and paste it as `css -> output`	
-* There is no replacement for "fontConfig", you probably want to use "copy" for that now.
-* To convert "fileCopyConfig":
-	* copy your contents of `fileCopyConfig -> files` to `copy -> from`
-	* copy the contents of `fileCopyConfig -> distDir` to `copy -> to`
-	* Make sure to check the `copy -> flatten` option if required.
-
 ## Different config builder versions
 The main part of this package is the so called **Config Builder** which takes
-your configuration out of the package.json and converts a webpack configuration
+your configuration out of the package.json and creates a webpack configuration
 out of it. The config is created in javascript and passed to webpack trough the 
 [Node.js API](https://webpack.js.org/api/node/) so, don't look around for any 
 config files, there will be none.
@@ -103,25 +83,25 @@ architectures of your code. This document, especially the **Configuration** sect
 describes both versions, and their differences. 
 
 **Version 1.0**  
-This is basically a carbon copy of our "old" / well known style of 
+This is basically a carbon copy of your "old" / well known style of 
 monolytic application.(sass/scss/less) and application.js files. With version 1.0 
-you should be able to transfer all your existing projects to the new asset 
-building. That includes a lot of manual labor like copying files to your public 
+we are able to transfer all our legacy projects to the modern world of asset 
+building. That, however includes a lot of manual labor like copying files to your public 
 folder, using relative path's to css assets based on your public path 
-and so on. Take a look in the "demo1" directory. **This is the default behavior**
+and so on. Take a look in the "demo1" directory.
 
 **Version 2.0**  
 This version follows the "webpack/angular/vue..." approach, where everything 
-you build is seen as a "component" of an app. If you want to you may create
-full blown [Web Components](https://www.webcomponents.org) or, as I like to do
+you build is seen as a "component" of an app. If you want, you may create
+full blown [Web Components](https://www.webcomponents.org) or, as I like to,
 create components which still keep their sources like js, css or assets
-in a single directory, bound by js includes.
+in a single directory, bound by js includes. 
 
 With this version your assets in css files should be defined as path's relative
 to your source files, or as node-modules which will be resolved and gathered
 in an output directory; when building for production webpack will also
 minify your images. When you look into the "demo2" directory you see a basic 
-example.
+example. **This is the default behavior**
  
 ## Commands / Modes
 By default there are two modes available (There may be more when you extend 
@@ -145,11 +125,11 @@ If you want to use es6 code, like arrow functions, constants and classes, just g
 for it. All javascript will be piped trough the typescript transpiler which
 takes care of the conversion to es5 compatible code. 
 
-**Please note:** There are a lot of es6 features which are not supported by typescript,
+**Please note:** There are a lot of es6 features are supported by typescript but not by older browsers,
 like promises, sets, maps and symbols. If you want to use them, we have to provide
-so called "polyfills" for older browsers. Those polyfills are provided by another
-library which is called [Core-js](https://github.com/zloirock/core-js/tree/v2) of which
-we are using version 2.5.x. To keep your files small we only include some basics.
+so called "polyfills" browsers that don't implement the required codebase. Those polyfills are provided by another
+library which is called [Core-js](https://github.com/zloirock/core-js/tree/v2)
+To keep your files small we only include some basics.
 Included polyfills are by default: 
 
 * [core-js/fn/promise](https://github.com/zloirock/core-js#ecmascript-promise)
@@ -165,9 +145,9 @@ If you want to add additional polyfills for your project, define them using the
 on your config builder version.
 
 **A note on typescript** When you want to use typescript, you can but be aware that
-we DO NOT USE the typescript typechecker (as it is far to slow). If you want to
+we DO NOT USE the typescript typechecker (as it is far to slow for big codebases). If you want to
 use the typechecker anyway define that using the 
-"labor -> js -> useTypeChecker" or "labor -> apps -> useTypeChecker" options, 
+"labor -> js -> useTypeChecker" or "labor -> apps -> Your app -> useTypeChecker" options, 
 depending on your builder version.
 
 ## CSS Superscript resources
@@ -231,4 +211,12 @@ a:before {
 For more information see: https://github.com/jantimon/iconfont-webpack-plugin
 
 ## Analyze your chunks
-When you are working with multiple chunks you will at some point in time want to take a look on what's in those files. We use webpack-bundle-analyzer internally to provide you with that inside. To analyze your chunks call `npm run analyze` and the report will show up in your default browser, after the build finished. 
+When you are working with multiple chunks you will at some point in time want to take a look on what's in those files. We use webpack-bundle-analyzer internally to provide you with that inside. To analyze your chunks call `npm run analyze` and the report will show up in your default browser, after the build finished.
+
+
+## Postcardware
+You're free to use these images, but if it makes it to your production environment we highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using.
+
+Our address is: LABOR.digital - Fischtorplatz 21 - 55116 Mainz, Germany
+
+We publish all received postcards on our [company website](https://labor.digital). 

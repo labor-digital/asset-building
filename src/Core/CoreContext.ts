@@ -16,9 +16,9 @@
  * Last modified: 2019.10.05 at 17:26
  */
 
-import {EventEmitter} from "@labor/helferlein/lib/Events/EventEmitter";
-import {asArray} from "@labor/helferlein/lib/FormatAndConvert/asArray";
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
+import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
+import {asArray} from "@labor-digital/helferlein/lib/FormatAndConvert/asArray";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import * as path from "path";
 import {ExtensionLoader} from "../Extension/ExtensionLoader";
 import {LaborConfigInterface} from "../Interfaces/LaborConfigInterface";

@@ -16,7 +16,7 @@
  * Last modified: 2019.10.05 at 20:34
  */
 
-import {md5} from "@labor/helferlein/lib/Misc/md5";
+import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
 import {AssetBuilderConfiguratorIdentifiers} from "../../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";

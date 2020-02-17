@@ -16,8 +16,8 @@
  * Last modified: 2019.10.06 at 15:35
  */
 
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import fs from "fs";
 import path from "path";

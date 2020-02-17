@@ -16,7 +16,7 @@
  * Last modified: 2019.10.04 at 19:21
  */
 
-import {PlainObject} from "@labor/helferlein/lib/Interfaces/PlainObject";
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 
 export interface AppCopyDefinition {
 	from: string;

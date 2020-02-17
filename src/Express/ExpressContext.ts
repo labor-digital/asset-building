@@ -16,8 +16,8 @@
  * Last modified: 2019.10.15 at 09:04
  */
 
-import {EventBus} from "@labor/helferlein/lib/Events/EventBus";
-import {EventEmitter} from "@labor/helferlein/lib/Events/EventEmitter";
+import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
+import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
 import {Application} from "express";
 import {Compiler} from "webpack";
 import {WorkerContext} from "../Core/WorkerContext";

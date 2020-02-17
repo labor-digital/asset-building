@@ -16,8 +16,8 @@
  * Last modified: 2019.10.05 at 21:31
  */
 
-import {forEach} from "@labor/helferlein/lib/Lists/forEach";
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
+import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 

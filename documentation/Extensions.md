@@ -4,7 +4,7 @@ old gulpfile without problems. But if you want to dive deeper, or want to edit
 the webpack config manually you can use either the "webpackConfig" option or
 create an extension that can use the provided hooks to alter the configuration.
 
-Extensions are mend to create reusable extensions to the asset builder that may 
+Extensions are meant to create reusable packages to the asset builder that may 
 require their own webpack plugins or loaders, while the "webpackConfig" option
 is intended an "per-project" alternative that requires no further understanding of the
 structure. 
@@ -18,7 +18,7 @@ On a global scale:
 "labor": {
     "extensions": [
         "./extensions/MyDemoExtension.js",
-        "@labor/your-packge/asset-building"
+        "@labor-digital/your-packge/asset-building"
     ]
 }
 ```
@@ -30,7 +30,7 @@ On an per-app scale (only for builderVersion 2):
     {
       "extensions": [
           "./extensions/MyDemoExtension.js",
-          "@labor/your-packge/asset-building"
+          "@labor-digital/your-packge/asset-building"
       ]
     }
   ]
@@ -60,8 +60,8 @@ module.exports = function (context, scope) {
 ```
 ### As Typescript:
 ```typescript
-import {WorkerContext} from "@labor/asset-building/dist/Core/WorkerContext";
-import {CoreContext} from "@labor/asset-building/dist/Core/CoreContext";
+import {WorkerContext} from "@labor-digital/asset-building/dist/Core/WorkerContext";
+import {CoreContext} from "@labor-digital/asset-building/dist/Core/CoreContext";
 export default function (context: WorkerContext|CoreContext, scope: "app" | "global") {
 	// Do stuff
 }
@@ -77,9 +77,9 @@ always contain a property called "args". The "e.args" property holds additional 
 about the hook and the payload your listener should filter.
 
 ```typescript
-import {WorkerContext} from "@labor/asset-building/dist/Core/WorkerContext";
-import {CoreContext} from "@labor/asset-building/dist/Core/CoreContext";
-import {AssetBuilderEventList} from "@labor/asset-building/dist/AssetBuilderEventList";
+import {WorkerContext} from "@labor-digital/asset-building/dist/Core/WorkerContext";
+import {CoreContext} from "@labor-digital/asset-building/dist/Core/CoreContext";
+import {AssetBuilderEventList} from "@labor-digital/asset-building/dist/AssetBuilderEventList";
 export default function (context: WorkerContext|CoreContext, scope: "app" | "global") {
 	(context as CoreContext).eventEmiter.bind(AssetBuilderEventList.CALLBACK_DONE, (e) => {
 	    // Show the arguments that were passed by the hook emitter

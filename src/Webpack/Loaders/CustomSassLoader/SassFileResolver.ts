@@ -16,7 +16,7 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
-import {md5} from "@labor/helferlein/lib/Misc/md5";
+import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
 import {watch} from "chokidar";
 import fs from "fs";
 import {FileHelpers} from "../../../Helpers/FileHelpers";

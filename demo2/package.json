@@ -11,10 +11,9 @@
 	"author": "LABOR GmbH",
 	"license": "MIT",
 	"devDependencies": {
-		"@labor/labor-asset-building": "file:.."
+		"@labor-digital/asset-building": "file:.."
 	},
 	"labor": {
-		"builderVersion": 2,
 		"apps": [
 			{
 				"entry": "./webroot/frontend/src/app.js",

@@ -16,7 +16,7 @@
  * Last modified: 2019.10.06 at 13:37
  */
 
-import {isArray} from "@labor/helferlein/lib/Types/isArray";
+import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import Chalk from "chalk";
 import {Stats} from "webpack";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";

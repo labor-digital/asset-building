@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import {isObject} from "@labor/helferlein/lib/Types/isObject";
-import {isUndefined} from "@labor/helferlein/lib/Types/isUndefined";
+import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import Chalk from "chalk";
 import {Bootstrap} from "./Core/Bootstrap";
 import {ProcessManager} from "./Core/ProcessManager";
