@@ -35,8 +35,7 @@ when it comes to webpack, you can extend this library using its lightwight
 - You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
 
 ## Installation
-* Use our private npm registry!
-* Install the npm dependency
+* Install the npm dependency:
 ```
 npm install --save-dev @labor-digital/asset-building
 ```
