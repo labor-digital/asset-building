@@ -34,6 +34,11 @@ when it comes to webpack, you can extend this library using its lightwight
 - I implemented a custom sass loader to speed up module based sass compiling
 - You can work with dynamic imports everywhere, thanks to an automatic promise polyfill for webpack
 
+**Available extensions to provide additional functionality**
+
+- [Dev server as standalone and express middleware](https://www.npmjs.com/package/@labor-digital/asset-building-dev-server)
+- [Vue.js build environment](https://www.npmjs.com/package/@labor-digital/asset-building-env-vuejs)
+
 ## Installation
 * Install the npm dependency:
 ```
