@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.9.3](https://github.com/labor-digital/asset-building/compare/v4.9.2...v4.9.3) (2020-02-18)
+
+
+### Bug Fixes
+
+* add tsconfig.json back to published npm sources ([5e0a89f](https://github.com/labor-digital/asset-building/commit/5e0a89fa8de511629b5d9e9843d62dd4e58d1919))
+
 ### [4.9.2](https://github.com/labor-digital/asset-building/compare/v4.9.1...v4.9.2) (2020-02-17)
 
 ### [4.9.1](https://github.com/labor-digital/asset-building/compare/v4.9.0...v4.9.1) (2020-02-17)
