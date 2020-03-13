@@ -108,7 +108,6 @@ export class ImageLoaderConfigurator implements ConfiguratorInterface {
 								loader: "svg-url-loader",
 								options: {
 									name: generateName,
-									outputPath: "assets/",
 									encoding: context.isProd ? "base64" : "none",
 									limit: context.isProd ? 10000 : 1,
 									iesafe: true,
