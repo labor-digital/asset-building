@@ -17,7 +17,6 @@
  */
 
 import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
-import {watch} from "chokidar";
 import fs from "fs";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
 import {SassFile} from "./Entities/SassFile";
@@ -25,7 +24,6 @@ import {SassFileResolverContext} from "./Entities/SassFileResolverContext";
 import {SassFilePreCompiler} from "./SassFilePreCompiler";
 
 const cache = new Map();
-const watchers = new Set();
 
 export class SassFileResolver {
 	/**
@@ -59,24 +57,19 @@ export class SassFileResolver {
 		// Execute the pre compiler
 		SassFilePreCompiler.apply(file, context);
 
-		// Register a watcher for this file
-		if (!watchers.has(filenamePosix)) {
-			watchers.add(filenamePosix);
-			try {
-				watch(filename, {
-					atomic: true,
-					ignoreInitial: true
-				}).on("all", (e) => {
-					if (cache.has(filenamePosix))
-						cache.delete(filenamePosix);
-				});
-			} catch (e) {
-				console.error("Error in sass file watcher", e);
-			}
-		}
-
 		// Done
 		cache.set(filenamePosix, file);
 		return file;
+	}
+
+	/**
+	 * Used to invalidate the cached information for a specific file
+	 * This is mostly an internal hook that is called when webpack invalidates a file
+	 * @param filename
+	 */
+	static invalidate(filename: string) {
+		const filenamePosix = FileHelpers.filenameToPosix(filename);
+		if (!cache.has(filenamePosix)) return;
+		cache.delete(filenamePosix);
 	}
 }

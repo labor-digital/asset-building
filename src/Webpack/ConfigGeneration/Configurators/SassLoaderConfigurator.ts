@@ -20,12 +20,18 @@ import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
+import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from "../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin";
 import {AbstractStyleLoaderConfigurator} from "./AbstractStyleLoaderConfigurator";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
 		let postCssConfig = null;
+
+		// Register cache clear plugin for custom sass compiler
+		context.webpackConfig.plugins.push(new CustomSassLoaderPreCompilerCacheInvalidatePlugin());
+
+		// Build config
 		return this.makePostcssConfig(identifier, context)
 			.then(config => {
 				postCssConfig = config;
