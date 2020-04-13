@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.11.0](https://github.com/labor-digital/asset-building/compare/v4.10.0...v4.11.0) (2020-04-11)
+
+
+### Features
+
+* update dependencies + remove chokidar ([08e3030](https://github.com/labor-digital/asset-building/commit/08e3030cae5aa33fcbcd089ff5697af13b93def0))
+
+
+### Bug Fixes
+
+* make sure custom sass loader cache is cleared when a file is changed ([3a8ecf8](https://github.com/labor-digital/asset-building/commit/3a8ecf818d8e3a2ddc57aa83af0ba262e972b557))
+
 ## [4.10.0](https://github.com/labor-digital/asset-building/compare/v4.9.3...v4.10.0) (2020-03-13)
 
 
