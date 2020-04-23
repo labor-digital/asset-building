@@ -16,6 +16,8 @@
  * Last modified: 2019.10.04 at 23:53
  */
 
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+
 export default {
 	disabled: {
 		type: "bool",
@@ -90,5 +92,13 @@ export default {
 	webpackConfig: {
 		type: ["undefined", "string", "plainObject", "true"],
 		default: undefined
+	},
+	additionalResolverPaths: {
+		type: ["undefined", "array", "string"],
+		default: undefined,
+		filter: function (v) {
+			if (isString(v)) return [v];
+			return v;
+		}
 	}
 };

@@ -36,7 +36,7 @@ export class BaseConfigurator implements ConfiguratorInterface {
 			name: context.app.appName + "",
 			mode: context.isProd ? "production" : "development",
 			target: "web",
-			watch: context.mode === "watch",
+			watch: context.mode === "watch" || context.mode === "analyze",
 			devtool: context.isProd ? "source-map" : "cheap-module-eval-source-map",
 			entry: {},
 			plugins: [],

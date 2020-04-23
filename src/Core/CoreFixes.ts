@@ -15,6 +15,9 @@
  *
  * Last modified: 2019.10.04 at 20:40
  */
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import Chalk from "chalk";
 import Module from "module";
 import * as path from "path";
@@ -75,10 +78,6 @@ export class CoreFixes {
 		const resolveFilenameOrig = (Module as any)._resolveFilename;
 		const resolverCache = {};
 		(Module as any)._resolveFilename = function resolveFilenameOverride(request, parent, isMain, options) {
-			// Create local paths
-			let additionalResolverPaths = Array.from(coreContext.additionalResolverPaths).map(
-				(s: string) => s.replace(/[\\\/]*$/, ""));
-
 			// Prepare cache key to make sure to prevent caching overlay's
 			const cacheKey = request + parent.id + isMain;
 			const isCacheable = typeof options === "undefined" || options === null;
@@ -93,18 +92,29 @@ export class CoreFixes {
 				// Try default approach
 				result = resolveFilenameOrig(request, parent, isMain, options);
 			} catch (e) {
-				// Try additional path's to resolve the request filename
-				if (typeof options !== "object" || options === null) options = {};
-				options.paths = [path.dirname(parent.filename)].concat(additionalResolverPaths);
-				result = resolveFilenameOrig(request, parent, isMain, options);
+				// Ignore errors 
 			}
 
-			// Check if we could resolve the filename
-			if (result === null) {
-				throw new Error("Could not resolve module request: \"" + request +
-					"\", tried: \"" + [path.dirname(request), path.dirname(parent.filename)]
-						.concat(additionalResolverPaths).join("\", \"") + "\"");
+			// Try harder
+			if (isNull(result)) {
+				// Create local paths
+				let additionalResolverPaths = Array.from(coreContext.additionalResolverPaths).map(
+					(s: string) => s.replace(/[\\\/]*$/, ""));
+
+				// Try additional path's to resolve the request filename
+				if (!isPlainObject(options)) options = {};
+				(options as PlainObject).paths = [path.dirname(parent.filename)].concat(additionalResolverPaths);
+
+				try {
+					// Try again
+					result = resolveFilenameOrig(request, parent, isMain, options);
+				} catch (e) {
+					throw new Error("Could not resolve module request: \"" + request +
+						"\", tried: \"" + [path.dirname(request), path.dirname(parent.filename)]
+							.concat((options as PlainObject).paths).join("\", \"") + "\"" + " | Original error: " + e.message);
+				}
 			}
+
 
 			// Store output or skip if the value is not cacheable
 			if (!isCacheable) return result;

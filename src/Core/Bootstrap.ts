@@ -21,6 +21,7 @@ import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject"
 import makeOptions from "@labor-digital/helferlein/lib/Misc/makeOptions";
 import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import {isBool} from "@labor-digital/helferlein/lib/Types/isBool";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import fs from "fs";
@@ -29,6 +30,7 @@ import {AssetBuilderEventList} from "../AssetBuilderEventList";
 import {ExtensionLoader} from "../Extension/ExtensionLoader";
 import {FileHelpers} from "../Helpers/FileHelpers";
 import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
+import {LaborConfigInterface} from "../Interfaces/LaborConfigInterface";
 import AppDefinitionSchema from "./AppDefinitionSchema";
 import {CoreContext} from "./CoreContext";
 import {CoreFixes} from "./CoreFixes";
@@ -43,8 +45,15 @@ export class Bootstrap {
 	 */
 	protected _isExpress: boolean;
 
-	public constructor(expressMode?: boolean) {
+	/**
+	 * Holds, if given a static labor configuration object.
+	 * If this is set the initMainProcess() method will not try to load the configuration from the package.json
+	 */
+	protected _staticLaborConfig?: PlainObject;
+
+	public constructor(expressMode?: boolean, staticLaborConfig?: LaborConfigInterface) {
 		this._isExpress = expressMode === true;
+		this._staticLaborConfig = staticLaborConfig;
 	}
 
 	/**
@@ -64,21 +73,30 @@ export class Bootstrap {
 		coreContext.isExpress = this._isExpress;
 		this.applyEnvironmentFixes(coreContext);
 
-		// Check if we are in the correct directory
-		if (!fs.existsSync(coreContext.packageJsonPath))
-			return Promise.reject(new Error("Could not find package.json at: \"" + coreContext.packageJsonPath + "\""));
+		// Load labor config
+		if (isPlainObject(this._staticLaborConfig))
+			coreContext.laborConfig = this._staticLaborConfig;
+		else {
+			// Check if we are in the correct directory
+			if (!fs.existsSync(coreContext.packageJsonPath))
+				return Promise.reject(new Error("Could not find package.json at: \"" + coreContext.packageJsonPath + "\""));
 
-		// Load package json
-		const packageJson = JSON.parse(fs.readFileSync(coreContext.packageJsonPath).toString("utf-8"));
-		if (typeof packageJson.labor === "undefined")
-			return Promise.reject(new Error("There is no \"labor\" node inside your current package json!"));
-		coreContext.laborConfig = packageJson.labor;
+			// Load the config using the package json
+			const packageJson = JSON.parse(fs.readFileSync(coreContext.packageJsonPath).toString("utf-8"));
+			if (typeof packageJson.labor === "undefined")
+				return Promise.reject(new Error("There is no \"labor\" node inside your current package json!"));
+			coreContext.laborConfig = packageJson.labor;
+		}
 
 		// Find the builder version
 		coreContext.builderVersion = isUndefined(coreContext.laborConfig.builderVersion) ?
 			2 : parseInt(coreContext.laborConfig.builderVersion + "");
 		if (coreContext.builderVersion !== 1 && coreContext.builderVersion !== 2)
 			return Promise.reject(new Error("An invalid builder version was given!"));
+
+		// Add configured resolver paths to the context
+		if (isArray(coreContext.laborConfig.additionalResolverPaths))
+			coreContext.laborConfig.additionalResolverPaths.forEach(v => coreContext.additionalResolverPaths.add(v));
 
 		// Check if we are running in sequential mode
 		coreContext.runWorkersSequential = isBool(coreContext.laborConfig.runWorkersSequential) ?
@@ -186,6 +204,8 @@ export class Bootstrap {
 			.then(() => coreContext.extensionLoader.loadExtensionsFromDefinition("app", workerContext, app))
 			// Build the app definition
 			.then(() => this.applyAppSchema(app, workerContext))
+			// Extend the context with the app configuration
+			.then((app: AppDefinitionInterface) => this.applyAppDefinitionToContext(app, workerContext))
 			// Build the worker context
 			.then((app: AppDefinitionInterface) => {
 				workerContext.app = app;
@@ -299,6 +319,18 @@ export class Bootstrap {
 				// Apply the app schema to the definition
 				return makeOptions(app, args.schema, {allowUnknown: true});
 			});
+	}
+
+	/**
+	 * Merges configured options into the context instances
+	 * @param app
+	 * @param context
+	 */
+	protected applyAppDefinitionToContext(app: AppDefinitionInterface, context: WorkerContext): Promise<AppDefinitionInterface> {
+		// Add configured resolver paths to the context
+		if (isArray(app.additionalResolverPaths))
+			app.additionalResolverPaths.forEach(v => context.parentContext.additionalResolverPaths.add(v));
+		return Promise.resolve(app);
 	}
 
 	/**

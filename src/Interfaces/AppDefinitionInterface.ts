@@ -143,6 +143,12 @@ export interface AppDefinitionInterface extends PlainObject {
 	htmlTemplate?: PlainObject | true;
 
 	/**
+	 * Additional, configured lookup paths to find imports in
+	 * These are used by require() to resolve node modules
+	 */
+	additionalResolverPaths?: Array<string>;
+
+	/**
 	 * The legacy set name we use for the legacy adapter. Internal only
 	 * @deprecated
 	 */
