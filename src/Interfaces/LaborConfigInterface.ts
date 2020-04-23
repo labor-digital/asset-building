@@ -66,4 +66,11 @@ export interface LaborConfigInterface {
 	 * @deprecated
 	 */
 	js?: Array<string>;
+
+	/**
+	 * Additional, configured lookup paths to find imports in
+	 * These are used by require() to resolve node modules
+	 */
+	additionalResolverPaths?: Array<string>;
+
 }

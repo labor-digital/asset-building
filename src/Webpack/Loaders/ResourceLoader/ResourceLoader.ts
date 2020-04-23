@@ -39,7 +39,7 @@ const resourceLoader: Loader = function (source: string) {
 	const possibleResourceLocations = [];
 
 	// Ignore css files
-	if(FileHelpers.getFileExtension(stylesheetPath) === "css") return callback(null, source);
+	if (FileHelpers.getFileExtension(stylesheetPath) === "css") return callback(null, source);
 
 	// Register root resources
 	this.query.ext.forEach(ext => {

@@ -89,23 +89,54 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		const statementDirname = path.dirname(output);
 		const statementRealPath = path.resolve(parentDirectory, statementDirname) + path.sep;
 		const currentExt = FileHelpers.getFileExtension(currentFile);
-		const possiblePaths = new Set();
-		possiblePaths
-			.add(statementRealPath + statementBasename + "." + currentExt)
-			.add(statementRealPath + "_" + statementBasename + "." + currentExt)
-			.add(statementRealPath + statementBasename + ".sass")
-			.add(statementRealPath + "_" + statementBasename + ".sass")
-			.add(statementRealPath + statementBasename + ".scss")
-			.add(statementRealPath + "_" + statementBasename + ".scss");
 
-		let foundPath: string | null = null;
-		forEach(possiblePaths, (possiblePath: string) => {
-			if (fs.existsSync(possiblePath) && fs.lstatSync(possiblePath).isFile()) {
-				foundPath = possiblePath;
-				return false;
-			}
-		});
+		/**
+		 * Helper to find a file in the given directory under the given filename
+		 * It tries to find all possible filename versions in the sass schema
+		 * @param dirName
+		 * @param filename
+		 */
+		const tryToFindFileIn = function (dirName: string, filename: string): string | null {
+			// Find possible paths
+			const possiblePaths: Set<string> = new Set();
+			possiblePaths
+				.add(dirName + filename + "." + currentExt)
+				.add(dirName + "_" + filename + "." + currentExt)
+				.add(dirName + filename + ".sass")
+				.add(dirName + "_" + filename + ".sass")
+				.add(dirName + filename + ".scss")
+				.add(dirName + "_" + filename + ".scss");
+
+			// Try to resolve the file path
+			let foundPath: string | null = null;
+			forEach(possiblePaths, (possiblePath: string) => {
+				if (fs.existsSync(possiblePath) && fs.lstatSync(possiblePath).isFile()) {
+					foundPath = possiblePath;
+					return false;
+				}
+			});
+			return foundPath;
+		};
+
+		// Try to find file in the default directory
+		let foundPath = tryToFindFileIn(statementRealPath, statementBasename);
 		if (!isNull(foundPath)) return foundPath;
+
+		// Try harder
+		output = importPath;
+
+		// Try to resolve "~" in the current path
+		if (output.charAt(0) === "~") {
+			if (currentFile.indexOf("node_modules") !== -1) {
+				const baseParts = currentFile.split(path.sep);
+				while (baseParts.length > 2) {
+					baseParts.pop();
+					const searchPath = path.join(baseParts.join(path.sep), output.replace(/^[~\\\/]+/, ""));
+					let foundPath = tryToFindFileIn(path.dirname(searchPath) + path.sep, path.basename(searchPath));
+					if (!isNull(foundPath)) return foundPath;
+				}
+			}
+		}
 
 		// Invalid statement
 		throw new Error("Could not resolve SASS import: \"" + importPath + "\" in file: \"" + currentFile + "\"!");
@@ -224,7 +255,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 				}
 
 				indentHistory = indentHistory.slice(0, indentHistory.length - layers);
-				parsedLines[lastLineWithContent].text += "}".repeat(layers);
+				parsedLines[lastLineWithContent].text += "};".repeat(layers);
 			}
 
 			lastIndent = indent;

@@ -44,7 +44,7 @@ const customSassLoader: Loader = function (source: string) {
 		const context = new SassFileResolverContext(this.query.context, this);
 
 		// Ignore if we don't have to do anything
-		if(context.baseExt === "css") return callback(null, source);
+		if (context.baseExt === "css") return callback(null, source);
 
 		context.init().then(() => {
 			const file = SassFileResolver.getFile(context.baseFile, source, context);
