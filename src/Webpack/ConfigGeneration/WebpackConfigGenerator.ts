@@ -57,7 +57,6 @@ export class WebpackConfigGenerator {
 	 * @param context
 	 */
 	public generateConfiguration(context: WorkerContext): Promise<WorkerContext> {
-
 		// Apply the configurators on the context object
 		return Promise.resolve(context)
 			.then(context => this.configuratorWrapper(Ids.BASE, context, new BaseConfigurator()))
@@ -172,7 +171,12 @@ export class WebpackConfigGenerator {
 			const customWebpackConfigPath = path.resolve(context.parentContext.sourcePath, (context.app.webpackConfig as string));
 			try {
 				const customWebpackConfig = require(customWebpackConfigPath);
-				if (typeof customWebpackConfig !== "function")
+				if (path.basename(customWebpackConfigPath) === "webpack.config.js") {
+					if (!isPlainObject(customWebpackConfig))
+						return Promise.reject(new Error("The default export of webpack.config.js has to be an object!"));
+					context.webpackConfig = merge(context.webpackConfig, customWebpackConfig);
+					return Promise.resolve(context);
+				} else if (typeof customWebpackConfig !== "function")
 					return Promise.reject(new Error("The custom webpack config has to be a function!"));
 				context.eventEmitter.unbindAll(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
 				context.eventEmitter.bind(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, () => customWebpackConfig(context));
