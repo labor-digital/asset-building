@@ -27,6 +27,7 @@ module.exports = {
 			"/guide/ConfigV1.md",
 			"/guide/ConfigV2.md",
 			"/guide/Extensions.md",
+			"/guide/Interop.md",
 			"/guide/MigratingFromGulp.md"
 		]
 	}

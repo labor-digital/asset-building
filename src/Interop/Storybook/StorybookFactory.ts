@@ -21,15 +21,15 @@ import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import {Configuration} from "webpack";
-import {AssetBuilderConfiguratorIdentifiers as Ids} from "../AssetBuilderConfiguratorIdentifiers";
-import {AssetBuilderEventList} from "../AssetBuilderEventList";
-import {Bootstrap} from "../Core/Bootstrap";
-import {CoreContext} from "../Core/CoreContext";
-import {WorkerContext} from "../Core/WorkerContext";
-import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
-import {WebpackConfigGenerator} from "../Webpack/ConfigGeneration/WebpackConfigGenerator";
+import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
+import {AssetBuilderEventList} from "../../AssetBuilderEventList";
+import {Bootstrap} from "../../Core/Bootstrap";
+import {CoreContext} from "../../Core/CoreContext";
+import {WorkerContext} from "../../Core/WorkerContext";
+import {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
+import {WebpackConfigGenerator} from "../../Webpack/ConfigGeneration/WebpackConfigGenerator";
 
-export class StoryBookFactory {
+export class StorybookFactory {
 	/**
 	 * The instance of the asset builder bootstrap class
 	 */
@@ -64,7 +64,7 @@ export class StoryBookFactory {
 	public getCoreContext(): Promise<CoreContext> {
 		if (!isUndefined(this._coreContext)) return Promise.resolve(this._coreContext);
 		return this.getBootstrap()
-			.initMainProcess(require("../../package.json"), process.cwd(), require("path").dirname(__dirname), "watch")
+			.initMainProcess(require("../../../package.json"), process.cwd(), require("path").dirname(__dirname), "watch")
 			.then(context => {
 				this._coreContext = context;
 
@@ -79,9 +79,8 @@ export class StoryBookFactory {
 				// Disable all not required configurator ids
 				context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e) => {
 					const id = e.args.identifier;
-					if ([Ids.BASE, Ids.APP_PATHS, Ids.PROGRESS_BAR_PLUGIN, Ids.HTML_LOADER,
-						Ids.IMAGE_LOADER, Ids.FONT_LOADER, Ids.CSS_EXTRACT_PLUGIN,
-						Ids.CLEAN_OUTPUT_DIR_PLUGIN, Ids.COPY_PLUGIN, Ids.MIN_CHUNK_SIZE_PLUGIN,
+					if ([Ids.BASE, Ids.APP_PATHS, Ids.PROGRESS_BAR_PLUGIN,
+						Ids.CSS_EXTRACT_PLUGIN, Ids.CLEAN_OUTPUT_DIR_PLUGIN, Ids.COPY_PLUGIN, Ids.MIN_CHUNK_SIZE_PLUGIN,
 						Ids.BUNDLE_ANALYZER_PLUGIN, Ids.HTML_PLUGIN, Ids.JS_PRE_LOADER
 					].indexOf(id) === -1) return;
 					e.args.useConfigurator = false;

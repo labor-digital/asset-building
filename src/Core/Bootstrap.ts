@@ -63,13 +63,14 @@ export class Bootstrap {
 	 * @param cwd
 	 * @param dirName
 	 * @param mode
+	 * @param environment
 	 */
-	public initMainProcess(assetBuilderPackageJson: PlainObject, cwd: string, dirName: string, mode?: string): Promise<CoreContext> {
+	public initMainProcess(assetBuilderPackageJson: PlainObject, cwd: string, dirName: string, mode?: string, environment?: string): Promise<CoreContext> {
 		// Render our fancy intro
 		if (!this._isExpress) this.fancyIntro(assetBuilderPackageJson.version);
 
 		// Create the core context object
-		const coreContext = new CoreContext(cwd, dirName);
+		const coreContext = new CoreContext(cwd, dirName, (!isString(environment) ? "standalone" : environment));
 		coreContext.isExpress = this._isExpress;
 		this.applyEnvironmentFixes(coreContext);
 

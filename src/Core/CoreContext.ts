@@ -31,6 +31,11 @@ export class CoreContext {
 	public process: "main" | "worker";
 
 	/**
+	 * Defines the inter-op environment the asset builder runs in
+	 */
+	public environment: "standalone" | "express" | "storybook" | string;
+
+	/**
 	 * Defines the type of this context
 	 */
 	public type: "core";
@@ -116,10 +121,11 @@ export class CoreContext {
 	 */
 	public laborConfig: LaborConfigInterface;
 
-	constructor(cwd: string, assetBuilderPath: string) {
+	constructor(cwd: string, assetBuilderPath: string, environment: string) {
 		this.isExpress = false;
 		this.type = "core";
 		this.process = "main";
+		this.environment = environment;
 		this.runWorkersSequential = false;
 		this.builderVersion = 1;
 		this.sourcePath = cwd.replace(/\\\/$/g, "") + path.sep;
@@ -146,6 +152,7 @@ export class CoreContext {
 		return JSON.stringify({
 			builderVersion: this.builderVersion,
 			isProd: this.isProd,
+			environment: this.environment,
 			mode: this.mode,
 			sourcePath: this.sourcePath,
 			assetBuilderPath: this.assetBuilderPath,
@@ -166,7 +173,7 @@ export class CoreContext {
 	 * @param json
 	 */
 	public static fromJson(json: string): CoreContext {
-		const self = new CoreContext("", "");
+		const self = new CoreContext("", "", "");
 		const data = JSON.parse(json);
 		forEach(data, (v, k) => {
 			if (k === "additionalResolverPaths") v = new Set(v);

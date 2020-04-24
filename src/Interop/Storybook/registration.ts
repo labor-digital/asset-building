@@ -17,12 +17,12 @@
  */
 import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {Configuration} from "webpack";
-import {StoryBookFactory} from "./StoryBookFactory"; // eslint-disable-line import/no-extraneous-dependencies
+import {StorybookFactory} from "./StorybookFactory";
 
 export const webpack = (
 	webpackConfig: Configuration = {},
 	options
 ): Promise<Configuration> => {
-	const factory = new StoryBookFactory(isPlainObject(options.app) ? options.app : {});
+	const factory = new StorybookFactory(isPlainObject(options.app) ? options.app : {});
 	return factory.enhanceWebpackConfig(webpackConfig);
 };
