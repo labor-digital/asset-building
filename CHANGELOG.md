@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.13.0](https://github.com/labor-digital/asset-building/compare/v4.12.0...v4.13.0) (2020-04-24)
+
+
+### Features
+
+* **Interop:** add INTEROP_WEBPACK_CONFIG event to allow extension to filter the webpack config before they are passed to the third party software ([03af9b9](https://github.com/labor-digital/asset-building/commit/03af9b91bff6e1ed08b6ef8d0b6ca6675f61421d))
+
+
+### Bug Fixes
+
+* make sure all exclude patterns have the correct definition ([62b4013](https://github.com/labor-digital/asset-building/commit/62b40138ff8c561f4680301dbf741b809cc6a8a0))
+
 ## [4.12.0](https://github.com/labor-digital/asset-building/compare/v4.11.1...v4.12.0) (2020-04-24)
 
 
