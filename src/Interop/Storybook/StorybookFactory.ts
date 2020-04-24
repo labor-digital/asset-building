@@ -138,6 +138,14 @@ export class StorybookFactory {
 
 			// Run the config generator
 			return (new WebpackConfigGenerator()).generateConfiguration(context)
+				.then(context => context.parentContext.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_WEBPACK_CONFIG, {
+					environment: context.parentContext.environment,
+					context,
+					config: context.webpackConfig
+				})).then(args => {
+					args.context.webpackConfig = args.config;
+					return args.context;
+				})
 				.then(context => {
 					// Make sure we correctly override existing rules
 					const knownPatterns = [];

@@ -52,6 +52,18 @@ export enum AssetBuilderEventList {
 	CALLBACK_DONE = "assetBuilder__callbackDone",
 	PROCESS_CREATED = "assetBuilder__processManager--processCreated",
 
+	// Special Interop events
+	/**
+	 * Emitted when an interop package built a webpack config, can be used by extensions
+	 * to perform additional actions for interop contexts
+	 *
+	 * Arguments:
+	 * - environment: type of the interop environment
+	 * - context: used worker context
+	 * - config: the built webpack config to filter
+	 */
+	INTEROP_WEBPACK_CONFIG = "assetBuilder__interop--webpackConfig",
+
 	// Additional loader events
 	SASS_LOADER_FILE_EXTENSION_FALLBACK = "customSassLoader__fileExtensionFallback",
 
