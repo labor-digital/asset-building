@@ -88,7 +88,7 @@ export class JsPreloadConfigurator implements ConfiguratorInterface {
 
 			// Prepare exclude pattern
 			.then(() => {
-				const baseExcludePattern = /node_modules(?![\\/\\\\]@labor[\\/\\\\])/;
+				const baseExcludePattern = /node_modules(?![\\/\\\\]@labor(?:-digital)?[\\/\\\\])/;
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_EXCLUDE_PATTERN, {
 					pattern: context.builderVersion === 1 ? baseExcludePattern : undefined,
 					identifier,
