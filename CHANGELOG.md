@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.12.0](https://github.com/labor-digital/asset-building/compare/v4.11.1...v4.12.0) (2020-04-24)
+
+
+### Features
+
+* **Express:** move express interop functionallity to "Interop" ([4b98bde](https://github.com/labor-digital/asset-building/commit/4b98bdec32f248c251310bac2fe4ab2e1493e948))
+* **Storybook:** implement storybook interop functionality ([e2494b9](https://github.com/labor-digital/asset-building/commit/e2494b9d298b52939bf8e498f5d561398dc0e8dd))
+* add new configuration option for additional resolver paths ([49db7e8](https://github.com/labor-digital/asset-building/commit/49db7e8091e73a6c506ebfd7d8835c0626aaf811))
+* implement factory and addon definition to run the asset builder as StoryBook addon ([c615369](https://github.com/labor-digital/asset-building/commit/c615369a8f8e37e65c608a099d92e26d23ef8fa7))
+* update dependencies ([7146e90](https://github.com/labor-digital/asset-building/commit/7146e903046f093d5d8e23f00b6c2b9c697cd89d))
+
+
+### Bug Fixes
+
+* **CustomSassLoader:** make sass include file resolution more reliable ([e47b919](https://github.com/labor-digital/asset-building/commit/e47b9191fb8ade5ef08c82bc9d7ef3b710bb14cf))
+* **Interop:** make sure the correct root directory is used after express interop move ([e1d7d83](https://github.com/labor-digital/asset-building/commit/e1d7d8310052b49390c03cccdedd720d9d86bd06))
+* **WebpackConfigGenerator:** make sure that the webpackConfig: true option correctly loads the webpack.config.js file ([0ee86f0](https://github.com/labor-digital/asset-building/commit/0ee86f0c8bbe64d804950f868b8546e571a0c928))
+
 ### [4.11.1](https://github.com/labor-digital/asset-building/compare/v4.11.0...v4.11.1) (2020-04-13)
 
 ## [4.11.0](https://github.com/labor-digital/asset-building/compare/v4.10.0...v4.11.0) (2020-04-11)
