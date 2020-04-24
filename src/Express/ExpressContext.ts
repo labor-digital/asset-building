@@ -16,5 +16,5 @@
  * Last modified: 2020.04.24 at 11:46
  */
 
-// DEPRECATED: use /Interopt/Express/ExpressContext instead!
+// DEPRECATED: use /Interop/Express/ExpressContext instead!
 export * from "../Interop/Express/ExpressContext";

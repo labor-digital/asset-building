@@ -16,5 +16,5 @@
  * Last modified: 2020.04.24 at 11:47
  */
 
-// DEPRECATED: use /Interopt/Express/ExpressFactory instead!
+// DEPRECATED: use /Interop/Express/ExpressFactory instead!
 export * from "../Interop/Express/ExpressFactory";

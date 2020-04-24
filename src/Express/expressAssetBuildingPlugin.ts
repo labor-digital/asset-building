@@ -19,7 +19,7 @@
 import * as LegacyPlugin from "../Interop/Express/expressAssetBuildingPlugin";
 import {ExpressAssetBuildingPluginOptions as LegacyOptions} from "../Interop/Express/expressAssetBuildingPlugin";
 
-// DEPRECATED: use /Interopt/Express/expressAssetBuildingPlugin instead!
+// DEPRECATED: use /Interop/Express/expressAssetBuildingPlugin instead!
 export interface ExpressAssetBuildingPluginOptions extends LegacyOptions {
 }
 
