@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2020 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,56 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.15 at 09:03
+ * Last modified: 2020.02.17 at 20:29
  */
 
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
-import {Application} from "express";
-import ExpressContext from "./ExpressContext";
-import ExpressFactory from "./ExpressFactory";
+import * as LegacyPlugin from "../Interop/Express/expressAssetBuildingPlugin";
+import {ExpressAssetBuildingPluginOptions as LegacyOptions} from "../Interop/Express/expressAssetBuildingPlugin";
 
-export interface ExpressAssetBuildingPluginOptions {
-	/**
-	 * The numeric index of the "apps" array in the package.json we should build.
-	 */
-	appId?: number;
-
-	/**
-	 * The path to the package json to read the "labor" config from
-	 */
-	packageJsonDirectory?: string;
-
-	/**
-	 * The mode to run the asset builder in.
-	 * This would normally be defined using the CLI parameters
-	 */
-	mode?: string;
+// DEPRECATED: use /Interopt/Express/expressAssetBuildingPlugin instead!
+export interface ExpressAssetBuildingPluginOptions extends LegacyOptions {
 }
 
-/**
- * Use this function to create an express context object that can be used by asset-builder extensions to run
- * apply build process relevant middlewares to the express app.
- *
- * @param expressApp
- * @param options
- */
-module.exports = function expressAssetBuildingPlugin(expressApp: Application, options?: ExpressAssetBuildingPluginOptions): Promise<ExpressContext> {
-	const isProd = process.env.NODE_ENV !== "development";
-	if (!isPlainObject(options)) options = {};
-	if (isUndefined(options.mode)) options.mode = "build";
-	if (isUndefined(options.appId)) options.appId = 0;
-	if (isUndefined(options.packageJsonDirectory)) options.packageJsonDirectory = process.cwd();
-	const context = new ExpressContext(options.appId, expressApp, isProd, options.packageJsonDirectory);
-	context.factory = new ExpressFactory(options);
-
-	// Be done if we are in production context
-	if (isProd) return Promise.resolve(context);
-
-	// Create the worker process
-	return context.factory.getWebpackCompiler(options.appId).then(compiler => {
-		context.compiler = compiler;
-		context.parentContext = (compiler as any).assetBuilderContext;
-		return context;
-	});
-};
+module.exports = LegacyPlugin;
