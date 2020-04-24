@@ -29,6 +29,10 @@ module.exports = {
 			"/guide/Extensions.md",
 			"/guide/Interop.md",
 			"/guide/MigratingFromGulp.md"
+		],
+		nav: [
+			{text: "GitHub", link: "https://github.com/labor-digital/asset-building"},
+			{text: "npm", link: "https://www.npmjs.com/package/@labor-digital/asset-building"}
 		]
 	}
 };

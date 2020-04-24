@@ -1,5 +1,9 @@
 {
 	"name": "@labor-digital/asset-building",
+	"homepage": "https://asset-building.labor.tools/",
+	"bugs": {
+		"url": "https://github.com/labor-digital/asset-building/issues"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+ssh://git@github.com:labor-digital/asset-building.git"
