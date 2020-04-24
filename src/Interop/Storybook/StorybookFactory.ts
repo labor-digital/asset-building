@@ -63,8 +63,9 @@ export class StorybookFactory {
 	 */
 	public getCoreContext(): Promise<CoreContext> {
 		if (!isUndefined(this._coreContext)) return Promise.resolve(this._coreContext);
+		const path = require("path");
 		return this.getBootstrap()
-			.initMainProcess(require("../../../package.json"), process.cwd(), require("path").dirname(__dirname), "watch")
+			.initMainProcess(require("../../../package.json"), process.cwd(), path.dirname(path.dirname(__dirname)), "watch")
 			.then(context => {
 				this._coreContext = context;
 

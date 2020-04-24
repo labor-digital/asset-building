@@ -23,4 +23,5 @@ import {ExpressAssetBuildingPluginOptions as LegacyOptions} from "../Interop/Exp
 export interface ExpressAssetBuildingPluginOptions extends LegacyOptions {
 }
 
-module.exports = LegacyPlugin;
+// @ts-ignore
+module.exports = LegacyPlugin.default;

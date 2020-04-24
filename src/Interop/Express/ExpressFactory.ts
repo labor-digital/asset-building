@@ -62,11 +62,12 @@ export default class ExpressFactory {
 	 */
 	public getCoreContext(): Promise<CoreContext> {
 		if (!isUndefined(this._coreContext)) return Promise.resolve(this._coreContext);
+		const path = require("path");
 		return this.getBootstrap()
 			.initMainProcess(
 				require("../../../package.json"),
 				this._options.packageJsonDirectory,
-				require("path").dirname(__dirname),
+				path.dirname(path.dirname(__dirname)),
 				this._options.mode,
 				"express"
 			)
