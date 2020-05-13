@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [4.14.0](https://github.com/labor-digital/asset-building/compare/v4.13.0...v4.14.0) (2020-05-13)
+
+
+### Features
+
+* update dependencies ([00b33cd](https://github.com/labor-digital/asset-building/commit/00b33cdcea6197f7b07f1f2707263ac82976941d))
+
 ## [4.13.0](https://github.com/labor-digital/asset-building/compare/v4.12.0...v4.13.0) (2020-04-24)
 
 
