@@ -22,20 +22,22 @@ import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
 import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import Chalk from "chalk";
-import webpack from "webpack";
 import {AssetBuilderEventList} from "./AssetBuilderEventList";
 import {Bootstrap} from "./Core/Bootstrap";
 import {WorkerContext} from "./Core/WorkerContext";
-import {WebpackConfigGenerator} from "./Webpack/ConfigGeneration/WebpackConfigGenerator";
 
 let isRunning = false;
 
 function init(message) {
 	(new Bootstrap())
 		.initWorkerProcess(message)
-		.then((context: WorkerContext) => (new WebpackConfigGenerator()).generateConfiguration(context))
+		.then((context: WorkerContext) => {
+			const WebpackConfigGenerator = require("./Webpack/ConfigGeneration/WebpackConfigGenerator");
+			return (new WebpackConfigGenerator.WebpackConfigGenerator()).generateConfiguration(context);
+		})
 		.then(context => {
 			return new Promise((resolve, reject) => {
+				const webpack = require("webpack");
 				context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_COMPILER, {
 					compiler: webpack,
 					callback: (err, stats) => {
