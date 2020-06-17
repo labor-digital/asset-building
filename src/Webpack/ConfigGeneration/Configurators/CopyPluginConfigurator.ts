@@ -86,7 +86,10 @@ export class CopyPluginConfigurator implements ConfiguratorInterface {
 			identifier,
 			context
 		}).then(args => {
-			context.webpackConfig.plugins.push(new CopyWebpackPlugin(args.config, args.options));
+			context.webpackConfig.plugins.push(new CopyWebpackPlugin({
+				patterns: args.config,
+				options: args.options
+			}));
 			return context;
 		});
 	}
