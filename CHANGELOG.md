@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [4.14.1](https://github.com/labor-digital/asset-building/compare/v4.14.0...v4.14.1) (2020-05-19)
+
+
+### Bug Fixes
+
+* **Worker:** make worker process more resilient when webpack is not located in the default directory ([f420727](https://github.com/labor-digital/asset-building/commit/f42072742986f5c8fe526b9e08fa5577b8ee0281))
+
 ## [4.14.0](https://github.com/labor-digital/asset-building/compare/v4.13.0...v4.14.0) (2020-05-13)
 
 
