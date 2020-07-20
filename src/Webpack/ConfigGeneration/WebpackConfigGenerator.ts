@@ -23,7 +23,7 @@ import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import isDocker from "is-docker";
 import path from "path";
-import merge from "webpack-merge";
+import {merge} from "webpack-merge";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {WorkerContext} from "../../Core/WorkerContext";
@@ -158,7 +158,7 @@ export class WebpackConfigGenerator {
 
 		// Check if we got an object
 		if (isPlainObject(context.app.webpackConfig)) {
-			context.webpackConfig = merge(context.webpackConfig, context.app.webpackConfig);
+			context.webpackConfig = merge(context.webpackConfig, context.app.webpackConfig as any);
 			return Promise.resolve(context);
 		}
 

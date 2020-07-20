@@ -17,7 +17,7 @@
  */
 
 import {BundleAnalyzerPlugin} from "webpack-bundle-analyzer";
-import merge from "webpack-merge";
+import {merge} from "webpack-merge";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";

@@ -16,7 +16,7 @@
  * Last modified: 2019.10.06 at 16:06
  */
 
-import merge from "webpack-merge";
+import {merge} from "webpack-merge";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 

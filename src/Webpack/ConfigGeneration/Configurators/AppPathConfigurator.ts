@@ -17,7 +17,7 @@
  */
 
 import path from "path";
-import merge from "webpack-merge";
+import {merge} from "webpack-merge";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
