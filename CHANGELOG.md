@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [5.0.0](https://github.com/labor-digital/asset-building/compare/v4.16.2...v5.0.0) (2020-08-09)
+
+
+### ⚠ BREAKING CHANGES
+
+* update css-loader to 4.0.0 + terser-plugin to 4.0.0 as
+well
+
+### Features
+
+* update dependencies ([55704cc](https://github.com/labor-digital/asset-building/commit/55704cc290998899505b4a718f77adf794e88835))
+
 ### [4.16.2](https://github.com/labor-digital/asset-building/compare/v4.16.1...v4.16.2) (2020-07-20)
 
 
