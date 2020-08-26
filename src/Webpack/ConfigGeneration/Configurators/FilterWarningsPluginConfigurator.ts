@@ -37,11 +37,6 @@ export class FilterWarningsPluginConfigurator implements ConfiguratorInterface {
 			return v;
 		});
 
-		// Add ard coded filters:
-		// Caused by some sort of some non matching tree layout architecture doohickey o.O
-		// We don't care, tho: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/250
-		warningsToIgnore.push(/mini-css-extract-plugin[^]*Conflicting order between:/);
-
 		// Allow filtering
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
 				patterns: warningsToIgnore,

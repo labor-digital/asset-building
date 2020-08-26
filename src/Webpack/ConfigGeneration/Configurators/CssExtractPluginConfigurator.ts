@@ -29,7 +29,8 @@ export class CssExtractPluginConfigurator implements ConfiguratorInterface {
 				config: {
 					filename: "css/" + outputFileWithoutExtension + ".css",
 					chunkFilename: "css/" + outputFileWithoutExtension +
-						(context.isProd ? "-[id]-[hash].css" : "-[id].css")
+						(context.isProd ? "-[id]-[hash].css" : "-[id].css"),
+					ignoreOrder: true
 				},
 				identifier,
 				context
