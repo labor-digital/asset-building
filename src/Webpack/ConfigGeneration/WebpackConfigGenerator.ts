@@ -171,16 +171,15 @@ export class WebpackConfigGenerator {
 			const customWebpackConfigPath = path.resolve(context.parentContext.sourcePath, (context.app.webpackConfig as string));
 			try {
 				const customWebpackConfig = require(customWebpackConfigPath);
-				if (path.basename(customWebpackConfigPath) === "webpack.config.js") {
-					if (!isPlainObject(customWebpackConfig))
-						return Promise.reject(new Error("The default export of webpack.config.js has to be an object!"));
+				if (isPlainObject(customWebpackConfig)) {
 					context.webpackConfig = merge(context.webpackConfig, customWebpackConfig);
 					return Promise.resolve(context);
-				} else if (typeof customWebpackConfig !== "function")
-					return Promise.reject(new Error("The custom webpack config has to be a function!"));
-				context.eventEmitter.unbindAll(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
-				context.eventEmitter.bind(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, () => customWebpackConfig(context));
-				return context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {}).then(() => context);
+				} else if (isFunction(customWebpackConfig)) {
+					context.eventEmitter.unbindAll(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
+					context.eventEmitter.bind(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, () => customWebpackConfig(context));
+					return context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {}).then(() => context);
+				}
+				return Promise.reject(new Error("The default export of " + customWebpackConfigPath + " has to be an object or a function!"));
 			} catch (e) {
 				return Promise.reject(new Error("Could not resolve the custom webpack config at: \"" + customWebpackConfigPath + "\""));
 			}
