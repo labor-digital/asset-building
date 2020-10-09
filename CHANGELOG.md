@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [6.0.1](https://github.com/labor-digital/asset-building/compare/v6.0.0...v6.0.1) (2020-09-28)
+
+
+### Bug Fixes
+
+* **CssExtractPlugin:** use correct "ignoreOrder" option instead of hiding the warning ([c9b1a89](https://github.com/labor-digital/asset-building/commit/c9b1a89bc0e40162821642c78c841fe016b11078))
+* **WebpackConfigGenerator:** make sure functions can be loaded correctly from custom webpack.config.js files ([af0d53b](https://github.com/labor-digital/asset-building/commit/af0d53b67876c7c0b4aab08c31346fafd528a352)), closes [#6](https://github.com/labor-digital/asset-building/issues/6)
+
 ## [6.0.0](https://github.com/labor-digital/asset-building/compare/v5.0.1...v6.0.0) (2020-08-26)
 
 
