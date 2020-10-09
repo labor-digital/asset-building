@@ -62,9 +62,11 @@ export abstract class AbstractStyleLoaderConfigurator {
 						loader: "postcss-loader",
 						options: {
 							ident: "postcss-" + md5(Math.random() + "" + Math.random()),
-							plugins: (loader) => {
-								resolveReference = loader.resolve;
-								return args.plugins;
+							postcssOptions: {
+								plugins: (loader) => {
+									resolveReference = loader.resolve;
+									return args.plugins;
+								}
 							}
 						}
 					},
