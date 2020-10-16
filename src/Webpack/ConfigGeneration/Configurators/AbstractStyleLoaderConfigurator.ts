@@ -17,7 +17,6 @@
  */
 
 import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
 import {AssetBuilderConfiguratorIdentifiers} from "../../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
@@ -61,7 +60,6 @@ export abstract class AbstractStyleLoaderConfigurator {
 					config: {
 						loader: "postcss-loader",
 						options: {
-							ident: "postcss-" + md5(Math.random() + "" + Math.random()),
 							postcssOptions: {
 								plugins: (loader) => {
 									resolveReference = loader.resolve;
