@@ -113,6 +113,12 @@ export class LegacyAdapter {
 		const outputPath = stats.outputPath;
 		stats.outputPath = path.resolve(context.parentContext.sourcePath);
 
+		// Ignore copy configurations
+		if (context.app._legacyCopy) {
+			fs.unlinkSync(path.join(stats.outputPath, context.app.output));
+			return stats;
+		}
+
 		// Prepare replacements
 		const setNamePattern = new RegExp("(.*?" + escapeRegex(context.app._legacySetName) + ")", "g");
 		const setNameReplacement = FileHelpers.getFileWithoutExtension(context.app._legacyConfig.output);
@@ -149,6 +155,8 @@ export class LegacyAdapter {
 				stats.errors.push("LEGACY ADAPTER: Failed to copy a temporary asset from: \"" + assetLocation + "\" to its destination at: \"" + assetLocationReal + "\"");
 			}
 		});
+
+		return stats;
 	}
 
 	/**

@@ -56,7 +56,7 @@ export class AppPathConfigurator implements ConfiguratorInterface {
 		}
 
 		// Don't set a public path for legacy configuration
-		if (context.builderVersion === 1) return;
+		if (context.builderVersion === 1) return Promise.resolve(context);
 
 		context.webpackConfig.output.publicPath = publicPath;
 

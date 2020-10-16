@@ -29,6 +29,16 @@ export class JsCompatConfigurator implements ConfiguratorInterface {
 			if (typeof config !== "object") throw new Error("Invalid js compat configuration at key: " + k);
 			if (typeof config.rule !== "string" || config.rule.trim().length === 0)
 				throw new Error("Invalid or missing js compat \"rule\" at key: " + k);
+			if (typeof config.options !== "undefined") {
+				context.webpackConfig.module.rules.push({
+					test: new RegExp(config.rule),
+					use: {
+						loader: "imports-loader",
+						options: config.options
+					}
+				});
+				return;
+			}
 			if (typeof config.fix !== "string" || config.fix.trim().length === 0)
 				throw new Error("Invalid or missing js compat \"fix\" at key: " + k);
 
@@ -41,5 +51,6 @@ export class JsCompatConfigurator implements ConfiguratorInterface {
 				"loader": config.fix
 			});
 		});
+		return Promise.resolve(context);
 	}
 }

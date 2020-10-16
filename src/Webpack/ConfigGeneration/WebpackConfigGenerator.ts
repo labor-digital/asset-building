@@ -17,6 +17,7 @@
  */
 
 
+import {isEmpty} from "@labor-digital/helferlein/lib/Types/isEmpty";
 import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
 import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
@@ -135,9 +136,16 @@ export class WebpackConfigGenerator {
 				})
 				.then(args => {
 					// Check if we should apply a legacy configuration
-					if (context.builderVersion === 1 && isFunction(configurator.applyLegacy))
+					if (context.builderVersion === 1 && isFunction(configurator.applyLegacy)) {
 						return args.configurator.applyLegacy(identifier, args.context);
+					}
 					return args.configurator.apply(identifier, args.context);
+				}).then(res => {
+					if (isEmpty(res)) {
+						console.log(configurator);
+						process.exit();
+					}
+					return res;
 				})
 				.then(context => context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_CONFIGURATOR, {
 					identifier,

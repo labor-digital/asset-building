@@ -116,8 +116,9 @@ export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator impl
 								loader: "sass-loader?sourceMapRoot=foo",
 								options: {
 									sourceMap: true,
-									outputStyle: "expanded",
-									sourceMapContents: true
+									sassOptions: {
+										outputStyle: "expanded"
+									}
 								}
 							}
 						]

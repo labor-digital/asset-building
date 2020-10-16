@@ -16,6 +16,7 @@
  * Last modified: 2019.10.06 at 15:35
  */
 
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import CopyWebpackPlugin from "copy-webpack-plugin";
@@ -40,6 +41,18 @@ export class CopyPluginConfigurator implements ConfiguratorInterface {
 
 		// Ignore if there are no copy configurations for this app
 		if (copyToAdd.length === 0) return Promise.resolve(context);
+
+		// Fix legacy "ignore" by convertig it to "globOptions"
+		copyToAdd.forEach((config: PlainObject) => {
+			if (typeof config.ignore === "undefined") {
+				return;
+			}
+			if (typeof config.globOptions === "undefined") {
+				config.globOptions = {};
+			}
+			config.globOptions.ignore = config.ignore;
+			delete config.ignore;
+		});
 
 		// Add the context to all configurations
 		copyToAdd.forEach(config => {
@@ -82,7 +95,7 @@ export class CopyPluginConfigurator implements ConfiguratorInterface {
 		// Allow filtering
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
 			config: copyToAdd,
-			options: {copyUnmodified: true},
+			options: {},
 			identifier,
 			context
 		}).then(args => {

@@ -24,7 +24,9 @@
 		"jsCompat": [
 			{
 				"rule": "(es6)\\.js$",
-				"fix": "win=>window"
+				"options": {
+					"additionalCode": "var win = window;"
+				}
 			}
 		],
 		"css": [

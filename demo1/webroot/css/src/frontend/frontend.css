@@ -16,14 +16,5 @@
  * Last modified: 2018.08.31 at 13:43
  */
 
-/**
-General information:
-When used in a css file you have to define the loaders for the languages yourself
- */
-/** Less */
-@import "~less-loader!./less/headline.less";
-
-/** Sass / Scss */
-@import "~sass-loader!./sass/image.scss";
-@import "~sass-loader!./sass/text.sass";
-
+@import "sass/image.scss";
+@import "sass/text.sass";
