@@ -57,7 +57,7 @@ export class ImageLoaderConfigurator implements ConfiguratorInterface {
 
 		// Generic images
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-				test: /\.(png|jpe?g|gif|svg|webp|avif)$/,
+				test: /\.(png|jpe?g|gif|webp|avif)$/,
 				identifier,
 				context
 			})
@@ -75,7 +75,8 @@ export class ImageLoaderConfigurator implements ConfiguratorInterface {
 									fallback: {
 										loader: "file-loader",
 										options: {
-											name: generateName
+											name: generateName,
+											outputPath: "assets/"
 										}
 									}
 								}
@@ -108,6 +109,7 @@ export class ImageLoaderConfigurator implements ConfiguratorInterface {
 								loader: "svg-url-loader",
 								options: {
 									name: generateName,
+									outputPath: "assets/",
 									encoding: context.isProd ? "base64" : "none",
 									limit: context.isProd ? 10000 : 1,
 									iesafe: true,
