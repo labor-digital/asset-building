@@ -38,6 +38,12 @@ when it comes to webpack, you can extend this library using its lightweight
 - [Dev server as standalone and express middleware](https://www.npmjs.com/package/@labor-digital/asset-building-dev-server)
 - [Vue.js build environment](https://www.npmjs.com/package/@labor-digital/asset-building-env-vuejs)
 
+** Available bridges to use the asset builder in other environments**
+
+- Express
+- Storybook
+- Nuxt
+
 ## Installation
 * Install the npm dependency:
 ```
