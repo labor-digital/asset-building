@@ -16,6 +16,7 @@
  * Last modified: 2020.10.21 at 12:05
  */
 
+import {EventEmitterEvent} from "@labor-digital/helferlein/lib/Events/EventEmitter";
 import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 import {cloneList} from "@labor-digital/helferlein/lib/Lists/cloneList";
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
@@ -144,60 +145,69 @@ export class NuxtFactory {
 				},
 				[AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
 					const context: WorkerContext = e.args.context;
-					const cssExtractorPluginRegex = new RegExp("mini-css-extract-plugin");
-					// Register additional loader to strip out all /deep/ selectors we need for component nesting,
-					// but that are not wanted in a browser environment
-					if (e.args.identifier === Ids.SASS_LOADER ||
-						e.args.identifier === Ids.LESS_LOADER) {
-						const deepRemoverPath = path.resolve(__dirname, "DeepRemoverLoader.js");
-						e.args.config.use.forEach((v, k) => {
-							if (typeof v === "string") v = {loader: v};
-							if (typeof v.loader === "undefined") return;
 
-							// Inject the loader
-							if (v.loader.match(cssExtractorPluginRegex)) {
-								const before = e.args.config.use.slice(0, k + 1);
-								const after = e.args.config.use.slice(k + 1);
-								e.args.config.use = [
-									...before,
-									deepRemoverPath,
-									...after
-								];
-							}
-						});
-					}
-
-					// If we are in production mode and we don't use the server
-					// side renderer we will not inject the vue style loader
-					if (context.isProd) return;
-
-					// Skip if the package requires us to use the css extract plugin
-					if (context.app.useCssExtractPlugin === true) return;
-
-					const cssLoaderRegex = /^css-loader/;
-
-					// Rewrite sass and less loader
-					if (e.args.identifier === Ids.SASS_LOADER ||
-						e.args.identifier === Ids.LESS_LOADER) {
-						e.args.config.use.forEach((v, k) => {
-							if (typeof v === "string") v = {loader: v};
-							if (typeof v.loader === "undefined") return;
-
-							// Update css-loader options
-							// @see https://github.com/vuejs/vue-style-loader/issues/46#issuecomment-670624576
-							if (v.loader.match(cssLoaderRegex) && isPlainObject(e.args.config.use[k].options)) {
-								e.args.config.use[k].options.esModule = false;
-							}
-
-							// Inject vue style loader
-							if (v.loader.match(cssExtractorPluginRegex)) {
-								e.args.config.use[k] = "vue-style-loader";
-							}
-						});
+					switch (e.args.identifier) {
+						case Ids.SASS_LOADER:
+						case Ids.LESS_LOADER:
+							return this.modifyStyleLoader(e, context);
 					}
 				}
 			}
 		};
+	}
+
+	/**
+	 * Modify the style loader to match the vue.js requirements
+	 * @param e
+	 * @param context
+	 * @protected
+	 */
+	protected modifyStyleLoader(e: EventEmitterEvent, context: WorkerContext): void {
+		const cssExtractorPluginRegex = new RegExp("mini-css-extract-plugin");
+
+		// Register additional loader to strip out all /deep/ selectors we need for component nesting,
+		// but that are not wanted in a browser environment
+		const deepRemoverPath = path.resolve(__dirname, "DeepRemoverLoader.js");
+		e.args.config.use.forEach((v, k) => {
+			if (typeof v === "string") v = {loader: v};
+			if (typeof v.loader === "undefined") return;
+
+			// Inject the loader
+			if (v.loader.match(cssExtractorPluginRegex)) {
+				const before = e.args.config.use.slice(0, k + 1);
+				const after = e.args.config.use.slice(k + 1);
+				e.args.config.use = [
+					...before,
+					deepRemoverPath,
+					...after
+				];
+			}
+		});
+
+		// If we are in production mode and we don't use the server
+		// side renderer we will not inject the vue style loader
+		// Also skip if the package requires us to use the css extract plugin
+		if (context.isProd || context.app.useCssExtractPlugin === true) {
+			return;
+		}
+
+		// Rewrite sass and less loader
+		const cssLoaderRegex = /^css-loader/;
+		e.args.config.use.forEach((v, k) => {
+			if (typeof v === "string") v = {loader: v};
+			if (typeof v.loader === "undefined") return;
+
+			// Update css-loader options
+			// @see https://github.com/vuejs/vue-style-loader/issues/46#issuecomment-670624576
+			if (v.loader.match(cssLoaderRegex) && isPlainObject(e.args.config.use[k].options)) {
+				e.args.config.use[k].options.esModule = false;
+			}
+
+			// Inject vue style loader
+			if (v.loader.match(cssExtractorPluginRegex)) {
+				e.args.config.use[k] = "vue-style-loader";
+			}
+		});
 	}
 
 	/**
