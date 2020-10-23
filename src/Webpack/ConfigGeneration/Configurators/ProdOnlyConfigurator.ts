@@ -63,7 +63,6 @@ export class ProdOnlyConfigurator implements ConfiguratorInterface {
 				});
 			})
 			.then(args => {
-				return context;
 				cssUglifyPluginConfig = args.config;
 				context.webpackConfig = merge(context.webpackConfig, {
 					optimization: {
