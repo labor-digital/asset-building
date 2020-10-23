@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [7.0.2](https://github.com/labor-digital/asset-building/compare/v7.0.1...v7.0.2) (2020-10-16)
+
+
+### Bug Fixes
+
+* **PostCssLoader:** fix multiple version issues ([8d63530](https://github.com/labor-digital/asset-building/commit/8d63530d925bd47808a3a791556f2cf6bb9daf83))
+* multiple fixes for bugs in v1 definition ([74740cc](https://github.com/labor-digital/asset-building/commit/74740cced28c1d59b947ddaccb55daec7e7edb83))
+
 ### [7.0.1](https://github.com/labor-digital/asset-building/compare/v7.0.0...v7.0.1) (2020-10-16)
 
 
