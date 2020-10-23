@@ -17,5 +17,5 @@
  */
 
 module.exports = function demoExtension(context, scope) {
-	console.log("[EXTENSION]: Loaded demoExtension.js for scope: " + scope + " context type: " + context.type);
+	console.log("[EXTENSION]: Loaded demoExtension.js for scope: " + scope + " context type: " + context.type + " in process: " + context.process);
 };
