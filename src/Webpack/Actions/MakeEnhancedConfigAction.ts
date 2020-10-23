@@ -19,6 +19,7 @@
 import {ComponentProxy} from "@labor-digital/helferlein/lib/Entities/ComponentProxy";
 import {cloneList} from "@labor-digital/helferlein/lib/Lists/cloneList";
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {getPath} from "@labor-digital/helferlein/lib/Lists/Paths/getPath";
 import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
 import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
@@ -27,6 +28,7 @@ import {Configuration, Options, RuleSetRule} from "webpack";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {WorkerContext} from "../../Core/WorkerContext";
+import {resolveFileExtensions} from "../ConfigGeneration/Configurators/BaseConfigurator";
 import {MakeEnhancedConfigActionOptions} from "./MakeEnhancedConfigAction.interfaces";
 import {WorkerActionInterface} from "./WorkerActionInterface";
 
@@ -84,10 +86,20 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface {
 						config.resolveLoader.modules.push(path);
 					}
 				});
+				config.resolve.modules.push(context.parentContext.sourcePath);
 
 				// Merge the resolve extensions
 				if (!isArray(config.resolve.extensions)) config.resolve.extensions = [];
-				forEach(config.resolve.extensions, ext => {
+				// Inherit from the base config
+				if (isArray(getPath(baseConfig, "resolve.extensions"))) {
+					forEach(baseConfig.resolve.extensions, ext => {
+						if (config.resolve.extensions.indexOf(ext) === -1) {
+							config.resolve.extensions.push(ext);
+						}
+					});
+				}
+				// Inherit from our own base step
+				forEach(resolveFileExtensions, ext => {
 					if (config.resolve.extensions.indexOf(ext) === -1) {
 						config.resolve.extensions.push(ext);
 					}

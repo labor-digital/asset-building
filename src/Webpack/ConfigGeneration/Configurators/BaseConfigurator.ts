@@ -22,6 +22,8 @@ import {inflectToUnderscore} from "@labor-digital/helferlein/lib/Strings/Inflect
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 
+export const resolveFileExtensions = [".ts", ".tsx", ".js", ".jsx", ".json"];
+
 export class BaseConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
 		// Build the json-p function name
@@ -48,7 +50,7 @@ export class BaseConfigurator implements ConfiguratorInterface {
 			},
 			resolve: {
 				modules: asArray(context.parentContext.additionalResolverPaths),
-				extensions: [".ts", ".tsx", ".js", ".jsx", ".json"]
+				extensions: resolveFileExtensions
 			},
 			resolveLoader: {
 				modules: asArray(context.parentContext.additionalResolverPaths)
