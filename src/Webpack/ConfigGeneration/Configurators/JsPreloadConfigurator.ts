@@ -21,15 +21,11 @@ import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
-import {WebpackPromiseShimPlugin} from "../../Plugins/WebpackPromiseShimPlugin";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class JsPreloadConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-
-		// Add a polyfill for promises which are required for webpack
-		context.webpackConfig.plugins.push(new WebpackPromiseShimPlugin());
-
+		
 		// Storage for temporary values
 		let excludePattern = undefined;
 		let loaders = [];

@@ -40,5 +40,6 @@ export enum AssetBuilderConfiguratorIdentifiers {
 	JS_UGLIFY_PLUGIN = "jsUglifyPlugin",
 	CSS_UGLIFY_PLUGIN = "cssUglifyPlugin",
 	BUNDLE_ANALYZER_PLUGIN = "bundleAnalyzerPlugin",
-	HTML_PLUGIN = "htmlPlugin"
+	HTML_PLUGIN = "htmlPlugin",
+	BUILT_IN_PLUGIN = "builtInPlugin"
 }

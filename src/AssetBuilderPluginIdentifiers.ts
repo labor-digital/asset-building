@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2020 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.06 at 13:39
+ * Last modified: 2020.10.22 at 10:49
  */
 
-import {Stats} from "webpack";
-import {WorkerContext} from "../Core/WorkerContext";
-
-export interface WebpackCompilerCallbackInterface {
-	(context: WorkerContext, stats: Stats, resolve: Function, reject: Function): void
+export enum AssetBuilderPluginIdentifiers {
+	FANCY_STATS = "fancyStats",
+	FIX_BROKEN_CHUNKS = "fixBrokenChunks",
+	PROMISE_SHIM = "promiseShim",
+	CUSTOM_SASS_LOADER_CACHE_INVALIDATOR = "sassCacheInvalidator",
+	GIT_ADD = "gitAdd"
 }

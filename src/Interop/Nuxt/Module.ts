@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2020 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.06 at 13:39
+ * Last modified: 2020.10.20 at 17:25
  */
 
-import {Stats} from "webpack";
-import {WorkerContext} from "../Core/WorkerContext";
+import {NuxtFactory} from "./NuxtFactory";
 
-export interface WebpackCompilerCallbackInterface {
-	(context: WorkerContext, stats: Stats, resolve: Function, reject: Function): void
+export default function Module(options) {
+	this.nuxt.hook("webpack:config", function (configs) {
+		return new NuxtFactory(options).enhanceWebpackConfigs(configs);
+	});
 }

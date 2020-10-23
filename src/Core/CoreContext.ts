@@ -26,6 +26,11 @@ import {LaborConfigInterface} from "../Interfaces/LaborConfigInterface";
 export class CoreContext {
 
 	/**
+	 * Contains the version number of the asset builder package
+	 */
+	public version: string;
+
+	/**
 	 * Defines if the current process is the main process or a worker
 	 */
 	public process: "main" | "worker";
@@ -33,17 +38,12 @@ export class CoreContext {
 	/**
 	 * Defines the inter-op environment the asset builder runs in
 	 */
-	public environment: "standalone" | "express" | "storybook" | string;
+	public environment: string;
 
 	/**
 	 * Defines the type of this context
 	 */
 	public type: "core";
-
-	/**
-	 * This is true if the asset builder is running in express/single process mode
-	 */
-	public isExpress: boolean;
 
 	/**
 	 * If this is true the workers will be spawn in sequential order instead of being called as parallel processes
@@ -122,7 +122,10 @@ export class CoreContext {
 	public laborConfig: LaborConfigInterface;
 
 	constructor(cwd: string, assetBuilderPath: string, environment: string) {
-		this.isExpress = false;
+		if (cwd === "" && assetBuilderPath === "" && environment === "") {
+			return;
+		}
+
 		this.type = "core";
 		this.process = "main";
 		this.environment = environment;
@@ -150,6 +153,9 @@ export class CoreContext {
 	 */
 	public toJson(): string {
 		return JSON.stringify({
+			type: this.type,
+			process: this.process,
+			version: this.version,
 			builderVersion: this.builderVersion,
 			isProd: this.isProd,
 			environment: this.environment,
@@ -163,8 +169,7 @@ export class CoreContext {
 			coreContextFilePath: this.coreContextFilePath,
 			additionalResolverPaths: asArray(this.additionalResolverPaths),
 			laborConfig: this.laborConfig,
-			runWorkersSequential: this.runWorkersSequential,
-			isExpress: this.isExpress
+			runWorkersSequential: this.runWorkersSequential
 		});
 	}
 

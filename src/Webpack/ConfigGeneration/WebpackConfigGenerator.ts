@@ -30,6 +30,7 @@ import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {WorkerContext} from "../../Core/WorkerContext";
 import {AppPathConfigurator} from "./Configurators/AppPathConfigurator";
 import {BaseConfigurator} from "./Configurators/BaseConfigurator";
+import {BuiltInPluginConfigurator} from "./Configurators/BuiltInPluginConfigurator";
 import {BundleAnalyzerPluginConfigurator} from "./Configurators/BundleAnalyzerPluginConfigurator";
 import {CleanOutputDirPluginConfigurator} from "./Configurators/CleanOutputDirPluginConfigurator";
 import {ConfiguratorInterface} from "./Configurators/ConfiguratorInterface";
@@ -81,6 +82,7 @@ export class WebpackConfigGenerator {
 			.then(context => this.configuratorWrapper(Ids.PROD_ONLY, context, new ProdOnlyConfigurator()))
 			.then(context => this.configuratorWrapper(Ids.BUNDLE_ANALYZER_PLUGIN, context, new BundleAnalyzerPluginConfigurator()))
 			.then(context => this.configuratorWrapper(Ids.HTML_PLUGIN, context, new HtmlPluginConfigurator()))
+			.then(context => this.configuratorWrapper(Ids.BUILT_IN_PLUGIN, context, new BuiltInPluginConfigurator()))
 
 			// Allow filtering
 			.then(context => {

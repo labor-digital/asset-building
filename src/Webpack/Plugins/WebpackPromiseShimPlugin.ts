@@ -16,18 +16,24 @@
  * Last modified: 2019.08.01 at 15:15
  */
 
+import {
+	AssetBuilderWebpackPluginInterface,
+	AssetBuilderWebpackPluginStaticInterface
+} from "./AssetBuilderWebpackPluginInterface";
+
 /**
  * This module plugin makes sure that every package can use dynamic imports,
  * without an additional polyfill, as we provide a polyfill for promises.
  */
-export class WebpackPromiseShimPlugin {
-	apply(compiler) {
-		compiler.hooks.compilation.tap("WebpackPromiseShimPlugin", compilation => {
-			compilation.mainTemplate.hooks.bootstrap.tap("WebpackPromiseShimPlugin", function (_, chunk, hash, chunkIdVar) {
-				/*
-				 * @see https://github.com/taylorhakes/promise-polyfill
-				 */
-				_ += `
+export const WebpackPromiseShimPlugin: AssetBuilderWebpackPluginStaticInterface =
+	class implements AssetBuilderWebpackPluginInterface {
+		apply(compiler) {
+			compiler.hooks.compilation.tap("WebpackPromiseShimPlugin", compilation => {
+				compilation.mainTemplate.hooks.bootstrap.tap("WebpackPromiseShimPlugin", function (_, chunk, hash, chunkIdVar) {
+					/*
+					 * @see https://github.com/taylorhakes/promise-polyfill
+					 */
+					_ += `
 				// Shimming in a polyfill for Promise if it is not already defined
 				if(typeof Promise === "undefined"){
 				(function() {
@@ -35,8 +41,8 @@ export class WebpackPromiseShimPlugin {
 				})();
 				};
 				`;
-				return _;
+					return _;
+				});
 			});
-		});
-	}
-}
+		}
+	};

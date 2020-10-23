@@ -17,11 +17,16 @@
  */
 
 import {SassFileResolver} from "../Loaders/CustomSassLoader/SassFileResolver";
+import {
+	AssetBuilderWebpackPluginInterface,
+	AssetBuilderWebpackPluginStaticInterface
+} from "./AssetBuilderWebpackPluginInterface";
 
-export class CustomSassLoaderPreCompilerCacheInvalidatePlugin {
-	apply(compiler) {
-		compiler.hooks.invalid.tap("CustomSassLoaderPreCompilerCacheInvalidatePlugin", function(filename){
-			SassFileResolver.invalidate(filename);
-		});
-	}
-}
+export const CustomSassLoaderPreCompilerCacheInvalidatePlugin: AssetBuilderWebpackPluginStaticInterface =
+	class implements AssetBuilderWebpackPluginInterface {
+		apply(compiler) {
+			compiler.hooks.invalid.tap("CustomSassLoaderPreCompilerCacheInvalidatePlugin", function (filename) {
+				SassFileResolver.invalidate(filename);
+			});
+		}
+	};

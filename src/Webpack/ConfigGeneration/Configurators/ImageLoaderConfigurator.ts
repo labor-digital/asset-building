@@ -57,7 +57,7 @@ export class ImageLoaderConfigurator implements ConfiguratorInterface {
 
 		// Generic images
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-				test: /\.(png|gif|jpe?g)$/,
+				test: /\.(png|jpe?g|gif|svg|webp|avif)$/,
 				identifier,
 				context
 			})

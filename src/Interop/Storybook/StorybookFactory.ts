@@ -18,84 +18,95 @@
 
 import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import {Configuration} from "webpack";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {Bootstrap} from "../../Core/Bootstrap";
-import {CoreContext} from "../../Core/CoreContext";
-import {WorkerContext} from "../../Core/WorkerContext";
-import {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
-import {WebpackConfigGenerator} from "../../Webpack/ConfigGeneration/WebpackConfigGenerator";
+import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
+import {Factory} from "../../Core/Factory";
+import {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
 
 export class StorybookFactory {
-	/**
-	 * The instance of the asset builder bootstrap class
-	 */
-	protected _bootstrap?: Bootstrap;
 
 	/**
-	 * Holds the core context instance after it was initialized
+	 * The story book module options to extract the app from
+	 * @protected
 	 */
-	protected _coreContext?: CoreContext;
+	protected _options: PlainObject;
 
 	/**
-	 * Holds either the given app configuration or an empty, plain object
+	 * The concrete factory to create the asset builder with
+	 * @protected
 	 */
-	protected _appConfig: AppDefinitionInterface;
+	protected _factory: Factory;
 
-	public constructor(appConfig ?: AppDefinitionInterface | PlainObject) {
-		this._appConfig = isUndefined(appConfig) ? {} as any : appConfig;
+	/**
+	 * Injects the factory instance and options
+	 * @param factory
+	 * @param options
+	 */
+	public constructor(options: PlainObject, factory?: Factory) {
+		this._options = options;
+		this._factory = factory ?? new Factory();
 	}
 
 	/**
-	 * Returns the bootstrap instance of the asset builder
+	 * Enhances the given storybook configuration with the config build by our asset builder logic
+	 * @param config
 	 */
-	public getBootstrap(): Bootstrap {
-		if (!isUndefined(this._bootstrap)) return this._bootstrap;
-		return this._bootstrap = new Bootstrap(true, {apps: [{...this._appConfig}]});
+	public enhanceWebpackConfig(config: Configuration): Promise<Configuration> {
+		return this._factory.makeCoreContext({
+				mode: config.mode === "development" ? "watch" : "build",
+				environment: "storyBook",
+				laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
+			})
+			.then(coreContext =>
+				this._factory.makeWorkerContext(coreContext, {
+					app: this._options.app ?? {},
+					noEntryOutputValidation: true
+				})
+			)
+			.then(workerContext => workerContext.do.makeEnhancedConfig(config, this.getEnhancerOptions()));
 	}
 
 	/**
-	 * Returns the core context instance.
-	 * You should only use this in development mode!
+	 * Provides the options for the makeEnhancedConfig method
+	 * @protected
 	 */
-	public getCoreContext(): Promise<CoreContext> {
-		if (!isUndefined(this._coreContext)) return Promise.resolve(this._coreContext);
-		const path = require("path");
-		return this.getBootstrap()
-			.initMainProcess(require("../../../package.json"), process.cwd(), path.dirname(path.dirname(__dirname)), "watch")
-			.then(context => {
-				this._coreContext = context;
-
-				// Make sure we have a dummy entry file
-				context.laborConfig.apps[0].entry = "./package.json";
-
-				// Disable entry / output validation
-				context.eventEmitter.bind(AssetBuilderEventList.FILTER_APP_DEFINITION_SCHEMA, (e) => {
-					delete e.args.schema.output;
-				});
-
-				// Disable all not required configurator ids
-				context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e) => {
-					const id = e.args.identifier;
-					if ([Ids.BASE, Ids.APP_PATHS, Ids.PROGRESS_BAR_PLUGIN,
-						Ids.CSS_EXTRACT_PLUGIN, Ids.CLEAN_OUTPUT_DIR_PLUGIN, Ids.COPY_PLUGIN, Ids.MIN_CHUNK_SIZE_PLUGIN,
-						Ids.BUNDLE_ANALYZER_PLUGIN, Ids.HTML_PLUGIN, Ids.JS_PRE_LOADER
-					].indexOf(id) === -1) return;
-					e.args.useConfigurator = false;
-				});
-
-				// Remove css extract loader
-				context.eventEmitter.bind(AssetBuilderEventList.FILTER_LOADER_CONFIG, (e) => {
+	protected getEnhancerOptions(): MakeEnhancedConfigActionOptions {
+		return {
+			disableConfigurators: [
+				Ids.APP_PATHS,
+				Ids.CSS_EXTRACT_PLUGIN,
+				Ids.CLEAN_OUTPUT_DIR_PLUGIN,
+				Ids.COPY_PLUGIN,
+				Ids.MIN_CHUNK_SIZE_PLUGIN,
+				Ids.BUNDLE_ANALYZER_PLUGIN,
+				Ids.HTML_PLUGIN,
+				Ids.JS_PRE_LOADER
+			],
+			disablePlugins: [
+				AssetBuilderPluginIdentifiers.GIT_ADD
+			],
+			ruleFilter: test => {
+				// The list of FORBIDDEN patterns that should NOT pass
+				return [
+					"/\\.vue$/"
+				].indexOf(test) === -1;
+			},
+			pluginFilter: test => {
+				return [
+					"ProgressPlugin",
+					"VueLoaderPlugin"
+				].indexOf(test) === -1;
+			},
+			events: {
+				[AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
 					const cssExtractorPluginRegex = new RegExp("mini-css-extract-plugin");
-					// Register additional loader to strip out all /deep/ selectors we need for component nesting,
-					// but that are not wanted in a browser environment
 					if (e.args.identifier === Ids.SASS_LOADER ||
 						e.args.identifier === Ids.LESS_LOADER) {
 						forEach(e.args.config.use, (v, k) => {
-							// Remove css extract plugin
 							if (!isString(v.loader)) return;
 							if (v.loader.match(cssExtractorPluginRegex)) {
 								e.args.config.use.splice(k, 1);
@@ -103,77 +114,8 @@ export class StorybookFactory {
 							}
 						});
 					}
-
-				}, 5000);
-
-				return context;
-			});
-	}
-
-	/**
-	 * Gets a worker context for a dummy application to configure story book with
-	 */
-	public getWorkerContext(): Promise<WorkerContext> {
-		// Create the worker context
-		return this.getCoreContext().then((context: CoreContext) => {
-			return this.getBootstrap().initWorkerProcess({
-				app: JSON.stringify(context.laborConfig.apps[0]),
-				context: context.toJson()
-			});
-		});
-	}
-
-	/**
-	 * Returns the webpack config that should be merged into the configuration of story book
-	 */
-	public enhanceWebpackConfig(rawConfig: Configuration): Promise<Configuration> {
-		return this.getWorkerContext().then(context => {
-			const moduleBackup = rawConfig.module.rules;
-			const pluginBackup = rawConfig.plugins;
-
-			// Set the default configuration provided by story book
-			rawConfig.module.rules = [];
-			rawConfig.plugins = [];
-			context.webpackConfig = rawConfig;
-
-			// Run the config generator
-			return (new WebpackConfigGenerator()).generateConfiguration(context)
-				.then(context => context.parentContext.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_WEBPACK_CONFIG, {
-					environment: context.parentContext.environment,
-					context,
-					config: context.webpackConfig
-				})).then(args => {
-					args.context.webpackConfig = args.config;
-					return args.context;
-				})
-				.then(context => {
-					// Make sure we correctly override existing rules
-					const knownPatterns = [];
-					forEach(context.webpackConfig.module.rules, (v) => {
-						knownPatterns.push((v.test as RegExp) + "");
-					});
-
-					// Merge in the module backup if we don't have an override
-					forEach(moduleBackup, (v) => {
-						if (knownPatterns.indexOf((v.test as RegExp) + "") !== -1) return;
-						context.webpackConfig.module.rules.push(v);
-					});
-
-					// Make sure we correctly override existing plugins
-					const knownPlugins = [];
-					forEach(context.webpackConfig.plugins, (v) => {
-						knownPlugins.push(v.constructor.name + "");
-					});
-
-					// Merge in the plugin backup if we don't have an override
-					forEach(pluginBackup, (v) => {
-						if (knownPlugins.indexOf(v.constructor.name + "") !== -1) return;
-						context.webpackConfig.plugins.push(v);
-					});
-
-					// Done
-					return context.webpackConfig;
-				});
-		});
+				}
+			}
+		};
 	}
 }

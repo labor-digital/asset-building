@@ -33,6 +33,7 @@ export enum AssetBuilderEventList {
 	AFTER_CONFIGURATOR = "assetBuilder__afterConfigurator",
 	FILTER_LOADER_CONFIG = "assetBuilder__filterLoaderConfig",
 	FILTER_LOADER_TEST = "assetBuilder__filterLoaderTest",
+	FILTER_BUILT_IN_PLUGIN = "assetBuilder__filterBuildInPlugin",
 	FILTER_PLUGIN_CONFIG = "assetBuilder__filterPluginConfig",
 	FILTER_POLYFILLS = "assetBuilder__filterJsPolyfills",
 	GET_JS_PROVIDES = "assetBuilder__getJsProvides",

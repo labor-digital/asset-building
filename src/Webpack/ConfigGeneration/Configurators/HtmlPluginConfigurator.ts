@@ -18,6 +18,7 @@
 
 import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
 import HtmlWebpackPlugin from "html-webpack-plugin";
+import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
@@ -30,7 +31,9 @@ export class HtmlPluginConfigurator implements ConfiguratorInterface {
 		let template = context.app.htmlTemplate;
 		if (template === true) template = {};
 		if (typeof template.template === "undefined") {
-			template.template = require("html-webpack-template");
+			template.template = path.resolve(
+				path.join(__dirname, "../../../../static/HtmlDefaultTemplate.ejs")
+			);
 			if (typeof template.inject === "undefined") template.inject = false;
 			if (!Array.isArray(template.meta)) {
 				template.meta = [

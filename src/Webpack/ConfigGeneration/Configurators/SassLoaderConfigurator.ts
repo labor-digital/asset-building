@@ -55,6 +55,7 @@ export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator impl
 							{
 								loader: "css-loader",
 								options: {
+									esModule: false,
 									import: true
 								}
 							},

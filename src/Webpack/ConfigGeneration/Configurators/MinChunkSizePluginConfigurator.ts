@@ -19,7 +19,6 @@
 import webpack from "webpack";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
-import {WebpackFixBrokenChunkPlugin} from "../../Plugins/WebpackFixBrokenChunkPlugin";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class MinChunkSizePluginConfigurator implements ConfiguratorInterface {
@@ -33,11 +32,6 @@ export class MinChunkSizePluginConfigurator implements ConfiguratorInterface {
 			})
 			.then(args => {
 				context.webpackConfig.plugins.push(new webpack.optimize.MinChunkSizePlugin(args.config));
-				return context;
-			})
-			.then(context => {
-				// Load a bugfix for a crash that happens while using promises, if the plugin above is used
-				context.webpackConfig.plugins.push(new WebpackFixBrokenChunkPlugin());
 				return context;
 			});
 	}

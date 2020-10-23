@@ -16,6 +16,7 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import fs from "fs";
 import path from "path";
 // noinspection ES6UnusedImports
@@ -28,7 +29,7 @@ const resourceLoader: Loader = function (source: string) {
 	const callback = this.async();
 
 	// Ignore empty inputs
-	if (source.replace(/[\s\n]+/g, "").trim() === "") {
+	if (source.replace(/[\s\n]+/g, "").trim() === "" || !isString(this.query.entry)) {
 		callback(null, source);
 		return;
 	}

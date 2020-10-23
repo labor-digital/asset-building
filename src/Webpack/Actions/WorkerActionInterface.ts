@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2020 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.06 at 13:39
+ * Last modified: 2020.10.21 at 21:30
  */
 
-import {Stats} from "webpack";
-import {WorkerContext} from "../Core/WorkerContext";
+import {WorkerContext} from "../../Core/WorkerContext";
 
-export interface WebpackCompilerCallbackInterface {
-	(context: WorkerContext, stats: Stats, resolve: Function, reject: Function): void
+export interface WorkerActionInterface {
+
+	/**
+	 * Receives the worker context and must perform the required steps for the action
+	 * @param context
+	 */
+	do(context: WorkerContext): any;
+
 }

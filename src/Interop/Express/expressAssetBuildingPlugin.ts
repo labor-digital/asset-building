@@ -19,6 +19,7 @@
 import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import {Application} from "express";
+import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import ExpressContext from "./ExpressContext";
 import ExpressFactory from "./ExpressFactory";
 
@@ -48,21 +49,29 @@ export interface ExpressAssetBuildingPluginOptions {
  * @param options
  */
 module.exports = function expressAssetBuildingPlugin(expressApp: Application, options?: ExpressAssetBuildingPluginOptions): Promise<ExpressContext> {
+	GeneralHelper.renderFancyIntro();
+
 	const isProd = process.env.NODE_ENV !== "development";
+
 	if (!isPlainObject(options)) options = {};
 	if (isUndefined(options.mode)) options.mode = "build";
 	if (isUndefined(options.appId)) options.appId = 0;
 	if (isUndefined(options.packageJsonDirectory)) options.packageJsonDirectory = process.cwd();
+	
 	const context = new ExpressContext(options.appId, expressApp, isProd, options.packageJsonDirectory);
 	context.factory = new ExpressFactory(options);
 
 	// Be done if we are in production context
-	if (isProd) return Promise.resolve(context);
+	if (isProd) {
+		return Promise.resolve(context);
+	}
 
 	// Create the worker process
-	return context.factory.getWebpackCompiler(options.appId).then(compiler => {
-		context.compiler = compiler;
-		context.parentContext = (compiler as any).assetBuilderContext;
-		return context;
-	});
+	return context.factory.getWorkerContext()
+		.then(context => context.do.runCompiler())
+		.then(res => {
+			context.compiler = res.compiler;
+			context.parentContext = res.context;
+			return context;
+		});
 };

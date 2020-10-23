@@ -20,11 +20,16 @@ import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject"
 import {Configuration} from "webpack";
 import {ExtensionLoader} from "../Extension/ExtensionLoader";
 import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
-import {WebpackCompilerCallbackInterface} from "../Interfaces/WebpackCompilerCallbackInterface";
-import {DefaultCompilerCallback} from "../Webpack/DefaultCompilerCallback";
+import {WebpackWorkerActions} from "../Webpack/WebpackWorkerActions";
 import {CoreContext} from "./CoreContext";
 
 export class WorkerContext {
+	/**
+	 * The action handler instance to execute the asset builder actions with
+	 * @protected
+	 */
+	protected _actionHandler: WebpackWorkerActions;
+
 	/**
 	 * Defines the type of this context
 	 */
@@ -41,11 +46,6 @@ export class WorkerContext {
 	public webpackConfig: Configuration | PlainObject;
 
 	/**
-	 * The callback for the webpack compiler
-	 */
-	public webpackCallback: WebpackCompilerCallbackInterface;
-
-	/**
 	 * The core context object that is used for this context object
 	 */
 	public parentContext: CoreContext;
@@ -60,10 +60,14 @@ export class WorkerContext {
 		this.parentContext = parentContext;
 		this.app = app;
 		this.webpackConfig = {};
-		this.webpackCallback = function () {
-			// @ts-ignore
-			return (new DefaultCompilerCallback()).handle(...arguments);
-		};
+		this._actionHandler = new WebpackWorkerActions(this);
+	}
+
+	/**
+	 * Defines if the current process is the main process or a worker
+	 */
+	public get process(): "main" | "worker" {
+		return this.parentContext.process;
 	}
 
 	/**
@@ -106,5 +110,12 @@ export class WorkerContext {
 	 */
 	public get mode(): string {
 		return this.parentContext.mode;
+	}
+
+	/**
+	 * Gives you access to all actions you can perform with a worker context
+	 */
+	public get do(): WebpackWorkerActions {
+		return this._actionHandler;
 	}
 }

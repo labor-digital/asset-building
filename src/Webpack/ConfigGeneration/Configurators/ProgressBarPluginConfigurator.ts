@@ -16,7 +16,8 @@
  * Last modified: 2019.10.06 at 15:23
  */
 
-import ProgressBarPlugin from "progress-bar-webpack-plugin";
+import WebpackBar from "webpackbar";
+//import ProgressBarPlugin from "progress-bar-webpack-plugin";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {WorkerContext} from "../../../Core/WorkerContext";
 import {ConfiguratorInterface} from "./ConfiguratorInterface";
@@ -29,7 +30,7 @@ export class ProgressBarPluginConfigurator implements ConfiguratorInterface {
 				context
 			})
 			.then(args => {
-				context.webpackConfig.plugins.push(new ProgressBarPlugin(args.config));
+				context.webpackConfig.plugins.push(new WebpackBar(args.config));
 				return context;
 			});
 	}

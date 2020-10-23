@@ -15,14 +15,16 @@
  *
  * Last modified: 2020.04.23 at 20:03
  */
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {Configuration} from "webpack";
+import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import {StorybookFactory} from "./StorybookFactory";
 
 export const webpack = (
 	webpackConfig: Configuration = {},
 	options
 ): Promise<Configuration> => {
-	const factory = new StorybookFactory(isPlainObject(options.app) ? options.app : {});
-	return factory.enhanceWebpackConfig(webpackConfig);
+	GeneralHelper.renderFancyIntro();
+	return (new StorybookFactory(options))
+		.enhanceWebpackConfig(webpackConfig)
+		.catch(err => GeneralHelper.renderError(err) as never);
 };

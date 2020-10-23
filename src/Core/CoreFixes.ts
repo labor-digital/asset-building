@@ -21,7 +21,7 @@ import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import Chalk from "chalk";
 import Module from "module";
 import * as path from "path";
-import {CoreContext} from "../Core/CoreContext";
+import {CoreContext} from "./CoreContext";
 
 export class CoreFixes {
 	/**

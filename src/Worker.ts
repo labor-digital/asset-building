@@ -18,63 +18,20 @@
 
 import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
 import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
-import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
-import Chalk from "chalk";
 import {AssetBuilderEventList} from "./AssetBuilderEventList";
 import {Bootstrap} from "./Core/Bootstrap";
-import {WorkerContext} from "./Core/WorkerContext";
+import {GeneralHelper} from "./Helpers/GeneralHelper";
 
 let isRunning = false;
 
 function init(message) {
 	(new Bootstrap())
 		.initWorkerProcess(message)
-		.then((context: WorkerContext) => {
-			const WebpackConfigGenerator = require("./Webpack/ConfigGeneration/WebpackConfigGenerator");
-			return (new WebpackConfigGenerator.WebpackConfigGenerator()).generateConfiguration(context);
-		})
-		.then(context => {
-			return new Promise((resolve, reject) => {
-				const webpack = require("webpack");
-				context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_COMPILER, {
-					compiler: webpack,
-					callback: (err, stats) => {
-						// Check if we got obvious errors
-						if (!isNull(err)) return reject(err);
-						context.webpackCallback(context, stats)
-							.then((exitCode) => {
-								process.send({WEBPACK_DONE: true});
-								if (exitCode === -1) {
-									console.log("Webpack finished, but I should keep the script running...");
-									return;
-								}
-								if (context.webpackConfig.watch !== true) return resolve(exitCode);
-							}).catch(reject);
-					},
-					resolve,
-					reject,
-					context
-				}).then(args => {
-					const compiler: Function = args.compiler;
-					const context: WorkerContext = args.context;
-					const webpackCompiler = compiler(context.webpackConfig, args.callback);
-					context.eventEmitter.emit(AssetBuilderEventList.WEBPACK_COMPILER, {
-						compilerDefinition: compiler,
-						context,
-						webpackCompiler
-					});
-				}).catch(reject);
-			});
-		})
+		.then(context => context.do.runCompiler())
+		.then(res => res.promise)
 		.then((exitCode: number) => process.exit(exitCode))
 		.catch(err => {
-			if (isObject(err) && !isUndefined(err.stack)) err = err.stack;
-			console.error("");
-			console.error(Chalk.redBright("ERROR IN WORKER PROCESS:"));
-			console.error(Chalk.redBright(err));
-			process.exit(1);
+			GeneralHelper.renderError(err, "ERROR IN WORKER PROCESS:");
 		});
 }
 

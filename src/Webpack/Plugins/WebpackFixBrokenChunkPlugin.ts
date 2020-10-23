@@ -15,6 +15,11 @@
  *
  * Last modified: 2018.10.19 at 18:27
  */
+import {
+	AssetBuilderWebpackPluginInterface,
+	AssetBuilderWebpackPluginStaticInterface
+} from "./AssetBuilderWebpackPluginInterface";
+
 /**
  * This plugin is currently required because of a strange bug, which occurs if:
  * - Dynamic imports are used
@@ -27,13 +32,14 @@
  * This is because __webpack_require__.e is not defined in that case.
  * This plugin provides a tiny polyfill to make sure the script runs correctly...
  */
-export class WebpackFixBrokenChunkPlugin {
-	apply(compiler) {
-		compiler.hooks.compilation.tap("WebpackFixBrokenChunkPlugin", compilation => {
-			compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (_, chunk, hash, chunkIdVar) {
-				_ += "\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== 'function') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n";
-				return _;
+export const WebpackFixBrokenChunkPlugin: AssetBuilderWebpackPluginStaticInterface =
+	class implements AssetBuilderWebpackPluginInterface {
+		apply(compiler) {
+			compiler.hooks.compilation.tap("WebpackFixBrokenChunkPlugin", compilation => {
+				compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (_, chunk, hash, chunkIdVar) {
+					_ += "\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== 'function') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n";
+					return _;
+				});
 			});
-		});
-	}
-}
+		}
+	};

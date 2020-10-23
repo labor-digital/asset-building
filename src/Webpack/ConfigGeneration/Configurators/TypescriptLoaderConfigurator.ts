@@ -39,6 +39,7 @@ export class TypescriptLoaderConfigurator implements ConfiguratorInterface {
 						transpileOnly: !(context.app.useTypeChecker === true),
 						experimentalWatchApi: true,
 						onlyCompileBundledFiles: true,
+						appendTsSuffixTo: [/\.vue$/],
 						compilerOptions: {
 							allowJs: true,
 							target: "es5",

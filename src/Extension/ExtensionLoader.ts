@@ -32,18 +32,6 @@ import {WorkerContext} from "../Core/WorkerContext";
 export class ExtensionLoader {
 
 	/**
-	 * The list of loaded extensions to avoid overrides
-	 */
-	protected extensions: Array<any>;
-
-	/**
-	 * Extension loader constructor
-	 */
-	public constructor() {
-		this.extensions = [];
-	}
-
-	/**
 	 * Internal helper to load the list of extensions from a definition object
 	 * @param scope
 	 * @param context
@@ -57,8 +45,6 @@ export class ExtensionLoader {
 
 	/**
 	 * Loads the extension list for either the global extensions, or the app based extension.
-	 * Note that this only LOADS the extension functions into the memory, you will
-	 * have to call initExtension() when you are ready to initialize the extension objects
 	 * @param scope
 	 * @param context
 	 * @param extensionPaths
@@ -69,7 +55,7 @@ export class ExtensionLoader {
 		forEach(extensionPaths, (extensionPath: string) => {
 			const extension = this.resolveExtensionPath(context, extensionPath);
 			// Ignore if this extension is already known
-			if (this.extensions.indexOf(extension) !== -1) {
+			if (extensions.indexOf(extension) !== -1) {
 				console.log("Skipped to load already known extension: " + extension);
 				return;
 			}
@@ -78,7 +64,6 @@ export class ExtensionLoader {
 				return extension(context, scope);
 			});
 		});
-		this.extensions = extensions;
 		return context.eventEmitter.emitHook(AssetBuilderEventList.EXTENSION_LOADING, {});
 	}
 
