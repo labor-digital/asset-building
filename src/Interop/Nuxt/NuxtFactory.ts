@@ -125,7 +125,8 @@ export class NuxtFactory {
 				Ids.MIN_CHUNK_SIZE_PLUGIN,
 				Ids.BUNDLE_ANALYZER_PLUGIN,
 				Ids.HTML_PLUGIN,
-				Ids.JS_UGLIFY_PLUGIN
+				Ids.JS_UGLIFY_PLUGIN,
+				Ids.DEV_ONLY
 			],
 			ruleFilter: test => {
 				// The list of allowed patterns that should pass
