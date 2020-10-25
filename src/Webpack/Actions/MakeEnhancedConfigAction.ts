@@ -78,6 +78,7 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface {
 				if (isUndefined(config.resolveLoader)) config.resolveLoader = {};
 				if (!isArray(config.resolve.modules)) config.resolve.modules = [];
 				if (!isArray(config.resolveLoader.modules)) config.resolveLoader.modules = [];
+				config.resolveLoader.modules.unshift(context.parentContext.buildingNodeModulesPath);
 				forEach(context.parentContext.additionalResolverPaths, (path: string) => {
 					if (config.resolve.modules.indexOf(path) === -1) {
 						config.resolve.modules.push(path);
