@@ -21,13 +21,16 @@ import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject"
 import {cloneList} from "@labor-digital/helferlein/lib/Lists/cloneList";
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
 import {isNumber} from "@labor-digital/helferlein/lib/Types/isNumber";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import path from "path";
 import {Configuration} from "webpack";
+import {merge} from "webpack-merge";
 import {isPlainObject} from "webpack-merge/dist/utils";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
+import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
 import {CoreContext} from "../../Core/CoreContext";
 import {Factory} from "../../Core/Factory";
 import {WorkerContext} from "../../Core/WorkerContext";
@@ -97,8 +100,10 @@ export class NuxtFactory {
 				return false;
 			}
 		});
-		if (config === null || key === null)
+
+		if (config === null || key === null) {
 			return Promise.reject(new Error("Could not find " + type + " configuration!"));
+		}
 
 		// Build the enhanced configuration
 		return this._factory.makeWorkerContext(
@@ -106,11 +111,15 @@ export class NuxtFactory {
 				noEntryOutputValidation: true,
 				app: this.makeAppDefinition(type, config)
 			}
-		).then(context => context.do.makeEnhancedConfig(
-			config, this.getEnhancerOptions()
-		)).then(config => {
-			configs[key] = config;
-		});
+		).then(context =>
+				context.do
+					.makeEnhancedConfig(config, this.getEnhancerOptions())
+					.then(config => this.applyAdditionalServerConfiguration(type, config, context))
+					.then(config => this.applyAdditionalConfiguration(config))
+			)
+			.then(config => {
+				configs[key] = config;
+			});
 	}
 
 	/**
@@ -128,6 +137,9 @@ export class NuxtFactory {
 				Ids.HTML_PLUGIN,
 				Ids.JS_UGLIFY_PLUGIN,
 				Ids.DEV_ONLY
+			],
+			disablePlugins: [
+				AssetBuilderPluginIdentifiers.FANCY_STATS
 			],
 			ruleFilter: test => {
 				// The list of allowed patterns that should pass
@@ -245,12 +257,83 @@ export class NuxtFactory {
 
 		// Make server definition
 		if (type === "server") {
-			app.appName += " - Server Generator";
 			app.id += 1000;
 			app.minChunkSize = 999999999;
 			app.polyfills = false;
 		}
 
 		return app;
+	}
+
+	/**
+	 * Applys additional setup for the server webpack configuration
+	 * @param type
+	 * @param config
+	 * @param context
+	 * @protected
+	 */
+	protected applyAdditionalServerConfiguration(type: string, config: Configuration, context: WorkerContext): Promise<Configuration> {
+		if (type !== "server") {
+			return Promise.resolve(config);
+		}
+
+		// To be able to use files from other node_modules that may be included without an extension
+		// we have to modify the node externals plugin of nuxt.
+		// Sadly there is no "good" way of enhancing the allow-list pattern.
+		// Therefore we just kick the plugin and reinject it using our own config.
+		// I only hope that we can rely on the fact that the first array entry is always the nuxt plugin /o\
+		if (!isArray(config.externals)) {
+			return Promise.resolve(config);
+		}
+
+		// Remove the externals plugin of nuxt
+		const filteredExternals = [];
+		forEach(config.externals as Array<any>, (external) => {
+			if (isFunction(external) && external.toString().indexOf("mark this module as external") !== false) {
+				return;
+			}
+		});
+		config.externals = filteredExternals;
+
+		// Allow to filter the extension pattern and inject the new instance of the plugin
+		return context.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_VUE_EXTERNAL_EXTENSION_PATTERN,
+			{pattern: /\.jso?n?$/i})
+			.then(args => args.pattern)
+			.then((pattern: RegExp) => {
+				(config.externals as Array<any>).unshift(
+					require("webpack-node-externals")({
+						allowlist: (modulePath): boolean => {
+							try {
+								return !(require.resolve(modulePath) + "").match(pattern);
+							} catch (e) {
+								return true;
+							}
+						}
+					})
+				);
+				return config;
+			});
+	}
+
+	/**
+	 * Adds additional, recommended configuration to the webpack setup
+	 * @param config
+	 * @protected
+	 */
+	protected applyAdditionalConfiguration(config: Configuration): Configuration {
+		return merge(config, {
+			node: {
+				// Prevent webpack from injecting useless setImmediate polyfill because Vue
+				// source contains it (although only uses it if it's native).
+				setImmediate: false,
+				// Prevent webpack from injecting mocks to Node native modules
+				// that does not make sense for the client
+				dgram: "empty",
+				fs: "empty",
+				net: "empty",
+				tls: "empty",
+				child_process: "empty"
+			}
+		});
 	}
 }
