@@ -62,7 +62,7 @@ module that takes care of the config registration.
 
 - install the asset builder to your project
 - open your ``nuxt.config.js``
-- add the asset-builder module into the "modules" section: ``@labor-digital/asset-building/interop/nuxt``
+- add the asset-builder module into the "buildModules" section: ``@labor-digital/asset-building/interop/nuxt``
 - start nuxt, and you will use the asset builder webpack configuration
 
 ::: warning
@@ -84,7 +84,7 @@ export default {
         host: '0.0.0.0',
         port: 8000
     },
-    modules: [
+    buildModules: [
         [
             '@labor-digital/asset-building/interop/nuxt', {
             // In "app" you can use all the options you find in the "V2" config options
