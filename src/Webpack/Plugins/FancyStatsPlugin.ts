@@ -16,6 +16,7 @@
  * Last modified: 2020.10.21 at 17:31
  */
 
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import Chalk from "chalk";
 import webpack, {Compiler} from "webpack";
 import {WorkerContext} from "../../Core/WorkerContext";
@@ -93,7 +94,13 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
 		protected renderAssetList(output: Array<string>, stats: ToJsonOutput): void {
 			let time = stats.time > 5000 ? Math.round(stats.time / 100) / 10 + "s" : stats.time + "ms";
 
-			output.push(this._context.app.appName + " (" + this._context.webpackConfig.target + ") | Time: " + time);
+			output.push(this._context.app.appName +
+				(
+					isString(this._context.webpackConfig.target)
+						? " (" + this._context.webpackConfig.target + ")"
+						: ""
+				) +
+				" | Time: " + time);
 			output.push("Asset".padStart(assetColLength, " ") + "  " + "Size".padStart(sizeColLength));
 
 			let ignoredChunks = 0;
