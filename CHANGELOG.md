@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.0.0](https://github.com/labor-digital/asset-building/compare/v7.0.2...v8.0.0) (2020-10-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* API changes
+* major dependency updates
+
+### Features
+
+* implement custom html template based on html-webpack-template ([8470ddc](https://github.com/labor-digital/asset-building/commit/8470ddc3a682a107e72c34e656f86095d05a4ed8))
+* implement main factory as alternative to the "bootstrap" ([7e3deb2](https://github.com/labor-digital/asset-building/commit/7e3deb28a9ff2165c9adba0592d699b2228d63bf))
+* implement new "interop" directory for easier registration ([6cbc6a2](https://github.com/labor-digital/asset-building/commit/6cbc6a20c2a3846b05a96e989cb7f8fc442a7a0a))
+* update dependencies ([99829ac](https://github.com/labor-digital/asset-building/commit/99829ac05b019bfd7b86e24ebe8ddfbe6520c1a0))
+
 ### [7.0.2](https://github.com/labor-digital/asset-building/compare/v7.0.1...v7.0.2) (2020-10-16)
 
 
