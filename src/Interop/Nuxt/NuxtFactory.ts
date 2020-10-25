@@ -163,6 +163,18 @@ export class NuxtFactory {
 						case Ids.LESS_LOADER:
 							return this.modifyStyleLoader(e, context);
 					}
+				},
+				[AssetBuilderEventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
+					// We adjust the typescript options here to match
+					// https://github.com/nuxt/typescript/blob/master/packages/typescript-build/src/index.ts#L65
+					// and
+					// https://typescript.nuxtjs.org/guide/setup.html#configuration
+					// because otherwise we had problems with some other modules...
+					const context: WorkerContext = e.args.context;
+					e.args.options = {
+						configFile: e.args.options.configFile.replace(/tsconfig\.json$/, "tsconfig.nuxt.json"),
+						transpileOnly: !(context.app.useTypeChecker === true)
+					};
 				}
 			}
 		};
