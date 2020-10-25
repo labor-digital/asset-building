@@ -65,6 +65,12 @@ export enum AssetBuilderEventList {
 	 */
 	INTEROP_WEBPACK_CONFIG = "assetBuilder__interop--webpackConfig",
 
+	/**
+	 * Allows you to filter the file extensions that should be externalized in a (nuxt/vue) application.
+	 * Those files will not be processed by webpack but directly included on the server side
+	 */
+	INTEROP_VUE_EXTERNAL_EXTENSION_PATTERN = "assetBuilder__interop--vueExternalExtensionPattern",
+
 	// Additional loader events
 	SASS_LOADER_FILE_EXTENSION_FALLBACK = "customSassLoader__fileExtensionFallback",
 
