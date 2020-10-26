@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.2](https://github.com/labor-digital/asset-building/compare/v8.0.1...v8.0.2) (2020-10-26)
+
+
+### Bug Fixes
+
+* **NuxtFactory:** adjust typeScript settings for nuxt compatibility ([f2a8b77](https://github.com/labor-digital/asset-building/commit/f2a8b77a41b28d20df2587d4c26357243aabf43f))
+
 ### [8.0.1](https://github.com/labor-digital/asset-building/compare/v8.0.0...v8.0.1) (2020-10-25)
 
 
