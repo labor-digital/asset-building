@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.1](https://github.com/labor-digital/asset-building/compare/v8.0.0...v8.0.1) (2020-10-25)
+
+
+### Bug Fixes
+
+* add INTEROP_VUE_EXTERNAL_EXTENSION_PATTERN event ([8fabe2f](https://github.com/labor-digital/asset-building/commit/8fabe2f7f30033a6e599d315390e1353252f09b3))
+* **FancyStatsPlugin:** only render "target" if existing ([ac69690](https://github.com/labor-digital/asset-building/commit/ac696908c3e4eeac7a81f93f406b5c9e8e3cb69c))
+* **ImageLoader:** make sure that .svg files are loaded correctly ([a1575cd](https://github.com/labor-digital/asset-building/commit/a1575cd75ea4f0c226da4b95baf54ccad24435ad))
+* **MakeEnhancedConfigAction:** Add source directory to resolver paths ([023f10c](https://github.com/labor-digital/asset-building/commit/023f10c05f2178d8ae52da8717035e4241527ed0))
+* **MakeEnhancedConfigAction:** also inject our own resolver extensions into extended config ([101db4d](https://github.com/labor-digital/asset-building/commit/101db4d7a90a8aae87fd3fd549d347630ee211f3))
+* **Nuxt:** add "fancy intro" ([bac6300](https://github.com/labor-digital/asset-building/commit/bac6300769f9bdae20e5a72e020551f290819d48))
+* **Nuxt:** disable dev only optimization ([0abd9f2](https://github.com/labor-digital/asset-building/commit/0abd9f2431cf502254a237f637871ea1a2884ee7))
+* **NuxtFactory:** additional nuxt adjustments for better compatibility ([1ad2cfb](https://github.com/labor-digital/asset-building/commit/1ad2cfbd055ddd3293b4fff470afd24a99395622))
+* **NuxtFactory:** clean up filter registration ([ed9657d](https://github.com/labor-digital/asset-building/commit/ed9657de7f3a3c46c9a99f512bca981dafd28a23))
+* **ProdOnlyConfigurator:** make sure configurator gets applied ([6accbb0](https://github.com/labor-digital/asset-building/commit/6accbb0ed7bda5193651997e2c7b9a5e32021fec))
+
 ## [8.0.0](https://github.com/labor-digital/asset-building/compare/v7.0.2...v8.0.0) (2020-10-23)
 
 
