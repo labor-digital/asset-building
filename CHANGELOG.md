@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.3](https://github.com/labor-digital/asset-building/compare/v8.0.2...v8.0.3) (2020-10-28)
+
+
+### Bug Fixes
+
+* **NuxtFactory:** add cssnano for inline css files ([7faab0d](https://github.com/labor-digital/asset-building/commit/7faab0dd06e2da0db38ea4f9f63627e9832cac02))
+* **NuxtFactory:** always use vue-style-loader ([30c5397](https://github.com/labor-digital/asset-building/commit/30c5397208ae338eac2ca252bd43f78b92af3a8c))
+* **NuxtFactory:** always use vue-style-loader in prod ([5809d65](https://github.com/labor-digital/asset-building/commit/5809d65508f776c5cb210b4f9990865f21a3fa84))
+* **NuxtFactory:** harden entry point detection ([1217ee1](https://github.com/labor-digital/asset-building/commit/1217ee17034c115c9e06e7c8ef7ca5d2d4730d9b))
+
 ### [8.0.2](https://github.com/labor-digital/asset-building/compare/v8.0.1...v8.0.2) (2020-10-26)
 
 
