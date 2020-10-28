@@ -208,13 +208,6 @@ export class NuxtFactory {
 			}
 		});
 
-		// If we are in production mode and we don't use the server
-		// side renderer we will not inject the vue style loader
-		// Also skip if the package requires us to use the css extract plugin
-		if (context.isProd || context.app.useCssExtractPlugin === true) {
-			return;
-		}
-
 		// Rewrite sass and less loader
 		const cssLoaderRegex = /^css-loader/;
 		e.args.config.use.forEach((v, k) => {
