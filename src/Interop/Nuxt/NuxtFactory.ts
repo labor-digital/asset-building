@@ -164,6 +164,13 @@ export class NuxtFactory {
 							return this.modifyStyleLoader(e, context);
 					}
 				},
+				[AssetBuilderEventList.FILTER_POSTCSS_PLUGINS]: (e) => {
+					const context = e.args.context;
+					if (!context.isProd) {
+						return;
+					}
+					e.args.plugins.push(require("cssnano"));
+				},
 				[AssetBuilderEventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
 					// We adjust the typescript options here to match
 					// https://github.com/nuxt/typescript/blob/master/packages/typescript-build/src/index.ts#L65
