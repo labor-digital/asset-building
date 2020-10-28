@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.4](https://github.com/labor-digital/asset-building/compare/v8.0.3...v8.0.4) (2020-10-28)
+
+
+### Bug Fixes
+
+* **NuxtFactory:** only replace the css-extractor with vue-style-loader not everything /o\ ([779a037](https://github.com/labor-digital/asset-building/commit/779a0378f9d2b2b40f48356d7704a6025f9b18c6))
+
 ### [8.0.3](https://github.com/labor-digital/asset-building/compare/v8.0.2...v8.0.3) (2020-10-28)
 
 
