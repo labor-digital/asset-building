@@ -228,9 +228,7 @@ export class NuxtFactory {
 			}
 
 			// Inject vue style loader
-			if (v.loader.match(cssExtractorPluginRegex)) {
-				e.args.config.use[k] = "vue-style-loader";
-			}
+			e.args.config.use[k] = "vue-style-loader";
 		});
 	}
 
