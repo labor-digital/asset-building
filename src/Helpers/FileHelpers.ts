@@ -15,6 +15,7 @@
  *
  * Last modified: 2019.02.18 at 18:55
  */
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import fs from "fs";
 import path from "path";
 
@@ -29,6 +30,7 @@ export class FileHelpers {
 	}
 
 	static unifyFilename(filename: string): string {
+		if (!isString(filename)) return filename;
 		// Make sure windows drives are unified to lowercase
 		if (filename.charAt(1) === ":") {
 			filename = filename.charAt(0).toLowerCase() + filename.substr(1);
