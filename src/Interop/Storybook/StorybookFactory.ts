@@ -109,7 +109,7 @@ export class StorybookFactory {
 						forEach(e.args.config.use, (v, k) => {
 							if (!isString(v.loader)) return;
 							if (v.loader.match(cssExtractorPluginRegex)) {
-								e.args.config.use.splice(k, 1);
+								e.args.config.use[k] = "style-loader";
 								return false;
 							}
 						});
