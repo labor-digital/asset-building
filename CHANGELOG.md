@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.5](https://github.com/labor-digital/asset-building/compare/v8.0.4...v8.0.5) (2020-11-05)
+
+
+### Bug Fixes
+
+* **FileHelpers:** make sure unifyFilename does not crash if no string is given ([29cb849](https://github.com/labor-digital/asset-building/commit/29cb8493cc8e83cc6e5acf53bd9bad3467242ebb))
+* **StorybookFactory:** allow storybook to keep the generated css ([b9980a1](https://github.com/labor-digital/asset-building/commit/b9980a146062cd53da30a0abf9d9bff3d8a50e94))
+
 ### [8.0.4](https://github.com/labor-digital/asset-building/compare/v8.0.3...v8.0.4) (2020-10-28)
 
 
