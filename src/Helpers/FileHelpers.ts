@@ -39,19 +39,23 @@ export class FileHelpers {
 	}
 
 	static getFileExtension(filename: string): string {
+		if (!isString(filename)) return filename;
 		return FileHelpers.stripOffQuery(filename.replace(/^(.*?\.)([^.\\\/]*)$/, "$2").toLowerCase());
 	}
 
 	static stripOffQuery(filename: string): string {
+		if (!isString(filename)) return filename;
 		return filename.replace(/[?#].*?$/, "");
 	}
 
 	static getFileWithoutExtension(filename: string): string {
+		if (!isString(filename)) return filename;
 		const ext = FileHelpers.getFileExtension(filename);
 		return filename.replace(new RegExp("\\." + ext + "$"), "");
 	}
 
 	static filenameToPosix(filename: string): string {
+		if (!isString(filename)) return filename;
 		return FileHelpers.unifyFilename(filename).replace(/\\/g, "/");
 	}
 
@@ -65,6 +69,7 @@ export class FileHelpers {
 	 * @param {string} directory The directory to create
 	 */
 	static mkdir(directory): void {
+		if (!isString(directory)) return;
 		var path = directory.replace(/[\\\/]/g, "/").replace(/\/$/, "").split("/");
 
 		for (var i = 1; i <= path.length; i++) {
@@ -75,6 +80,7 @@ export class FileHelpers {
 	}
 
 	static flushDirectory(directory): void {
+		if (!isString(directory)) return;
 		try {
 			var files = fs.readdirSync(directory);
 		} catch (e) {
@@ -94,6 +100,7 @@ export class FileHelpers {
 	};
 
 	static touch(filename): void {
+		if (!isString(filename)) return;
 		if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
 		fs.utimesSync(filename, new Date(), new Date());
 	}

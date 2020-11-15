@@ -17,6 +17,7 @@
  */
 
 import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
+import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import fs from "fs";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
 import {SassFile} from "./Entities/SassFile";
@@ -68,6 +69,7 @@ export class SassFileResolver {
 	 * @param filename
 	 */
 	static invalidate(filename: string) {
+		if (!isString(filename)) return;
 		const filenamePosix = FileHelpers.filenameToPosix(filename);
 		if (!cache.has(filenamePosix)) return;
 		cache.delete(filenamePosix);
