@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.6](https://github.com/labor-digital/asset-building/compare/v8.0.5...v8.0.6) (2020-11-10)
+
+
+### Bug Fixes
+
+* **AbstractStyleLoaderConfigurator:** don't use a random ident for the postcss loader ([0425db3](https://github.com/labor-digital/asset-building/commit/0425db3544dd34612d18abee214a068a2be93cfe))
+
 ### [8.0.5](https://github.com/labor-digital/asset-building/compare/v8.0.4...v8.0.5) (2020-11-05)
 
 
