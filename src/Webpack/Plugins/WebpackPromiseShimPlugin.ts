@@ -16,6 +16,7 @@
  * Last modified: 2019.08.01 at 15:15
  */
 
+import {WorkerContext} from "../../Core/WorkerContext";
 import {
 	AssetBuilderWebpackPluginInterface,
 	AssetBuilderWebpackPluginStaticInterface
@@ -27,13 +28,20 @@ import {
  */
 export const WebpackPromiseShimPlugin: AssetBuilderWebpackPluginStaticInterface =
 	class implements AssetBuilderWebpackPluginInterface {
-		apply(compiler) {
-			compiler.hooks.compilation.tap("WebpackPromiseShimPlugin", compilation => {
-				compilation.mainTemplate.hooks.bootstrap.tap("WebpackPromiseShimPlugin", function (_, chunk, hash, chunkIdVar) {
-					/*
-					 * @see https://github.com/taylorhakes/promise-polyfill
-					 */
-					_ += `
+		protected _context: WorkerContext;
+
+		public setContext(context: WorkerContext): void {
+			this._context = context;
+		}
+
+		public apply(compiler) {
+			if (this._context.app.polyfills !== false) {
+				compiler.hooks.compilation.tap("WebpackPromiseShimPlugin", compilation => {
+					compilation.mainTemplate.hooks.bootstrap.tap("WebpackPromiseShimPlugin", function (_, chunk, hash, chunkIdVar) {
+						/*
+						 * @see https://github.com/taylorhakes/promise-polyfill
+						 */
+						_ += `
 				// Shimming in a polyfill for Promise if it is not already defined
 				if(typeof Promise === "undefined"){
 				(function() {
@@ -41,8 +49,9 @@ export const WebpackPromiseShimPlugin: AssetBuilderWebpackPluginStaticInterface 
 				})();
 				};
 				`;
-					return _;
+						return _;
+					});
 				});
-			});
+			}
 		}
 	};
