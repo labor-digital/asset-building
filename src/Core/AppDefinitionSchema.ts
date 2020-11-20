@@ -18,6 +18,9 @@
 
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 
+let fallbackAppCounter = 0;
+const chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+
 export default {
 	disabled: {
 		type: "bool",
@@ -30,7 +33,7 @@ export default {
 	appName: {
 		type: "string",
 		default: (field, data) => {
-			return "App - " + data.id;
+			return "App - " + (data.id ?? chars[fallbackAppCounter++] ?? "X");
 		}
 	},
 	entry: {
