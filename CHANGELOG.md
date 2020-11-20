@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.7](https://github.com/labor-digital/asset-building/compare/v8.0.6...v8.0.7) (2020-11-19)
+
+
+### Bug Fixes
+
+* **FileHelpers:** make sure multiple file helpers do not crash if no string is given ([7d8018d](https://github.com/labor-digital/asset-building/commit/7d8018d78eb44ee50969cd8353c3d356a8397a44))
+
 ### [8.0.6](https://github.com/labor-digital/asset-building/compare/v8.0.5...v8.0.6) (2020-11-10)
 
 
