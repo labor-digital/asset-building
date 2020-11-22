@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.9](https://github.com/labor-digital/asset-building/compare/v8.0.8...v8.0.9) (2020-11-22)
+
+
+### Bug Fixes
+
+* **ResourceLoader:** ensure execution in interop context ([63d0e65](https://github.com/labor-digital/asset-building/commit/63d0e65da9f19f68463d213d4bba6bce4616c3b2))
+
 ### [8.0.8](https://github.com/labor-digital/asset-building/compare/v8.0.7...v8.0.8) (2020-11-20)
 
 
