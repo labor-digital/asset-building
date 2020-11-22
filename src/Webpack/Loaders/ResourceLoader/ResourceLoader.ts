@@ -29,14 +29,21 @@ const resourceLoader: Loader = function (source: string) {
 	const callback = this.async();
 
 	// Ignore empty inputs
-	if (source.replace(/[\s\n]+/g, "").trim() === "" || !isString(this.query.entry)) {
+	if (source.replace(/[\s\n]+/g, "").trim() === "") {
 		callback(null, source);
 		return;
 	}
 
+	// Resolve the root path
+	let rootPath: string;
+	if (isString(this.query.entry)) {
+		rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
+	} else {
+		rootPath = FileHelpers.unifyFilename(this.query.currentDir) + path.sep;
+	}
+
 	// Prepare file locations
 	let stylesheetPath = FileHelpers.unifyFilename(FileHelpers.stripOffQuery(this.resourcePath));
-	let rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
 	const possibleResourceLocations = [];
 
 	// Ignore css files
