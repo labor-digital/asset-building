@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.8](https://github.com/labor-digital/asset-building/compare/v8.0.7...v8.0.8) (2020-11-20)
+
+
+### Bug Fixes
+
+* **AppDefinitionSchema:** make sure the app name is generated correctly ([738ca78](https://github.com/labor-digital/asset-building/commit/738ca78271a857efae3e0e02d37560a4fd83b826))
+* **WebpackPromiseShimPlugin:** don't inject the promise shim if polyfills are disabled ([ba1a1fc](https://github.com/labor-digital/asset-building/commit/ba1a1fc25fb82525e535c61f964b01026a8da952))
+
 ### [8.0.7](https://github.com/labor-digital/asset-building/compare/v8.0.6...v8.0.7) (2020-11-19)
 
 
