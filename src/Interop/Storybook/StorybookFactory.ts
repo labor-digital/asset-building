@@ -20,11 +20,12 @@ import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject"
 import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import {Configuration} from "webpack";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
-import {CoreFixes} from "../../Core/CoreFixes";
+import {CoreContext} from "../../Core/CoreContext";
 import {Factory} from "../../Core/Factory";
 import {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
 
@@ -42,6 +43,8 @@ export class StorybookFactory {
 	 */
 	protected _factory: Factory;
 
+	protected coreContextPromise: Promise<CoreContext>;
+
 	/**
 	 * Injects the factory instance and options
 	 * @param factory
@@ -53,17 +56,24 @@ export class StorybookFactory {
 	}
 
 	/**
+	 * Allows us to create the core context early, so storybook can resolve all our node_modules
+	 */
+	public initializeCoreContext(): Promise<CoreContext> {
+		if (!isUndefined(this.coreContextPromise)) return this.coreContextPromise;
+		return this.coreContextPromise = this._factory.makeCoreContext({
+			environment: "storyBook",
+			laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
+		});
+	}
+
+	/**
 	 * Enhances the given storybook configuration with the config build by our asset builder logic
 	 * @param config
 	 */
 	public enhanceWebpackConfig(config: Configuration): Promise<Configuration> {
-		return this._factory.makeCoreContext({
-				mode: config.mode === "development" ? "watch" : "build",
-				environment: "storyBook",
-				laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
-			})
+		return this.initializeCoreContext()
 			.then(coreContext => {
-					CoreFixes.resolveFilenameFix(coreContext);
+					coreContext.mode = config.mode === "development" ? "watch" : "build";
 					return this._factory.makeWorkerContext(coreContext, {
 						app: this._options.app ?? {},
 						noEntryOutputValidation: true

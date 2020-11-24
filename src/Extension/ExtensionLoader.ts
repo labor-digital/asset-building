@@ -68,6 +68,33 @@ export class ExtensionLoader {
 	}
 
 	/**
+	 * Interates the given definition in order to find all additional resolver paths that must be
+	 * registered and adds them to the given core context object
+	 *
+	 * @param context The context to find the paths for
+	 * @param definition Either the laborConfig or a single app definition
+	 */
+	public resolveAdditionalResolverPaths(context: CoreContext, definition: PlainObject): void {
+		if (isPlainObject(definition)) {
+
+			if (isArray(definition.extensions)) {
+				forEach(definition.extensions, (extensionPath: string) => {
+					this.resolveExtensionPath(context, extensionPath);
+				});
+			}
+
+			// Add all resolver paths for potential apps
+			if (isArray(definition.apps)) {
+				forEach(definition.apps, app => {
+					if (isPlainObject(app))
+						this.resolveAdditionalResolverPaths(context, app);
+				});
+			}
+
+		}
+	}
+
+	/**
 	 * Internal helper to resolve an extension path into a function
 	 * @param context
 	 * @param extensionPath

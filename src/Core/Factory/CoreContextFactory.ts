@@ -24,10 +24,13 @@ import {isString} from "@labor-digital/helferlein/lib/Types/isString";
 import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
 import fs from "fs";
 import path from "path";
+import {isPlainObject} from "webpack-merge/dist/utils";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {ExtensionLoader} from "../../Extension/ExtensionLoader";
 import {FileHelpers} from "../../Helpers/FileHelpers";
+import {LaborConfigInterface} from "../../Interfaces/LaborConfigInterface";
 import {CoreContext} from "../CoreContext";
+import {CoreFixes} from "../CoreFixes";
 import {FactoryCoreContextOptions} from "../Factory.interfaces";
 
 export class CoreContextFactory {
@@ -46,7 +49,6 @@ export class CoreContextFactory {
 		this._options = options ?? {};
 
 		return this.makeNewContextInstance()
-			.then(c => this.loadConfig(c))
 			.then(c => this.applyConfig(c))
 			.then(c => this.loadExtensions(c))
 			.then(c => this.findMode(c))
@@ -58,23 +60,25 @@ export class CoreContextFactory {
 
 	/**
 	 * Creates a new, empty context instance with only the most basic settings applied
+	 *
+	 * IMPORTANT: Note to self -> This has to be synchronous so storybook does not break!
 	 * @protected
 	 */
 	protected makeNewContextInstance(): Promise<CoreContext> {
-		return Promise.resolve(
-			new CoreContext(
-				this._options.cwd ?? process.cwd(),
-				path.dirname(path.dirname(__dirname)),
-				this._options.environment ?? "standalone"
-			)
-		).then(context => {
-			// Late dependency injection
-			context.eventEmitter = EventBus.getEmitter();
-			context.extensionLoader = new ExtensionLoader();
-			context.version = require("../../../package.json").version;
+		const context = new CoreContext(
+			this._options.cwd ?? process.cwd(),
+			path.dirname(path.dirname(__dirname)),
+			this._options.environment ?? "standalone",
+			require("../../../package.json").version
+		);
 
-			return context;
-		});
+		context.eventEmitter = EventBus.getEmitter();
+		context.extensionLoader = new ExtensionLoader();
+		context.laborConfig = this.loadConfig(context);
+
+		this.applyModuleResolverFix(context);
+
+		return Promise.resolve(context);
 	}
 
 	/**
@@ -83,25 +87,37 @@ export class CoreContextFactory {
 	 * @param context
 	 * @protected
 	 */
-	protected loadConfig(context: CoreContext): Promise<CoreContext> {
+	protected loadConfig(context: CoreContext): LaborConfigInterface {
 		if (isUndefined(this._options.laborConfig)) {
 			// Check if we are in the correct directory
 			if (!fs.existsSync(context.packageJsonPath)) {
-				return Promise.reject(new Error("Could not find package.json at: \"" + context.packageJsonPath + "\""));
+				throw new Error("Could not find package.json at: \"" + context.packageJsonPath + "\"");
 			}
 
 			// Load the config using the package json
 			const packageJson = JSON.parse(fs.readFileSync(context.packageJsonPath).toString("utf-8"));
 			if (typeof packageJson.labor === "undefined") {
-				return Promise.reject(new Error("There is no \"labor\" node inside your current package json!"));
+				throw new Error("There is no \"labor\" node inside your current package json!");
 			}
-			context.laborConfig = packageJson.labor;
+			return packageJson.labor;
 
-		} else {
-			context.laborConfig = this._options.laborConfig;
 		}
 
-		return Promise.resolve(context);
+		return this._options.laborConfig;
+	}
+
+	/**
+	 * Applys the module resolver fix so that node_modules of the asset builder as well as all registerd
+	 * apps can be found by all node modules
+	 * @param context
+	 * @protected
+	 */
+	protected applyModuleResolverFix(context: CoreContext): void {
+		context.extensionLoader.resolveAdditionalResolverPaths(context,
+			isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {});
+		context.extensionLoader.resolveAdditionalResolverPaths(context,
+			isPlainObject(this._options.additionalResolversForApp) ? this._options.additionalResolversForApp : {});
+		CoreFixes.resolveFilenameFix(context);
 	}
 
 	/**

@@ -121,11 +121,12 @@ export class CoreContext {
 	 */
 	public laborConfig: LaborConfigInterface;
 
-	constructor(cwd: string, assetBuilderPath: string, environment: string) {
+	constructor(cwd: string, assetBuilderPath: string, environment: string, version: string) {
 		if (cwd === "" && assetBuilderPath === "" && environment === "") {
 			return;
 		}
 
+		this.version = version;
 		this.type = "core";
 		this.process = "main";
 		this.environment = environment;
@@ -178,7 +179,7 @@ export class CoreContext {
 	 * @param json
 	 */
 	public static fromJson(json: string): CoreContext {
-		const self = new CoreContext("", "", "");
+		const self = new CoreContext("", "", "", "");
 		const data = JSON.parse(json);
 		forEach(data, (v, k) => {
 			if (k === "additionalResolverPaths") v = new Set(v);

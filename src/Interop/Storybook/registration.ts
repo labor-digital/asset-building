@@ -15,10 +15,35 @@
  *
  * Last modified: 2020.04.23 at 20:03
  */
+import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
 import {Configuration} from "webpack";
 import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import {StorybookFactory} from "./StorybookFactory";
 
+/**
+ * V2 API that resolves issues with missing, bundled node modules
+ * use this in your main.js and add it like `module.exports = {webpack: makeAssetBuilder()}
+ * @param options
+ */
+export function makeAssetBuilder(options?: PlainObject) {
+	GeneralHelper.renderFancyIntro();
+	const factory = new StorybookFactory(options);
+	factory.initializeCoreContext();
+
+	return function (webpackConfig: Configuration = {}): Promise<Configuration> {
+		return factory
+			.enhanceWebpackConfig(webpackConfig)
+			.catch(err => GeneralHelper.renderError(err) as never);
+	};
+}
+
+/**
+ * Legacy mode to support addons api of storybook
+ *
+ * @param webpackConfig
+ * @param options
+ * @deprecated
+ */
 export const webpack = (
 	webpackConfig: Configuration = {},
 	options

@@ -106,7 +106,6 @@ export class Bootstrap {
 		if (fixesApplied) return Promise.resolve(context);
 		fixesApplied = true;
 		CoreFixes.eventsJsUncaughtErrorFix();
-		CoreFixes.resolveFilenameFix(context);
 		return Promise.resolve(context);
 	}
 

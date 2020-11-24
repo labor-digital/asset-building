@@ -50,6 +50,13 @@ export interface FactoryCoreContextOptions {
 	 * file in the current project directory. It will instead use this definition as config base
 	 */
 	laborConfig?: LaborConfigInterface;
+
+	/**
+	 * Internal helper to supply a app definition from which the additional
+	 * resolver paths should be provided when the core context is created.
+	 * This is a hacky solution to allow node to resolve our dependencies without issues
+	 */
+	additionalResolversForApp?: AppDefinitionInterface
 }
 
 export interface FactoryWorkerContextOptions {
