@@ -16,6 +16,7 @@
  * Last modified: 2020.04.23 at 20:03
  */
 import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
 import {Configuration} from "webpack";
 import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import {StorybookFactory} from "./StorybookFactory";
@@ -26,6 +27,7 @@ import {StorybookFactory} from "./StorybookFactory";
  * @param options
  */
 export function makeAssetBuilder(options?: PlainObject) {
+	options = isPlainObject(options) ? options : {};
 	GeneralHelper.renderFancyIntro();
 	const factory = new StorybookFactory(options);
 	factory.initializeCoreContext();

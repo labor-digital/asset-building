@@ -62,7 +62,8 @@ export class StorybookFactory {
 		if (!isUndefined(this.coreContextPromise)) return this.coreContextPromise;
 		return this.coreContextPromise = this._factory.makeCoreContext({
 			environment: "storyBook",
-			laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
+			laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {},
+			additionalResolversForApp: isPlainObject(this._options.app) ? this._options.app : {}
 		});
 	}
 
