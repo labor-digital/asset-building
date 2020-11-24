@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.10](https://github.com/labor-digital/asset-building/compare/v8.0.9...v8.0.10) (2020-11-24)
+
+
+### Bug Fixes
+
+* apply filename resolve fix in all factories ([666e04e](https://github.com/labor-digital/asset-building/commit/666e04ee7ee4db02c66e92aa93542ec6eb2478da))
+
 ### [8.0.9](https://github.com/labor-digital/asset-building/compare/v8.0.8...v8.0.9) (2020-11-22)
 
 
