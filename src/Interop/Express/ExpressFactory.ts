@@ -16,6 +16,7 @@
  * Last modified: 2020.04.24 at 11:24
  */
 
+import {CoreFixes} from "../../Core/CoreFixes";
 import {Factory} from "../../Core/Factory";
 import {WorkerContext} from "../../Core/WorkerContext";
 import {ExpressAssetBuildingPluginOptions} from "./expressAssetBuildingPlugin";
@@ -51,20 +52,11 @@ export default class ExpressFactory {
 			mode: this._options.mode,
 			packageJsonPath: this._options.packageJsonDirectory,
 			environment: "express"
-		}).then(coreContext => this._factory.makeWorkerContext(coreContext, {
-			app: this._options.appId
-		}));
-
-		this.getWorkerContext().then(workerContext => workerContext.do.runCompiler())
-			.then(e => {
-				// The running webpack compiler instance
-				e.compiler;
-
-				// A promise that is resolved when the compiler exited.
-				// The parameter is the numeric exit code
-				e.promise.then(exitCode => {
-					console.log(exitCode);
-				});
+		}).then(coreContext => {
+			CoreFixes.resolveFilenameFix(coreContext);
+			return this._factory.makeWorkerContext(coreContext, {
+				app: this._options.appId
 			});
+		});
 	}
 }

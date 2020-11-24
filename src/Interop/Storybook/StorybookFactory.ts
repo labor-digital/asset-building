@@ -24,6 +24,7 @@ import {Configuration} from "webpack";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
+import {CoreFixes} from "../../Core/CoreFixes";
 import {Factory} from "../../Core/Factory";
 import {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
 
@@ -61,11 +62,13 @@ export class StorybookFactory {
 				environment: "storyBook",
 				laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
 			})
-			.then(coreContext =>
-				this._factory.makeWorkerContext(coreContext, {
-					app: this._options.app ?? {},
-					noEntryOutputValidation: true
-				})
+			.then(coreContext => {
+					CoreFixes.resolveFilenameFix(coreContext);
+					return this._factory.makeWorkerContext(coreContext, {
+						app: this._options.app ?? {},
+						noEntryOutputValidation: true
+					});
+				}
 			)
 			.then(workerContext => workerContext.do.makeEnhancedConfig(config, this.getEnhancerOptions()));
 	}

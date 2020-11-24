@@ -32,6 +32,7 @@ import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConf
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
 import {CoreContext} from "../../Core/CoreContext";
+import {CoreFixes} from "../../Core/CoreFixes";
 import {Factory} from "../../Core/Factory";
 import {WorkerContext} from "../../Core/WorkerContext";
 import {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
@@ -70,10 +71,13 @@ export class NuxtFactory {
 			mode: configs[0].mode === "production" ? "build" : "watch",
 			environment: "nuxt",
 			laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
-		}).then(coreContext => Promise.all([
-			this.makeEnhancedConfig("client", configs, coreContext),
-			this.makeEnhancedConfig("server", configs, coreContext)
-		])).then(() => configs);
+		}).then(coreContext => {
+			CoreFixes.resolveFilenameFix(coreContext);
+			return Promise.all([
+				this.makeEnhancedConfig("client", configs, coreContext),
+				this.makeEnhancedConfig("server", configs, coreContext)
+			]);
+		}).then(() => configs);
 	}
 
 	/**
