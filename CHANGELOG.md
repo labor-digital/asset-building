@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.13](https://github.com/labor-digital/asset-building/compare/v8.0.12...v8.0.13) (2020-11-24)
+
+
+### Bug Fixes
+
+* resolve multiple story book issues ([2a95b10](https://github.com/labor-digital/asset-building/commit/2a95b105da3de3436c2a5df64892ac5e020c9257))
+
 ### [8.0.12](https://github.com/labor-digital/asset-building/compare/v8.0.11...v8.0.12) (2020-11-24)
 
 
