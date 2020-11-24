@@ -83,6 +83,13 @@ export class ExtensionLoader {
 				});
 			}
 
+			// Add configured resolver paths to the context
+			if (isArray(definition.additionalResolverPaths)) {
+				forEach(definition.additionalResolverPaths, path => {
+					context.additionalResolverPaths.add(path);
+				});
+			}
+
 			// Add all resolver paths for potential apps
 			if (isArray(definition.apps)) {
 				forEach(definition.apps, app => {
@@ -109,7 +116,7 @@ export class ExtensionLoader {
 				extension = require(path.resolve(basePath, extensionPath));
 
 				// Add additional lookup path for all plugin sources
-				let parts = path.dirname(path.resolve(basePath, extensionPath)).split(path.sep);
+				let parts = path.resolve(basePath, extensionPath).split(path.sep);
 				while (parts.length > 0) {
 					const pl = parts.join(path.sep) + path.sep + "node_modules" + path.sep;
 					if (fs.existsSync(pl)) {

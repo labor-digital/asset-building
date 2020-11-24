@@ -61,6 +61,7 @@ export class StorybookFactory {
 	public initializeCoreContext(): Promise<CoreContext> {
 		if (!isUndefined(this.coreContextPromise)) return this.coreContextPromise;
 		return this.coreContextPromise = this._factory.makeCoreContext({
+			mode: "watch",
 			environment: "storyBook",
 			laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {},
 			additionalResolversForApp: isPlainObject(this._options.app) ? this._options.app : {}
@@ -74,7 +75,11 @@ export class StorybookFactory {
 	public enhanceWebpackConfig(config: Configuration): Promise<Configuration> {
 		return this.initializeCoreContext()
 			.then(coreContext => {
-					coreContext.mode = config.mode === "development" ? "watch" : "build";
+					// Recalculate the context properties when we have the configuration
+					coreContext.isProd = config.mode !== "development";
+					coreContext.mode = coreContext.isProd ? "build" : "watch";
+
+					// Make the child context
 					return this._factory.makeWorkerContext(coreContext, {
 						app: this._options.app ?? {},
 						noEntryOutputValidation: true

@@ -17,7 +17,6 @@
  */
 
 import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
 import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
 import {isBool} from "@labor-digital/helferlein/lib/Types/isBool";
 import {isString} from "@labor-digital/helferlein/lib/Types/isString";
@@ -139,13 +138,6 @@ export class CoreContextFactory {
 		context.runWorkersSequential = isBool(context.laborConfig.runWorkersSequential) ?
 			context.laborConfig.runWorkersSequential :
 			context.builderVersion === 1;
-
-		// Add configured resolver paths to the context
-		if (isArray(context.laborConfig.additionalResolverPaths)) {
-			forEach(context.laborConfig.additionalResolverPaths, path => {
-				context.additionalResolverPaths.add(path);
-			});
-		}
 
 		return Promise.resolve(context);
 	}
