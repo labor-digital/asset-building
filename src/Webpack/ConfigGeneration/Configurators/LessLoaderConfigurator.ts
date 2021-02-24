@@ -101,7 +101,10 @@ export class LessLoaderConfigurator extends AbstractStyleLoaderConfigurator impl
 							{
 								loader: "less-loader",
 								options: {
-									sourceMap: true
+									sourceMap: true,
+									lessOptions: {
+										relativeUrls: false
+									}
 								}
 							}
 						]
