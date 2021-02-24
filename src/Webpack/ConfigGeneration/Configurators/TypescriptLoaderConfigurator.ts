@@ -34,6 +34,7 @@ export class TypescriptLoaderConfigurator implements ConfiguratorInterface {
 			.then(() => {
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_TYPESCRIPT_OPTIONS, {
 					options: {
+						// @todo these should be moved into the config file so they coan be exchanged more easily
 						context: context.parentContext.sourcePath,
 						configFile: path.resolve(context.parentContext.assetBuilderPath, "../ts/tsconfig.json"),
 						transpileOnly: !(context.app.useTypeChecker === true),
