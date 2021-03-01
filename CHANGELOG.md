@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.0.15](https://github.com/labor-digital/asset-building/compare/v8.0.14...v8.0.15) (2021-02-24)
+
+
+### Bug Fixes
+
+* added relativeUrls option to the less config ([85953d0](https://github.com/labor-digital/asset-building/commit/85953d0ea78bbc4aec58fb3a052a58210b941037))
+
+### [8.0.14](https://github.com/labor-digital/asset-building/compare/v8.0.13...v8.0.14) (2021-02-24)
+
+
+### Bug Fixes
+
+* **less-loader:** remove "relativeUrls" option from legacy less loader ([81b0696](https://github.com/labor-digital/asset-building/commit/81b06962a93863c4a9b99d1131df8f5d5dbdd8da))
+
 ### [8.0.13](https://github.com/labor-digital/asset-building/compare/v8.0.12...v8.0.13) (2020-11-24)
 
 
