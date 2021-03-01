@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.1.0](https://github.com/labor-digital/asset-building/compare/v8.0.15...v8.1.0) (2021-03-01)
+
+
+### Features
+
+* **ExtensionLoader:** prefer sourcePath instead of node modules ([e1aaeb2](https://github.com/labor-digital/asset-building/commit/e1aaeb226292e938d48a1dc29774161ecf5214bf))
+
+
+### Bug Fixes
+
+* **less-loader:** re-add "relativeUrls" option under lessOptions ([1364610](https://github.com/labor-digital/asset-building/commit/13646101fc077b75387537acec7995b39d664077))
+* **less-loader:** re-add "relativeUrls" option under lessOptions ([ee23fdb](https://github.com/labor-digital/asset-building/commit/ee23fdb05250e9c23e9b2a692a50aa9cf4f6368e))
+
 ### [8.0.15](https://github.com/labor-digital/asset-building/compare/v8.0.14...v8.0.15) (2021-02-24)
 
 
