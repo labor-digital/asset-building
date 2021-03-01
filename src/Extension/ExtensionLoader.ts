@@ -111,7 +111,7 @@ export class ExtensionLoader {
 		let extensionBaseName = path.basename(extensionPath);
 		const coreContext: CoreContext = (!isUndefined((context as WorkerContext).parentContext) ?
 			(context as WorkerContext).parentContext : context as WorkerContext) as CoreContext;
-		forEach([coreContext.buildingNodeModulesPath, coreContext.nodeModulesPath, coreContext.sourcePath], (basePath: string) => {
+		forEach([coreContext.sourcePath, coreContext.buildingNodeModulesPath, coreContext.nodeModulesPath], (basePath: string) => {
 			try {
 				extension = require(path.resolve(basePath, extensionPath));
 
