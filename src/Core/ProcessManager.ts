@@ -92,11 +92,13 @@ export class ProcessManager {
 					});
 
 					// Go to next app if the worker is still running but webpack did it's initial build
-					coreContext.eventEmitter.bind(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE, () => {
-						if (isResolved) return;
-						isResolved = true;
-						next(next);
-					});
+					if ( coreContext.mode === 'watch' ) {
+						coreContext.eventEmitter.bind(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE, () => {
+							if (isResolved) return;
+							isResolved = true;
+							next(next);
+						});
+					}
 				};
 
 				// Start the listener loop
