@@ -190,7 +190,10 @@ export class LegacyAdapter {
 				disableGitAdd: true,
 				_legacyCopy: true,
 				_legacySetName: setName,
-				_legacyConfig: copyList
+				_legacyConfig: copyList,
+				webpackConfig: {
+					devtool: false
+				}
 			};
 		};
 
