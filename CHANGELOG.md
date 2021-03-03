@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.2](https://github.com/labor-digital/asset-building/compare/v8.1.1...v8.1.2) (2021-03-03)
+
+
+### Bug Fixes
+
+* only start next worker in sequential build when in watch upon event ([41c8a2e](https://github.com/labor-digital/asset-building/commit/41c8a2efbd3f44e09eb5e0e233df2c29cd409bcd))
+
 ### [8.1.1](https://github.com/labor-digital/asset-building/compare/v8.1.0...v8.1.1) (2021-03-03)
 
 
