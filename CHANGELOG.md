@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.1](https://github.com/labor-digital/asset-building/compare/v8.1.0...v8.1.1) (2021-03-03)
+
+
+### Bug Fixes
+
+* fixing legacy copy app ([dcac702](https://github.com/labor-digital/asset-building/commit/dcac702d28432c83e35c68adfaacfbbcadf18fcc))
+
 ## [8.1.0](https://github.com/labor-digital/asset-building/compare/v8.0.15...v8.1.0) (2021-03-01)
 
 
