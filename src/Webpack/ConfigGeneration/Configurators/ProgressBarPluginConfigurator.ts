@@ -17,21 +17,23 @@
  */
 
 // @ts-ignore
-import WebpackBar from "webpackbar";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import WebpackBar from 'webpackbar';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class ProgressBarPluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-				config: {},
-				identifier,
-				context
-			})
-			.then(args => {
-				context.webpackConfig.plugins.push(new WebpackBar(args.config));
-				return context;
-			});
-	}
+export class ProgressBarPluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                          config: {},
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          context.webpackConfig.plugins.push(new WebpackBar(args.config));
+                          return context;
+                      });
+    }
 }

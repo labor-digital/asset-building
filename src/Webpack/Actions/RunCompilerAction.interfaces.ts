@@ -17,39 +17,41 @@
  */
 
 
-import type {Compiler, Configuration} from "webpack";
-import type {WorkerContext} from "../../Core/WorkerContext";
-import type {MakeConfigurationActionOptions} from "./MakeConfigurationAction";
+import type {Compiler, Configuration} from 'webpack';
+import type {WorkerContext} from '../../Core/WorkerContext';
+import type {MakeConfigurationActionOptions} from './MakeConfigurationAction';
 
-export interface RunCompilerOptions {
-
-	/**
-	 * Allows you to manually supply the configuration to run the compiler with.
-	 * If this is omitted a new configuration is build by the config generator
-	 */
-	config?: Configuration;
-
-	/**
-	 * Allows you to supply your own options when the configuration is generated.
-	 * Note that this option does nothing if "config" was supplied!
-	 */
-	configOptions?: MakeConfigurationActionOptions
+export interface RunCompilerOptions
+{
+    
+    /**
+     * Allows you to manually supply the configuration to run the compiler with.
+     * If this is omitted a new configuration is build by the config generator
+     */
+    config?: Configuration;
+    
+    /**
+     * Allows you to supply your own options when the configuration is generated.
+     * Note that this option does nothing if "config" was supplied!
+     */
+    configOptions?: MakeConfigurationActionOptions
 }
 
-export interface RunCompilerResult {
-	/**
-	 * The context object which was used to start the compiler
-	 */
-	context: WorkerContext;
-
-	/**
-	 * The instance of the webpack compiler that is currently running
-	 */
-	compiler: Compiler
-
-	/**
-	 * The promise that waits until the webpack compilier is finished.
-	 * It will contain the numeric exit code after it was resolved
-	 */
-	promise: Promise<number>
+export interface RunCompilerResult
+{
+    /**
+     * The context object which was used to start the compiler
+     */
+    context: WorkerContext;
+    
+    /**
+     * The instance of the webpack compiler that is currently running
+     */
+    compiler: Compiler
+    
+    /**
+     * The promise that waits until the webpack compilier is finished.
+     * It will contain the numeric exit code after it was resolved
+     */
+    promise: Promise<number>
 }

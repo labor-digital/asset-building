@@ -16,26 +16,27 @@
  * Last modified: 2019.10.15 at 09:03
  */
 
-import type {Application} from "express";
-import {GeneralHelper} from "../../Helpers/GeneralHelper";
-import ExpressContext from "./ExpressContext";
+import type {Application} from 'express';
+import {GeneralHelper} from '../../Helpers/GeneralHelper';
+import ExpressContext from './ExpressContext';
 
-export interface ExpressAssetBuildingPluginOptions {
-	/**
-	 * The numeric index of the "apps" array in the package.json we should build.
-	 */
-	appId?: number;
-
-	/**
-	 * The path to the package json to read the "labor" config from
-	 */
-	packageJsonDirectory?: string;
-
-	/**
-	 * The mode to run the asset builder in.
-	 * This would normally be defined using the CLI parameters
-	 */
-	mode?: string;
+export interface ExpressAssetBuildingPluginOptions
+{
+    /**
+     * The numeric index of the "apps" array in the package.json we should build.
+     */
+    appId?: number;
+    
+    /**
+     * The path to the package json to read the "labor" config from
+     */
+    packageJsonDirectory?: string;
+    
+    /**
+     * The mode to run the asset builder in.
+     * This would normally be defined using the CLI parameters
+     */
+    mode?: string;
 }
 
 /**
@@ -45,22 +46,25 @@ export interface ExpressAssetBuildingPluginOptions {
  * @param expressApp
  * @param options
  */
-module.exports = function expressAssetBuildingPlugin(expressApp: Application, options?: ExpressAssetBuildingPluginOptions): Promise<ExpressContext> {
-	GeneralHelper.renderFancyIntro();
-
-	const context = new ExpressContext(expressApp, options);
-
-	// Be done if we are in production context
-	if (context.isProd) {
-		return Promise.resolve(context);
-	}
-
-	// Create the worker process
-	return context.factory.getWorkerContext()
-		.then(context => context.do.runCompiler())
-		.then(res => {
-			context.compiler = res.compiler;
-			context.parentContext = res.context;
-			return context;
-		});
+module.exports = function expressAssetBuildingPlugin(
+    expressApp: Application,
+    options?: ExpressAssetBuildingPluginOptions
+): Promise<ExpressContext> {
+    GeneralHelper.renderFancyIntro();
+    
+    const context = new ExpressContext(expressApp, options);
+    
+    // Be done if we are in production context
+    if (context.isProd) {
+        return Promise.resolve(context);
+    }
+    
+    // Create the worker process
+    return context.factory.getWorkerContext()
+                  .then(context => context.do.runCompiler())
+                  .then(res => {
+                      context.compiler = res.compiler;
+                      context.parentContext = res.context;
+                      return context;
+                  });
 };

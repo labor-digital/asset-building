@@ -16,9 +16,10 @@
  * Last modified: 2019.10.06 at 13:39
  */
 
-import type {Stats} from "webpack";
-import type {WorkerContext} from "../Core/WorkerContext";
+import type {Stats} from 'webpack';
+import type {WorkerContext} from '../Core/WorkerContext';
 
-export interface WebpackCompilerCallbackInterface {
-	(context: WorkerContext, stats: Stats, resolve: Function, reject: Function): void
+export interface WebpackCompilerCallbackInterface
+{
+    (context: WorkerContext, stats: Stats, resolve: Function, reject: Function): void
 }

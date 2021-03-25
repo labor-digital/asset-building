@@ -15,6 +15,6 @@
  *
  * Last modified: 2018.09.20 at 19:27
  */
-console.log("hallo");
-import "./Components/Components.js";
-import "./Globals/Globals.sass";
+console.log('hallo');
+import './Components/Components.js';
+import './Globals/Globals.sass';

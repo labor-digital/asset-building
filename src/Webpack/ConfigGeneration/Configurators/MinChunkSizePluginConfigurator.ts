@@ -16,23 +16,25 @@
  * Last modified: 2019.10.06 at 15:49
  */
 
-import webpack from "webpack";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import webpack from 'webpack';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class MinChunkSizePluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-				config: {
-					minChunkSize: context.app.minChunkSize
-				},
-				identifier,
-				context
-			})
-			.then(args => {
-				context.webpackConfig.plugins.push(new webpack.optimize.MinChunkSizePlugin(args.config));
-				return context;
-			});
-	}
+export class MinChunkSizePluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                          config: {
+                              minChunkSize: context.app.minChunkSize
+                          },
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          context.webpackConfig.plugins.push(new webpack.optimize.MinChunkSizePlugin(args.config));
+                          return context;
+                      });
+    }
 }

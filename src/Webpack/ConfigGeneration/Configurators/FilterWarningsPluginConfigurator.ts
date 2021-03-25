@@ -16,44 +16,49 @@
  * Last modified: 2019.10.06 at 15:55
  */
 
-import {isArray, isString, map} from "@labor-digital/helferlein";
+import {isArray, isString, map} from '@labor-digital/helferlein';
 // @ts-ignore
-import WebpackFilterWarningsPlugin from "webpack-filter-warnings-plugin";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import WebpackFilterWarningsPlugin from 'webpack-filter-warnings-plugin';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class FilterWarningsPluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		// Get the warnings to ignore
-		let warningsToIgnore: Array<string | RegExp> = (isArray(context.app.warningsIgnorePattern) ? context.app.warningsIgnorePattern : (
-			isString(context.app.warningsIgnorePattern) ? [context.app.warningsIgnorePattern] : []
-		)) as Array<any>;
-
-		// Make sure everything is a regex
-		warningsToIgnore = map(warningsToIgnore, (v) => {
-			if (isString(v)) return new RegExp(v);
-			return v;
-		});
-
-		// Allow filtering
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
-				patterns: warningsToIgnore,
-				identifier,
-				context
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-					config: {
-						exclude: args.patterns
-					},
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				context.webpackConfig.plugins.push(new WebpackFilterWarningsPlugin(args.config));
-				return context;
-			});
-	}
+export class FilterWarningsPluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        // Get the warnings to ignore
+        let warningsToIgnore: Array<string | RegExp> = (isArray(context.app.warningsIgnorePattern)
+            ? context.app.warningsIgnorePattern : (
+                isString(context.app.warningsIgnorePattern) ? [context.app.warningsIgnorePattern] : []
+            )) as Array<any>;
+        
+        // Make sure everything is a regex
+        warningsToIgnore = map(warningsToIgnore, (v) => {
+            if (isString(v)) {
+                return new RegExp(v);
+            }
+            return v;
+        });
+        
+        // Allow filtering
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
+                          patterns: warningsToIgnore,
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                              config: {
+                                  exclude: args.patterns
+                              },
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          context.webpackConfig.plugins.push(new WebpackFilterWarningsPlugin(args.config));
+                          return context;
+                      });
+    }
 }

@@ -16,18 +16,20 @@
  * Last modified: 2020.04.11 at 19:31
  */
 
-import type {Compiler} from "webpack";
-import {SassFileResolver} from "../Loaders/CustomSassLoader/SassFileResolver";
+import type {Compiler} from 'webpack';
+import {SassFileResolver} from '../Loaders/CustomSassLoader/SassFileResolver';
 import type {
-	AssetBuilderWebpackPluginInterface,
-	AssetBuilderWebpackPluginStaticInterface
-} from "./AssetBuilderWebpackPluginInterface";
+    AssetBuilderWebpackPluginInterface,
+    AssetBuilderWebpackPluginStaticInterface
+} from './AssetBuilderWebpackPluginInterface';
 
 export const CustomSassLoaderPreCompilerCacheInvalidatePlugin: AssetBuilderWebpackPluginStaticInterface =
-	class implements AssetBuilderWebpackPluginInterface {
-		apply(compiler: Compiler) {
-			compiler.hooks.invalid.tap("CustomSassLoaderPreCompilerCacheInvalidatePlugin", function (filename) {
-				SassFileResolver.invalidate(filename ?? "");
-			});
-		}
-	};
+    class implements AssetBuilderWebpackPluginInterface
+    {
+        apply(compiler: Compiler)
+        {
+            compiler.hooks.invalid.tap('CustomSassLoaderPreCompilerCacheInvalidatePlugin', function (filename) {
+                SassFileResolver.invalidate(filename ?? '');
+            });
+        }
+    };

@@ -16,45 +16,51 @@
  * Last modified: 2019.10.06 at 15:44
  */
 
-import {CleanWebpackPlugin} from "clean-webpack-plugin";
-import path from "path";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {CleanWebpackPlugin} from 'clean-webpack-plugin';
+import path from 'path';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		if (!context.isProd) return Promise.resolve(context);
-		if (context.app.keepOutputDirectory) return Promise.resolve(context);
-
-		const inputDirectory = path.dirname(context.app.entry);
-		const outputDirectory = context.webpackConfig.output.path;
-
-		// Add plugin to clean the output directory when the app is compiled
-		// But make sure to keep all sources which have been defined in there
-		const sourceToExclude = path.relative(outputDirectory, inputDirectory)
-			.split(/\\\//)!
-			.shift()!
-			.replace(/^[.\\\/]+/g, "");
-		const cleanOnceBeforeBuildPatterns = ["**/*"];
-		if (sourceToExclude.length > 0) {
-			cleanOnceBeforeBuildPatterns.push("!" + sourceToExclude);
-			cleanOnceBeforeBuildPatterns.push("!" + sourceToExclude + "/**/*");
-		}
-
-		// Allow filtering
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-				config: {
-					verbose: true,
-					cleanStaleWebpackAssets: false,
-					cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
-				},
-				identifier,
-				context
-			})
-			.then(args => {
-				context.webpackConfig.plugins.push(new CleanWebpackPlugin(args.config));
-				return context;
-			});
-	}
+export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        if (!context.isProd) {
+            return Promise.resolve(context);
+        }
+        if (context.app.keepOutputDirectory) {
+            return Promise.resolve(context);
+        }
+        
+        const inputDirectory = path.dirname(context.app.entry);
+        const outputDirectory = context.webpackConfig.output.path;
+        
+        // Add plugin to clean the output directory when the app is compiled
+        // But make sure to keep all sources which have been defined in there
+        const sourceToExclude = path.relative(outputDirectory, inputDirectory)
+                                    .split(/\\\//)!
+            .shift()!
+            .replace(/^[.\\\/]+/g, '');
+        const cleanOnceBeforeBuildPatterns = ['**/*'];
+        if (sourceToExclude.length > 0) {
+            cleanOnceBeforeBuildPatterns.push('!' + sourceToExclude);
+            cleanOnceBeforeBuildPatterns.push('!' + sourceToExclude + '/**/*');
+        }
+        
+        // Allow filtering
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                          config: {
+                              verbose: true,
+                              cleanStaleWebpackAssets: false,
+                              cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
+                          },
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          context.webpackConfig.plugins.push(new CleanWebpackPlugin(args.config));
+                          return context;
+                      });
+    }
 }

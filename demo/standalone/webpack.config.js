@@ -17,5 +17,5 @@
  */
 
 module.exports = function (context) {
-	console.log("[WEBPACK CONFIG]: Loaded custom config in webpack.config.js!");
+    console.log('[WEBPACK CONFIG]: Loaded custom config in webpack.config.js!');
 };

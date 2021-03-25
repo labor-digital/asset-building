@@ -16,75 +16,79 @@
  * Last modified: 2019.10.06 at 11:34
  */
 
-import type {PlainObject} from "@labor-digital/helferlein";
+import type {PlainObject} from '@labor-digital/helferlein';
 // @ts-ignore
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import path from "path";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from "../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin";
-import {AbstractStyleLoaderConfigurator} from "./AbstractStyleLoaderConfigurator";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import path from 'path';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from '../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin';
+import {AbstractStyleLoaderConfigurator} from './AbstractStyleLoaderConfigurator';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		let postCssConfig: PlainObject | null = null;
-
-		// Register cache clear plugin for custom sass compiler
-		context.webpackConfig.plugins.push(new CustomSassLoaderPreCompilerCacheInvalidatePlugin());
-
-		// Build config
-		return this.makePostcssConfig(identifier, context)
-			.then(config => {
-				postCssConfig = config;
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-					test: /\.(sa|sc|c)ss$/,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						use: [
-							{
-								loader: MiniCssExtractPlugin.loader,
-								options: {
-									publicPath: "../"
-								}
-							},
-							{
-								loader: "css-loader",
-								options: {
-									esModule: false,
-									import: true
-								}
-							},
-							postCssConfig,
-							{
-								loader: path.resolve(context.parentContext.assetBuilderPath, "./Webpack/Loaders/CustomSassLoader/CustomSassLoader.js"),
-								options: {
-									app: context.app,
-									context
-								}
-							},
-							{
-								loader: path.resolve(context.parentContext.assetBuilderPath, "./Webpack/Loaders/ResourceLoader/ResourceLoader.js"),
-								options: {
-									currentDir: context.parentContext.sourcePath,
-									entry: context.app.entry,
-									ext: ["sass", "scss", "css"]
-								}
-							}
-						]
-					},
-					identifier,
-					context
-				});
-			}).then(args => {
-				context.webpackConfig.module.rules.push(args.config);
-				return context;
-			});
-	}
+export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        let postCssConfig: PlainObject | null = null;
+        
+        // Register cache clear plugin for custom sass compiler
+        context.webpackConfig.plugins.push(new CustomSassLoaderPreCompilerCacheInvalidatePlugin());
+        
+        // Build config
+        return this.makePostcssConfig(identifier, context)
+                   .then(config => {
+                       postCssConfig = config;
+                       return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+                           test: /\.(sa|sc|c)ss$/,
+                           identifier,
+                           context
+                       });
+                   })
+                   .then(args => {
+                       return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                           config: {
+                               test: args.test,
+                               use: [
+                                   {
+                                       loader: MiniCssExtractPlugin.loader,
+                                       options: {
+                                           publicPath: '../'
+                                       }
+                                   },
+                                   {
+                                       loader: 'css-loader',
+                                       options: {
+                                           esModule: false,
+                                           import: true
+                                       }
+                                   },
+                                   postCssConfig,
+                                   {
+                                       loader: path.resolve(context.parentContext.assetBuilderPath,
+                                           './Webpack/Loaders/CustomSassLoader/CustomSassLoader.js'),
+                                       options: {
+                                           app: context.app,
+                                           context
+                                       }
+                                   },
+                                   {
+                                       loader: path.resolve(context.parentContext.assetBuilderPath,
+                                           './Webpack/Loaders/ResourceLoader/ResourceLoader.js'),
+                                       options: {
+                                           currentDir: context.parentContext.sourcePath,
+                                           entry: context.app.entry,
+                                           ext: ['sass', 'scss', 'css']
+                                       }
+                                   }
+                               ]
+                           },
+                           identifier,
+                           context
+                       });
+                   }).then(args => {
+                context.webpackConfig.module.rules.push(args.config);
+                return context;
+            });
+    }
 }

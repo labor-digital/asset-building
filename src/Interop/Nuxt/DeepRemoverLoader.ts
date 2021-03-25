@@ -18,5 +18,5 @@
 
 // @ts-ignore
 module.exports = function (source) {
-	return source.replace(/\s+\/deep\/\s+/gmi, " ");
+    return source.replace(/\s+\/deep\/\s+/gmi, ' ');
 };

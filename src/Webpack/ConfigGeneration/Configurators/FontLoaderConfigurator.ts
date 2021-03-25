@@ -16,42 +16,46 @@
  * Last modified: 2019.10.05 at 20:41
  */
 
-import {md5} from "@labor-digital/helferlein";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {md5} from '@labor-digital/helferlein';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class FontLoaderConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-			test: /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/,
-			identifier,
-			context
-		}).then(args => {
-			return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-				config: {
-					test: args.test,
-					use: [
-						{
-							loader: "file-loader",
-							options: {
-								name: (file: string) => {
-									if (context.isProd) return "[name]-[fullhash].[ext]";
-									// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
-									return "[name]-" + md5(file) + ".[ext]";
-								},
-								outputPath: "assets/"
-							}
-						}
-					]
-				},
-				identifier,
-				context
-			});
-		}).then(args => {
-			context.webpackConfig.module.rules.push(args.config);
-			return context;
-		});
-	}
+export class FontLoaderConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+            test: /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/,
+            identifier,
+            context
+        }).then(args => {
+            return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                config: {
+                    test: args.test,
+                    use: [
+                        {
+                            loader: 'file-loader',
+                            options: {
+                                name: (file: string) => {
+                                    if (context.isProd) {
+                                        return '[name]-[fullhash].[ext]';
+                                    }
+                                    // Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
+                                    return '[name]-' + md5(file) + '.[ext]';
+                                },
+                                outputPath: 'assets/'
+                            }
+                        }
+                    ]
+                },
+                identifier,
+                context
+            });
+        }).then(args => {
+            context.webpackConfig.module.rules.push(args.config);
+            return context;
+        });
+    }
 }

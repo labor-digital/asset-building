@@ -16,74 +16,80 @@
  * Last modified: 2020.10.21 at 21:29
  */
 
-import {isArray, PlainObject} from "@labor-digital/helferlein";
-import type {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
-import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import type {AssetBuilderPluginIdentifiers as PluginIds} from "../../AssetBuilderPluginIdentifiers";
-import type {WorkerContext} from "../../Core/WorkerContext";
-import {WebpackConfigGenerator} from "../ConfigGeneration/WebpackConfigGenerator";
-import type {WorkerActionInterface} from "./WorkerActionInterface";
+import {isArray, PlainObject} from '@labor-digital/helferlein';
+import type {AssetBuilderConfiguratorIdentifiers as Ids} from '../../AssetBuilderConfiguratorIdentifiers';
+import {AssetBuilderEventList} from '../../AssetBuilderEventList';
+import type {AssetBuilderPluginIdentifiers as PluginIds} from '../../AssetBuilderPluginIdentifiers';
+import type {WorkerContext} from '../../Core/WorkerContext';
+import {WebpackConfigGenerator} from '../ConfigGeneration/WebpackConfigGenerator';
+import type {WorkerActionInterface} from './WorkerActionInterface';
 
-export interface MakeConfigurationActionOptions {
-	/**
-	 * An optional list of configurator ids that should be disabled when the config is generated
-	 */
-	disableConfigurators?: Array<Ids>
-
-	/**
-	 * A list of all asset builder plugin ids that should be disabled when the configuration is being build
-	 */
-	disablePlugins?: Array<PluginIds>
-
+export interface MakeConfigurationActionOptions
+{
+    /**
+     * An optional list of configurator ids that should be disabled when the config is generated
+     */
+    disableConfigurators?: Array<Ids>
+    
+    /**
+     * A list of all asset builder plugin ids that should be disabled when the configuration is being build
+     */
+    disablePlugins?: Array<PluginIds>
+    
 }
 
-export class MakeConfigurationAction implements WorkerActionInterface {
-
-	/**
-	 * @inheritDoc
-	 */
-	public do(context: WorkerContext, options?: MakeConfigurationActionOptions): any {
-		options = options ?? {};
-
-		this.bindDisalbedElementListener(context, options);
-
-		return (new WebpackConfigGenerator())
-			.generateConfiguration(context)
-			.then(context =>
-				context.parentContext.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_WEBPACK_CONFIG, {
-					environment: context.parentContext.environment,
-					context,
-					config: context.webpackConfig
-				})
-			)
-			.then(args => args.config);
-	}
-
-	/**
-	 * Binds an event listener to disable some configurators if required by the given options
-	 * @param context
-	 * @param options
-	 * @protected
-	 */
-	protected bindDisalbedElementListener(context: WorkerContext, options?: MakeConfigurationActionOptions): void {
-		if (!options) return;
-
-		if (isArray(options.disableConfigurators)) {
-			context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e: PlainObject) => {
-				if (options.disableConfigurators!.indexOf(e.args.identifier) === -1) {
-					return;
-				}
-				e.args.useConfigurator = false;
-			});
-		}
-		if (isArray(options.disablePlugins)) {
-			context.eventEmitter.bind(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, (e: PlainObject) => {
-				if (options.disablePlugins!.indexOf(e.args.identifier) === -1) {
-					return;
-				}
-				e.args.usePlugin = false;
-			});
-		}
-	}
-
+export class MakeConfigurationAction implements WorkerActionInterface
+{
+    
+    /**
+     * @inheritDoc
+     */
+    public do(context: WorkerContext, options?: MakeConfigurationActionOptions): any
+    {
+        options = options ?? {};
+        
+        this.bindDisalbedElementListener(context, options);
+        
+        return (new WebpackConfigGenerator())
+            .generateConfiguration(context)
+            .then(context =>
+                context.parentContext.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_WEBPACK_CONFIG, {
+                    environment: context.parentContext.environment,
+                    context,
+                    config: context.webpackConfig
+                })
+            )
+            .then(args => args.config);
+    }
+    
+    /**
+     * Binds an event listener to disable some configurators if required by the given options
+     * @param context
+     * @param options
+     * @protected
+     */
+    protected bindDisalbedElementListener(context: WorkerContext, options?: MakeConfigurationActionOptions): void
+    {
+        if (!options) {
+            return;
+        }
+        
+        if (isArray(options.disableConfigurators)) {
+            context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e: PlainObject) => {
+                if (options.disableConfigurators!.indexOf(e.args.identifier) === -1) {
+                    return;
+                }
+                e.args.useConfigurator = false;
+            });
+        }
+        if (isArray(options.disablePlugins)) {
+            context.eventEmitter.bind(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, (e: PlainObject) => {
+                if (options.disablePlugins!.indexOf(e.args.identifier) === -1) {
+                    return;
+                }
+                e.args.usePlugin = false;
+            });
+        }
+    }
+    
 }

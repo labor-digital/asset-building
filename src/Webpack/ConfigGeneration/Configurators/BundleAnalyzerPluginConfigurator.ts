@@ -17,27 +17,31 @@
  */
 
 // @ts-ignore
-import {BundleAnalyzerPlugin} from "webpack-bundle-analyzer";
-import {merge} from "webpack-merge";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer';
+import {merge} from 'webpack-merge';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class BundleAnalyzerPluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		if (context.mode !== "analyze") return Promise.resolve(context);
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-			config: {},
-			identifier,
-			context
-		}).then(args => {
-			context.webpackConfig = merge(context.webpackConfig, {
-				profile: true,
-				plugins: [
-					new BundleAnalyzerPlugin(args.config)
-				]
-			});
-			return context;
-		});
-	}
+export class BundleAnalyzerPluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        if (context.mode !== 'analyze') {
+            return Promise.resolve(context);
+        }
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+            config: {},
+            identifier,
+            context
+        }).then(args => {
+            context.webpackConfig = merge(context.webpackConfig, {
+                profile: true,
+                plugins: [
+                    new BundleAnalyzerPlugin(args.config)
+                ]
+            });
+            return context;
+        });
+    }
 }

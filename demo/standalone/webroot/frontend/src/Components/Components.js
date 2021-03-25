@@ -17,5 +17,5 @@
  */
 
 // Imports all components in this directory
-import "ComponentA/ComponentA";
-import "ComponentB/ComponentB";
+import 'ComponentA/ComponentA';
+import 'ComponentB/ComponentB';

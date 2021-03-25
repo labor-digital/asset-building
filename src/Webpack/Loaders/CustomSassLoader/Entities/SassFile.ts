@@ -15,16 +15,18 @@
  *
  * Last modified: 2019.02.18 at 20:58
  */
-export class SassFile {
-	filename: string;
-	extension: string;
-	content: string;
-	hash: string;
-
-	constructor() {
-		this.filename = "";
-		this.extension = "";
-		this.content = "";
-		this.hash = "-1";
-	}
+export class SassFile
+{
+    filename: string;
+    extension: string;
+    content: string;
+    hash: string;
+    
+    constructor()
+    {
+        this.filename = '';
+        this.extension = '';
+        this.content = '';
+        this.hash = '-1';
+    }
 }

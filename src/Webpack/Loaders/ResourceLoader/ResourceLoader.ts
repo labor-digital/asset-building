@@ -16,88 +16,92 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
-import {isString} from "@labor-digital/helferlein";
-import fs from "fs";
-import path from "path";
+import {isString} from '@labor-digital/helferlein';
+import fs from 'fs';
+import path from 'path';
 // @ts-ignore
-import type {Loader} from "webpack";
-import {FileHelpers} from "../../../Helpers/FileHelpers";
+import type {Loader} from 'webpack';
+import {FileHelpers} from '../../../Helpers/FileHelpers';
 
 const resourceLoader = function (this: Loader, source: string) {
-	// Make this loader async
-	const callback = this.async();
-
-	// Ignore empty inputs
-	if (source.replace(/[\s\n]+/g, "").trim() === "") {
-		callback(null, source);
-		return;
-	}
-
-	// Resolve the root path
-	let rootPath: string;
-	if (isString(this.query.entry)) {
-		rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
-	} else {
-		rootPath = FileHelpers.unifyFilename(this.query.currentDir) + path.sep;
-	}
-
-	// Prepare file locations
-	let stylesheetPath = FileHelpers.unifyFilename(FileHelpers.stripOffQuery(this.resourcePath));
-	const possibleResourceLocations: Array<string> = [];
-
-	// Ignore css files
-	if (FileHelpers.getFileExtension(stylesheetPath) === "css") return callback(null, source);
-
-	// Register root resources
-	this.query.ext.forEach((ext: string) => {
-		const possiblePath = path.resolve(rootPath) + path.sep + "Resources." + ext;
-		possibleResourceLocations.push(possiblePath);
-	});
-
-	// Check if we have to search upwards for resources in our root path
-	if (stylesheetPath.indexOf(rootPath) === -1) {
-		const rootParts = rootPath.split(path.sep);
-		while (rootParts.length > 0) {
-			rootParts.pop();
-			if (stylesheetPath.indexOf(rootParts.join(path.sep) + path.sep) === 0) {
-				rootPath = rootParts.join(path.sep) + path.sep;
-				break;
-			}
-		}
-	}
-
-	// Add resources up to the root directory
-	if (stylesheetPath.indexOf(rootPath) === 0) {
-		// We can traverse the path down...
-		const pathParts = stylesheetPath.replace(rootPath, "").split(path.sep);
-		pathParts.unshift(".");
-		pathParts.pop();
-		let localPath = "";
-		pathParts.forEach(part => {
-			localPath += part + path.sep;
-			this.query.ext.forEach((ext: string) => {
-				const possiblePath = path.resolve(rootPath + localPath) + path.sep + "Resources." + ext;
-				if (possibleResourceLocations.indexOf(possiblePath) !== -1) return;
-				possibleResourceLocations.push(possiblePath);
-			});
-		});
-	}
-
-	// Filter out all non-existing resources
-	const existingResourceLocations = possibleResourceLocations.filter((v) => fs.existsSync(v));
-
-	// Skip if there are no resources
-	if (existingResourceLocations.length === 0) {
-		callback(null, source);
-		return;
-	}
-
-	// Make wrapper to import the required files
-	const wrapper: Array<string> = [];
-	existingResourceLocations.forEach(file => {
-		wrapper.push("@import \"" + FileHelpers.unifyFilename(file) + "\";");
-	});
-
-	callback(null, wrapper.join("\r\n") + "\r\n" + source);
+    // Make this loader async
+    const callback = this.async();
+    
+    // Ignore empty inputs
+    if (source.replace(/[\s\n]+/g, '').trim() === '') {
+        callback(null, source);
+        return;
+    }
+    
+    // Resolve the root path
+    let rootPath: string;
+    if (isString(this.query.entry)) {
+        rootPath = FileHelpers.unifyFilename(this.query.currentDir + path.dirname(this.query.entry)) + path.sep;
+    } else {
+        rootPath = FileHelpers.unifyFilename(this.query.currentDir) + path.sep;
+    }
+    
+    // Prepare file locations
+    let stylesheetPath = FileHelpers.unifyFilename(FileHelpers.stripOffQuery(this.resourcePath));
+    const possibleResourceLocations: Array<string> = [];
+    
+    // Ignore css files
+    if (FileHelpers.getFileExtension(stylesheetPath) === 'css') {
+        return callback(null, source);
+    }
+    
+    // Register root resources
+    this.query.ext.forEach((ext: string) => {
+        const possiblePath = path.resolve(rootPath) + path.sep + 'Resources.' + ext;
+        possibleResourceLocations.push(possiblePath);
+    });
+    
+    // Check if we have to search upwards for resources in our root path
+    if (stylesheetPath.indexOf(rootPath) === -1) {
+        const rootParts = rootPath.split(path.sep);
+        while (rootParts.length > 0) {
+            rootParts.pop();
+            if (stylesheetPath.indexOf(rootParts.join(path.sep) + path.sep) === 0) {
+                rootPath = rootParts.join(path.sep) + path.sep;
+                break;
+            }
+        }
+    }
+    
+    // Add resources up to the root directory
+    if (stylesheetPath.indexOf(rootPath) === 0) {
+        // We can traverse the path down...
+        const pathParts = stylesheetPath.replace(rootPath, '').split(path.sep);
+        pathParts.unshift('.');
+        pathParts.pop();
+        let localPath = '';
+        pathParts.forEach(part => {
+            localPath += part + path.sep;
+            this.query.ext.forEach((ext: string) => {
+                const possiblePath = path.resolve(rootPath + localPath) + path.sep + 'Resources.' + ext;
+                if (possibleResourceLocations.indexOf(possiblePath) !== -1) {
+                    return;
+                }
+                possibleResourceLocations.push(possiblePath);
+            });
+        });
+    }
+    
+    // Filter out all non-existing resources
+    const existingResourceLocations = possibleResourceLocations.filter((v) => fs.existsSync(v));
+    
+    // Skip if there are no resources
+    if (existingResourceLocations.length === 0) {
+        callback(null, source);
+        return;
+    }
+    
+    // Make wrapper to import the required files
+    const wrapper: Array<string> = [];
+    existingResourceLocations.forEach(file => {
+        wrapper.push('@import "' + FileHelpers.unifyFilename(file) + '";');
+    });
+    
+    callback(null, wrapper.join('\r\n') + '\r\n' + source);
 };
 export default resourceLoader;

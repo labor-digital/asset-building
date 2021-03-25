@@ -16,37 +16,41 @@
  * Last modified: 2020.10.21 at 17:33
  */
 
-import type {CoreContext} from "./CoreContext";
-import type {FactoryCoreContextOptions, FactoryWorkerContextOptions} from "./Factory.interfaces";
-import {CoreContextFactory} from "./Factory/CoreContextFactory";
-import {WorkerContextFactory} from "./Factory/WorkerContextFactory";
-import type {WorkerContext} from "./WorkerContext";
+import type {CoreContext} from './CoreContext';
+import type {FactoryCoreContextOptions, FactoryWorkerContextOptions} from './Factory.interfaces';
+import {CoreContextFactory} from './Factory/CoreContextFactory';
+import {WorkerContextFactory} from './Factory/WorkerContextFactory';
+import type {WorkerContext} from './WorkerContext';
 
-export class Factory {
-
-	protected _coreContextFactory: CoreContextFactory;
-	protected _workerContextFactory: WorkerContextFactory;
-
-	public constructor(coreContextFactory?: CoreContextFactory, workerContextFactory?: WorkerContextFactory) {
-		this._coreContextFactory = coreContextFactory ?? new CoreContextFactory();
-		this._workerContextFactory = workerContextFactory ?? new WorkerContextFactory();
-	}
-
-	/**
-	 * Creates a new instance of the core context object which resembles the context of the main thread/root application.
-	 * You need this context to create a worker/app context with
-	 * @param options
-	 */
-	public makeCoreContext(options?: FactoryCoreContextOptions): Promise<CoreContext> {
-		return this._coreContextFactory.make(options);
-	}
-
-	/**
-	 * Creates a new worker context instance based on the core context and given options
-	 * @param coreContext
-	 * @param options
-	 */
-	public makeWorkerContext(coreContext: CoreContext, options?: FactoryWorkerContextOptions): Promise<WorkerContext> {
-		return this._workerContextFactory.make(coreContext, options);
-	}
+export class Factory
+{
+    
+    protected _coreContextFactory: CoreContextFactory;
+    protected _workerContextFactory: WorkerContextFactory;
+    
+    public constructor(coreContextFactory?: CoreContextFactory, workerContextFactory?: WorkerContextFactory)
+    {
+        this._coreContextFactory = coreContextFactory ?? new CoreContextFactory();
+        this._workerContextFactory = workerContextFactory ?? new WorkerContextFactory();
+    }
+    
+    /**
+     * Creates a new instance of the core context object which resembles the context of the main thread/root application.
+     * You need this context to create a worker/app context with
+     * @param options
+     */
+    public makeCoreContext(options?: FactoryCoreContextOptions): Promise<CoreContext>
+    {
+        return this._coreContextFactory.make(options);
+    }
+    
+    /**
+     * Creates a new worker context instance based on the core context and given options
+     * @param coreContext
+     * @param options
+     */
+    public makeWorkerContext(coreContext: CoreContext, options?: FactoryWorkerContextOptions): Promise<WorkerContext>
+    {
+        return this._workerContextFactory.make(coreContext, options);
+    }
 }

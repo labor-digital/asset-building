@@ -16,61 +16,64 @@
  * Last modified: 2019.10.05 at 21:39
  */
 
-import type {PlainObject} from "@labor-digital/helferlein";
+import type {PlainObject} from '@labor-digital/helferlein';
 // @ts-ignore
-import MiniCssExtractPlugin from "mini-css-extract-plugin";
-import path from "path";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import {AbstractStyleLoaderConfigurator} from "./AbstractStyleLoaderConfigurator";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import path from 'path';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import {AbstractStyleLoaderConfigurator} from './AbstractStyleLoaderConfigurator';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class LessLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		let postCssConfig: PlainObject | null = null;
-		return this.makePostcssConfig(identifier, context)
-			.then(config => {
-				postCssConfig = config;
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-					test: /\.less$/,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						use: [
-							{
-								loader: MiniCssExtractPlugin.loader,
-								options: {
-									publicPath: "../"
-								}
-							},
-							{
-								loader: "css-loader"
-							},
-							postCssConfig,
-							{
-								loader: "less-loader"
-							},
-							{
-								loader: path.resolve(context.parentContext.assetBuilderPath, "./Webpack/Loaders/ResourceLoader/ResourceLoader.js"),
-								options: {
-									currentDir: context.parentContext.sourcePath,
-									entry: context.app.entry,
-									ext: ["less", "css"]
-								}
-							}
-						]
-					},
-					identifier,
-					context
-				});
-			}).then(args => {
-				context.webpackConfig.module.rules.push(args.config);
-				return context;
-			});
-	}
+export class LessLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        let postCssConfig: PlainObject | null = null;
+        return this.makePostcssConfig(identifier, context)
+                   .then(config => {
+                       postCssConfig = config;
+                       return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+                           test: /\.less$/,
+                           identifier,
+                           context
+                       });
+                   })
+                   .then(args => {
+                       return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                           config: {
+                               test: args.test,
+                               use: [
+                                   {
+                                       loader: MiniCssExtractPlugin.loader,
+                                       options: {
+                                           publicPath: '../'
+                                       }
+                                   },
+                                   {
+                                       loader: 'css-loader'
+                                   },
+                                   postCssConfig,
+                                   {
+                                       loader: 'less-loader'
+                                   },
+                                   {
+                                       loader: path.resolve(context.parentContext.assetBuilderPath,
+                                           './Webpack/Loaders/ResourceLoader/ResourceLoader.js'),
+                                       options: {
+                                           currentDir: context.parentContext.sourcePath,
+                                           entry: context.app.entry,
+                                           ext: ['less', 'css']
+                                       }
+                                   }
+                               ]
+                           },
+                           identifier,
+                           context
+                       });
+                   }).then(args => {
+                context.webpackConfig.module.rules.push(args.config);
+                return context;
+            });
+    }
 }

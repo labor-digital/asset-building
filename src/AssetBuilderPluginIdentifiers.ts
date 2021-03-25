@@ -16,10 +16,11 @@
  * Last modified: 2020.10.22 at 10:49
  */
 
-export enum AssetBuilderPluginIdentifiers {
-	FANCY_STATS = "fancyStats",
-	FIX_BROKEN_CHUNKS = "fixBrokenChunks",
-	PROMISE_SHIM = "promiseShim",
-	CUSTOM_SASS_LOADER_CACHE_INVALIDATOR = "sassCacheInvalidator",
-	GIT_ADD = "gitAdd"
+export enum AssetBuilderPluginIdentifiers
+{
+    FANCY_STATS = 'fancyStats',
+    FIX_BROKEN_CHUNKS = 'fixBrokenChunks',
+    PROMISE_SHIM = 'promiseShim',
+    CUSTOM_SASS_LOADER_CACHE_INVALIDATOR = 'sassCacheInvalidator',
+    GIT_ADD = 'gitAdd'
 }

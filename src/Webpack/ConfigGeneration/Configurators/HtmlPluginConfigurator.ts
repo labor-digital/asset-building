@@ -16,56 +16,66 @@
  * Last modified: 2019.10.06 at 16:37
  */
 
-import {isNull} from "@labor-digital/helferlein";
-import HtmlWebpackPlugin from "html-webpack-plugin";
-import path from "path";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {isNull} from '@labor-digital/helferlein';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
+import path from 'path';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class HtmlPluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		if (isNull(context.app.htmlTemplate)) return Promise.resolve(context);
-
-		// Apply a basic configuration
-		let template = context.app.htmlTemplate;
-		if (template === true) template = {};
-		if (typeof template!.template === "undefined") {
-			template!.template = path.resolve(
-				path.join(__dirname, "../../../../static/HtmlDefaultTemplate.ejs")
-			);
-			if (typeof template!.inject === "undefined") template!.inject = false;
-			if (!Array.isArray(template!.meta)) {
-				template!.meta = [
-					{
-						"http-equiv": "X-UA-Compatible",
-						content: "IE=edge,chrome=1"
-					}, {
-						name: "viewport",
-						content: "width=device-width, initial-scale=1.0, user-scalable=0"
-					}
-				];
-			}
-		}
-		if (typeof template!.appMountId === "undefined") template!.appMountId = "app";
-
-		// Allow filtering
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_HTML_PLUGIN_TEMPLATE, {
-				template,
-				identifier,
-				context
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-					config: args.template,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				context.webpackConfig.plugins.push(new HtmlWebpackPlugin(args.config));
-				return context;
-			});
-	}
-
+export class HtmlPluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        if (isNull(context.app.htmlTemplate)) {
+            return Promise.resolve(context);
+        }
+        
+        // Apply a basic configuration
+        let template = context.app.htmlTemplate;
+        if (template === true) {
+            template = {};
+        }
+        if (typeof template!.template === 'undefined') {
+            template!.template = path.resolve(
+                path.join(__dirname, '../../../../static/HtmlDefaultTemplate.ejs')
+            );
+            if (typeof template!.inject === 'undefined') {
+                template!.inject = false;
+            }
+            if (!Array.isArray(template!.meta)) {
+                template!.meta = [
+                    {
+                        'http-equiv': 'X-UA-Compatible',
+                        content: 'IE=edge,chrome=1'
+                    }, {
+                        name: 'viewport',
+                        content: 'width=device-width, initial-scale=1.0, user-scalable=0'
+                    }
+                ];
+            }
+        }
+        if (typeof template!.appMountId === 'undefined') {
+            template!.appMountId = 'app';
+        }
+        
+        // Allow filtering
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_HTML_PLUGIN_TEMPLATE, {
+                          template,
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                              config: args.template,
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          context.webpackConfig.plugins.push(new HtmlWebpackPlugin(args.config));
+                          return context;
+                      });
+    }
+    
 }

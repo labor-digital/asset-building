@@ -16,43 +16,46 @@
  * Last modified: 2020.04.24 at 11:24
  */
 
-import {Factory} from "../../Core/Factory";
-import type {WorkerContext} from "../../Core/WorkerContext";
-import type {ExpressAssetBuildingPluginOptions} from "./expressAssetBuildingPlugin";
+import {Factory} from '../../Core/Factory';
+import type {WorkerContext} from '../../Core/WorkerContext';
+import type {ExpressAssetBuildingPluginOptions} from './expressAssetBuildingPlugin';
 
-export default class ExpressFactory {
-	/**
-	 * The express plugin options to extract the app from
-	 * @protected
-	 */
-	protected _options: ExpressAssetBuildingPluginOptions;
-
-	/**
-	 * The concrete factory to create the asset builder with
-	 * @protected
-	 */
-	protected _factory: Factory;
-
-	/**
-	 * Injects the factory instance and options
-	 * @param factory
-	 * @param options
-	 */
-	public constructor(options: ExpressAssetBuildingPluginOptions, factory?: Factory) {
-		this._options = options;
-		this._factory = factory ?? new Factory();
-	}
-
-	/**
-	 * Makes the prepared worker context for the express app
-	 */
-	public getWorkerContext(): Promise<WorkerContext> {
-		return this._factory.makeCoreContext({
-			mode: this._options.mode ?? "build",
-			packageJsonPath: this._options.packageJsonDirectory,
-			environment: "express"
-		}).then(coreContext => this._factory.makeWorkerContext(coreContext, {
-			app: this._options.appId
-		}));
-	}
+export default class ExpressFactory
+{
+    /**
+     * The express plugin options to extract the app from
+     * @protected
+     */
+    protected _options: ExpressAssetBuildingPluginOptions;
+    
+    /**
+     * The concrete factory to create the asset builder with
+     * @protected
+     */
+    protected _factory: Factory;
+    
+    /**
+     * Injects the factory instance and options
+     * @param factory
+     * @param options
+     */
+    public constructor(options: ExpressAssetBuildingPluginOptions, factory?: Factory)
+    {
+        this._options = options;
+        this._factory = factory ?? new Factory();
+    }
+    
+    /**
+     * Makes the prepared worker context for the express app
+     */
+    public getWorkerContext(): Promise<WorkerContext>
+    {
+        return this._factory.makeCoreContext({
+            mode: this._options.mode ?? 'build',
+            packageJsonPath: this._options.packageJsonDirectory,
+            environment: 'express'
+        }).then(coreContext => this._factory.makeWorkerContext(coreContext, {
+            app: this._options.appId
+        }));
+    }
 }

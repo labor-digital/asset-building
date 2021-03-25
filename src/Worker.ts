@@ -16,32 +16,35 @@
  * Last modified: 2019.10.05 at 17:02
  */
 
-import {EventBus, PlainObject} from "@labor-digital/helferlein";
-import {AssetBuilderEventList} from "./AssetBuilderEventList";
-import {Bootstrap} from "./Core/Bootstrap";
-import {GeneralHelper} from "./Helpers/GeneralHelper";
+import {EventBus, PlainObject} from '@labor-digital/helferlein';
+import {AssetBuilderEventList} from './AssetBuilderEventList';
+import {Bootstrap} from './Core/Bootstrap';
+import {GeneralHelper} from './Helpers/GeneralHelper';
 
 let isRunning = false;
 
-function init(message: PlainObject) {
-	(new Bootstrap())
-		.initWorkerProcess(message)
-		.then(context => context.do.runCompiler())
-		.then(res => res.promise)
-		.then((exitCode: number) => process.exit(exitCode))
-		.catch(err => {
-			GeneralHelper.renderError(err, "ERROR IN WORKER PROCESS:");
-		});
+function init(message: PlainObject)
+{
+    (new Bootstrap())
+        .initWorkerProcess(message)
+        .then(context => context.do.runCompiler())
+        .then(res => res.promise)
+        .then((exitCode: number) => process.exit(exitCode))
+        .catch(err => {
+            GeneralHelper.renderError(err, 'ERROR IN WORKER PROCESS:');
+        });
 }
 
-process.on("message", (message: PlainObject) => {
-	if (message.SHUTDOWN === true) {
-		console.log("Starting worker process (" + process.pid + ") shutdown...");
-		EventBus.emitHook(AssetBuilderEventList.SHUTDOWN, {}).then(() => process.exit(0));
-	} else if (!isRunning) init(message);
+process.on('message', (message: PlainObject) => {
+    if (message.SHUTDOWN === true) {
+        console.log('Starting worker process (' + process.pid + ') shutdown...');
+        EventBus.emitHook(AssetBuilderEventList.SHUTDOWN, {}).then(() => process.exit(0));
+    } else if (!isRunning) {
+        init(message);
+    }
 });
 
-process.on("SIGTERM", function () {
-	console.log("Stopping worker process!");
-	process.exit(0);
+process.on('SIGTERM', function () {
+    console.log('Stopping worker process!');
+    process.exit(0);
 });

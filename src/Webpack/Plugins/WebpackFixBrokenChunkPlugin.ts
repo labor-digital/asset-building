@@ -15,11 +15,11 @@
  *
  * Last modified: 2018.10.19 at 18:27
  */
-import type {Compiler} from "webpack";
+import type {Compiler} from 'webpack';
 import type {
-	AssetBuilderWebpackPluginInterface,
-	AssetBuilderWebpackPluginStaticInterface
-} from "./AssetBuilderWebpackPluginInterface";
+    AssetBuilderWebpackPluginInterface,
+    AssetBuilderWebpackPluginStaticInterface
+} from './AssetBuilderWebpackPluginInterface';
 
 /**
  * This plugin is currently required because of a strange bug, which occurs if:
@@ -34,14 +34,18 @@ import type {
  * This plugin provides a tiny polyfill to make sure the script runs correctly...
  */
 export const WebpackFixBrokenChunkPlugin: AssetBuilderWebpackPluginStaticInterface =
-	// @todo is this still required?
-	class implements AssetBuilderWebpackPluginInterface {
-		apply(compiler: Compiler) {
-			compiler.hooks.compilation.tap("WebpackFixBrokenChunkPlugin", compilation => {
-				compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (content: string) {
-					content += "\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== 'function') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n";
-					return content;
-				});
-			});
-		}
-	};
+    // @todo is this still required?
+    class implements AssetBuilderWebpackPluginInterface
+    {
+        apply(compiler: Compiler)
+        {
+            compiler.hooks.compilation.tap('WebpackFixBrokenChunkPlugin', compilation => {
+                compilation.mainTemplate.hooks.requireExtensions.tap('WebpackFixBrokenChunkPlugin',
+                    function (content: string) {
+                        content
+                            += '\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== \'function\') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n';
+                        return content;
+                    });
+            });
+        }
+    };

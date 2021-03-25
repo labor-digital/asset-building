@@ -16,67 +16,69 @@
  * Last modified: 2019.10.05 at 20:50
  */
 
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class JsPreloadConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-
-		// Storage for temporary values
-		let excludePattern: RegExp | undefined = undefined;
-		let loaders: Array<any> = [];
-
-		// Loop through the preloader configuration
-		return Promise.resolve(context)
-
-			// Allow filtering of the loaders
-			.then(() => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_PRE_LOADERS, {
-					loaders,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				loaders = args.loaders;
-				return context;
-			})
-
-			// Prepare exclude pattern
-			.then(() => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_EXCLUDE_PATTERN, {
-					pattern: /node_modules/,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				excludePattern = args.pattern;
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-					test: /\.js$|\.jsx$|\.ts$|\.tsx$/,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						exclude: excludePattern ?? undefined,
-						enforce: "pre",
-						use: loaders
-					},
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				if (args.config.use.length !== 0) {
-					context.webpackConfig.module.rules.push(args.config);
-				}
-				return context;
-			});
-
-	}
+export class JsPreloadConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        
+        // Storage for temporary values
+        let excludePattern: RegExp | undefined = undefined;
+        let loaders: Array<any> = [];
+        
+        // Loop through the preloader configuration
+        return Promise.resolve(context)
+            
+            // Allow filtering of the loaders
+                      .then(() => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_PRE_LOADERS, {
+                              loaders,
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          loaders = args.loaders;
+                          return context;
+                      })
+            
+            // Prepare exclude pattern
+                      .then(() => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_EXCLUDE_PATTERN, {
+                              pattern: /node_modules/,
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          excludePattern = args.pattern;
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+                              test: /\.js$|\.jsx$|\.ts$|\.tsx$/,
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                              config: {
+                                  test: args.test,
+                                  exclude: excludePattern ?? undefined,
+                                  enforce: 'pre',
+                                  use: loaders
+                              },
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          if (args.config.use.length !== 0) {
+                              context.webpackConfig.module.rules.push(args.config);
+                          }
+                          return context;
+                      });
+        
+    }
 }

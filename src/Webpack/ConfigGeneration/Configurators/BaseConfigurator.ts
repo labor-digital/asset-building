@@ -16,49 +16,51 @@
  * Last modified: 2019.10.05 at 20:06
  */
 
-import {asArray, inflectToUnderscore, md5} from "@labor-digital/helferlein";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {asArray, inflectToUnderscore, md5} from '@labor-digital/helferlein';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export const resolveFileExtensions = [".ts", ".tsx", ".js", ".jsx", ".json"];
+export const resolveFileExtensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
 
-export class BaseConfigurator implements ConfiguratorInterface {
-	public apply(_: string, context: WorkerContext): Promise<WorkerContext> {
-		// Build the json-p function name
-		const jsonPName = "labor_webpack_" + md5(
-			context.parentContext.packageJsonPath +
-			(context.isProd ? Math.random() : "") +
-			context.appId +
-			JSON.stringify(context.app)) + "_" + inflectToUnderscore(context.app.appName!);
-
-		// Populate the basic webpack configuration
-		context.webpackConfig = {
-			name: context.app.appName + "",
-			mode: context.isProd ? "production" : "development",
-			target: ["web", "es5"],
-			watch: context.parentContext.watch,
-			devtool: context.isProd ? "source-map" : "eval",
-			entry: {},
-			plugins: [],
-			module: {
-				rules: []
-			},
-			performance: {
-				hints: false
-			},
-			resolve: {
-				modules: asArray(context.parentContext.additionalResolverPaths),
-				extensions: resolveFileExtensions
-			},
-			resolveLoader: {
-				modules: asArray(context.parentContext.additionalResolverPaths)
-			},
-			output: {
-				chunkLoadingGlobal: jsonPName
-			}
-		};
-
-		// Done
-		return Promise.resolve(context);
-	}
+export class BaseConfigurator implements ConfiguratorInterface
+{
+    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        // Build the json-p function name
+        const jsonPName = 'labor_webpack_' + md5(
+                          context.parentContext.packageJsonPath +
+                          (context.isProd ? Math.random() : '') +
+                          context.appId +
+                          JSON.stringify(context.app)) + '_' + inflectToUnderscore(context.app.appName!);
+        
+        // Populate the basic webpack configuration
+        context.webpackConfig = {
+            name: context.app.appName + '',
+            mode: context.isProd ? 'production' : 'development',
+            target: ['web', 'es5'],
+            watch: context.parentContext.watch,
+            devtool: context.isProd ? 'source-map' : 'eval',
+            entry: {},
+            plugins: [],
+            module: {
+                rules: []
+            },
+            performance: {
+                hints: false
+            },
+            resolve: {
+                modules: asArray(context.parentContext.additionalResolverPaths),
+                extensions: resolveFileExtensions
+            },
+            resolveLoader: {
+                modules: asArray(context.parentContext.additionalResolverPaths)
+            },
+            output: {
+                chunkLoadingGlobal: jsonPName
+            }
+        };
+        
+        // Done
+        return Promise.resolve(context);
+    }
 }

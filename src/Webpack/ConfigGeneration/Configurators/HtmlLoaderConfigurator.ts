@@ -16,30 +16,34 @@
  * Last modified: 2019.10.05 at 20:26
  */
 
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class HtmlLoaderConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-			test: /\.html$/,
-			identifier,
-			context
-		}).then(args => {
-			return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-				config: {
-					test: args.test,
-					use: [{
-						loader: "html-loader"
-					}]
-				},
-				identifier,
-				context
-			});
-		}).then(args => {
-			context.webpackConfig.module.rules.push(args.config);
-			return context;
-		});
-	}
+export class HtmlLoaderConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+            test: /\.html$/,
+            identifier,
+            context
+        }).then(args => {
+            return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                config: {
+                    test: args.test,
+                    use: [
+                        {
+                            loader: 'html-loader'
+                        }
+                    ]
+                },
+                identifier,
+                context
+            });
+        }).then(args => {
+            context.webpackConfig.module.rules.push(args.config);
+            return context;
+        });
+    }
 }

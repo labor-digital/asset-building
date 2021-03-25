@@ -16,29 +16,31 @@
  * Last modified: 2019.10.06 at 15:29
  */
 
-import webpack from "webpack";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import webpack from 'webpack';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class ProvidePluginConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		return context.eventEmitter.emitHook(AssetBuilderEventList.GET_JS_PROVIDES, {
-				provides: {},
-				identifier,
-				context
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-					config: args.provides,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				context.webpackConfig.plugins.push(new webpack.ProvidePlugin(args.config));
-				return context;
-			});
-	}
-
+export class ProvidePluginConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        return context.eventEmitter.emitHook(AssetBuilderEventList.GET_JS_PROVIDES, {
+                          provides: {},
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                              config: args.provides,
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          context.webpackConfig.plugins.push(new webpack.ProvidePlugin(args.config));
+                          return context;
+                      });
+    }
+    
 }

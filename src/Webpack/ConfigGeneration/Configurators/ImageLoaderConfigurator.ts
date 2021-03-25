@@ -16,116 +16,120 @@
  * Last modified: 2019.10.05 at 20:34
  */
 
-import {md5} from "@labor-digital/helferlein";
-import {AssetBuilderConfiguratorIdentifiers} from "../../../AssetBuilderConfiguratorIdentifiers";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {md5} from '@labor-digital/helferlein';
+import {AssetBuilderConfiguratorIdentifiers} from '../../../AssetBuilderConfiguratorIdentifiers';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class ImageLoaderConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-
-		// Prepare image optimization configuration
-		const imageOptimization = {
-			loader: "image-webpack-loader",
-			options: {
-				disable: !context.isProd || context.app.imageCompression === false,
-				mozjpeg: {
-					progressive: true,
-					quality: context.app.imageCompressionQuality,
-					dcScanOpt: 2,
-					dct: "float"
-				},
-				optipng: {
-					optimizationLevel: 5
-				},
-				pngquant: {
-					quality: [context.app.imageCompressionQuality! / 100, context.app.imageCompressionQuality! / 100],
-					speed: 2,
-					strip: true
-				}
-			}
-		};
-
-		// Name generation which uses a weak hash in development
-		const generateName = (file: string) => {
-			if (context.isProd) return "[name]-[fullhash].[ext]";
-			// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
-			return "[name]-" + md5(file) + ".[ext]";
-		};
-
-		// Generic images
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-				test: /\.(png|jpe?g|gif|webp|avif)$/,
-				identifier,
-				context
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						use: [
-							{
-								loader: "url-loader",
-								options: {
-									name: generateName,
-									outputPath: "assets/",
-									limit: context.isProd ? 10000 : 1,
-									fallback: {
-										loader: "file-loader",
-										options: {
-											name: generateName,
-											outputPath: "assets/"
-										}
-									}
-								}
-							},
-							imageOptimization
-						]
-					},
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				context.webpackConfig.module.rules.push(args.config);
-				return context;
-			})
-
-			// SVG images -> Fallback for IE 11
-			.then(context => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-					test: /\.svg$/,
-					identifier: AssetBuilderConfiguratorIdentifiers.SVG_IMAGE_LOADER,
-					context
-				});
-			}).then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						use: [
-							{
-								loader: "svg-url-loader",
-								options: {
-									name: generateName,
-									outputPath: "assets/",
-									encoding: context.isProd ? "base64" : "none",
-									limit: context.isProd ? 10000 : 1,
-									iesafe: true,
-									stripdeclarations: true
-								}
-							},
-							imageOptimization
-						]
-					},
-					identifier: args.identifier,
-					context
-				});
-			})
-			.then(args => {
-				context.webpackConfig.module.rules.push(args.config);
-				return context;
-			});
-	}
-
+export class ImageLoaderConfigurator implements ConfiguratorInterface
+{
+    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        
+        // Prepare image optimization configuration
+        const imageOptimization = {
+            loader: 'image-webpack-loader',
+            options: {
+                disable: !context.isProd || context.app.imageCompression === false,
+                mozjpeg: {
+                    progressive: true,
+                    quality: context.app.imageCompressionQuality,
+                    dcScanOpt: 2,
+                    dct: 'float'
+                },
+                optipng: {
+                    optimizationLevel: 5
+                },
+                pngquant: {
+                    quality: [context.app.imageCompressionQuality! / 100, context.app.imageCompressionQuality! / 100],
+                    speed: 2,
+                    strip: true
+                }
+            }
+        };
+        
+        // Name generation which uses a weak hash in development
+        const generateName = (file: string) => {
+            if (context.isProd) {
+                return '[name]-[fullhash].[ext]';
+            }
+            // Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
+            return '[name]-' + md5(file) + '.[ext]';
+        };
+        
+        // Generic images
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+                          test: /\.(png|jpe?g|gif|webp|avif)$/,
+                          identifier,
+                          context
+                      })
+                      .then(args => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                              config: {
+                                  test: args.test,
+                                  use: [
+                                      {
+                                          loader: 'url-loader',
+                                          options: {
+                                              name: generateName,
+                                              outputPath: 'assets/',
+                                              limit: context.isProd ? 10000 : 1,
+                                              fallback: {
+                                                  loader: 'file-loader',
+                                                  options: {
+                                                      name: generateName,
+                                                      outputPath: 'assets/'
+                                                  }
+                                              }
+                                          }
+                                      },
+                                      imageOptimization
+                                  ]
+                              },
+                              identifier,
+                              context
+                          });
+                      })
+                      .then(args => {
+                          context.webpackConfig.module.rules.push(args.config);
+                          return context;
+                      })
+            
+            // SVG images -> Fallback for IE 11
+                      .then(context => {
+                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+                              test: /\.svg$/,
+                              identifier: AssetBuilderConfiguratorIdentifiers.SVG_IMAGE_LOADER,
+                              context
+                          });
+                      }).then(args => {
+                return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+                    config: {
+                        test: args.test,
+                        use: [
+                            {
+                                loader: 'svg-url-loader',
+                                options: {
+                                    name: generateName,
+                                    outputPath: 'assets/',
+                                    encoding: context.isProd ? 'base64' : 'none',
+                                    limit: context.isProd ? 10000 : 1,
+                                    iesafe: true,
+                                    stripdeclarations: true
+                                }
+                            },
+                            imageOptimization
+                        ]
+                    },
+                    identifier: args.identifier,
+                    context
+                });
+            })
+                      .then(args => {
+                          context.webpackConfig.module.rules.push(args.config);
+                          return context;
+                      });
+    }
+    
 }

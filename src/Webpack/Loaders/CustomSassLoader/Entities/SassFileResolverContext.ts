@@ -17,64 +17,70 @@
  */
 
 // @ts-ignore
-import LoaderUtils from "loader-utils";
+import LoaderUtils from 'loader-utils';
 // @ts-ignore
-import * as webpack from "webpack";
-import {AssetBuilderEventList} from "../../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../../Core/WorkerContext";
-import {FileHelpers} from "../../../../Helpers/FileHelpers";
+import * as webpack from 'webpack';
+import {AssetBuilderEventList} from '../../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../../Core/WorkerContext';
+import {FileHelpers} from '../../../../Helpers/FileHelpers';
 // @ts-ignore
 import LoaderContext = webpack.loader.LoaderContext;
 
-export class SassFileResolverContext {
-	public parentContext: WorkerContext;
-	public loader: LoaderContext;
-	public baseFile: string;
-	public baseExt: string;
-	public path: Array<string>;
-	public validExtensions: Array<string>;
-
-	constructor(context: WorkerContext, loader: LoaderContext) {
-		this.validExtensions = ["css", "sass", "scss"];
-		this.baseFile = loader.resourcePath;
-		this.baseExt = FileHelpers.getFileExtension(loader.resourcePath);
-		this.parentContext = context;
-		this.loader = loader;
-		this.path = [];
-	}
-
-	/**
-	 * Initializes the context object by detecting the correct extension for the resource file
-	 */
-	public init(): Promise<any> {
-		if (this.validExtensions.indexOf(this.baseExt) === -1) {
-			const q = LoaderUtils.parseQuery(this.loader.resourceQuery);
-
-			// Try to determine by "lang" type -> Works for vue.js
-			if (typeof q.lang === "string" && this.validExtensions.indexOf(q.lang.trim().toLowerCase()) !== -1)
-				this.baseExt = q.lang.trim().toLowerCase();
-
-			// Still not? Check if we got help somewhere... /o\
-			else {
-				return this.parentContext.eventEmitter.emitHook(AssetBuilderEventList.SASS_LOADER_FILE_EXTENSION_FALLBACK, {
-						extension: this.baseExt,
-						resourceQuery: this.loader.resourceQuery,
-						context: this
-					})
-					.then(args => {
-						if (args.extension === this.baseExt)
-							throw new Error("Error while creating the context for a stylesheet called: \"" + this.baseFile + "\" the file's extension does not look like it is sass compatible!");
-						this.baseExt = args.extension;
-					})
-					.then(() => {
-						// Make sure our descendants know which file this is...
-						this.baseFile += "." + this.baseExt;
-					});
-			}
-
-			// Make sure our descendants know which file this is...
-			this.baseFile += "." + this.baseExt;
-		}
-		return Promise.resolve();
-	}
+export class SassFileResolverContext
+{
+    public parentContext: WorkerContext;
+    public loader: LoaderContext;
+    public baseFile: string;
+    public baseExt: string;
+    public path: Array<string>;
+    public validExtensions: Array<string>;
+    
+    constructor(context: WorkerContext, loader: LoaderContext)
+    {
+        this.validExtensions = ['css', 'sass', 'scss'];
+        this.baseFile = loader.resourcePath;
+        this.baseExt = FileHelpers.getFileExtension(loader.resourcePath);
+        this.parentContext = context;
+        this.loader = loader;
+        this.path = [];
+    }
+    
+    /**
+     * Initializes the context object by detecting the correct extension for the resource file
+     */
+    public init(): Promise<any>
+    {
+        if (this.validExtensions.indexOf(this.baseExt) === -1) {
+            const q = LoaderUtils.parseQuery(this.loader.resourceQuery);
+            
+            // Try to determine by "lang" type -> Works for vue.js
+            if (typeof q.lang === 'string' && this.validExtensions.indexOf(q.lang.trim().toLowerCase()) !== -1) {
+                this.baseExt = q.lang.trim().toLowerCase();
+            }// Still not? Check if we got help somewhere... /o\
+            else {
+                return this.parentContext.eventEmitter.emitHook(
+                    AssetBuilderEventList.SASS_LOADER_FILE_EXTENSION_FALLBACK, {
+                        extension: this.baseExt,
+                        resourceQuery: this.loader.resourceQuery,
+                        context: this
+                    })
+                           .then(args => {
+                               if (args.extension === this.baseExt) {
+                                   throw new Error(
+                                       'Error while creating the context for a stylesheet called: "' + this.baseFile +
+                                       '" the file\'s extension does not look like it is sass compatible!');
+                               }
+                               this.baseExt = args.extension;
+                           })
+                           .then(() => {
+                               // Make sure our descendants know which file this is...
+                               this.baseFile += '.' + this.baseExt;
+                           });
+            }
+            
+            // Make sure our descendants know which file this is...
+            this.baseFile += '.' + this.baseExt;
+        }
+        return Promise.resolve();
+    }
 }

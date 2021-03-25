@@ -16,34 +16,36 @@
  * Last modified: 2020.10.22 at 10:51
  */
 
-import type {PlainObject} from "@labor-digital/helferlein";
-import type {Compiler} from "webpack";
-import type {WorkerContext} from "../../Core/WorkerContext";
+import type {PlainObject} from '@labor-digital/helferlein';
+import type {Compiler} from 'webpack';
+import type {WorkerContext} from '../../Core/WorkerContext';
 
-export interface AssetBuilderWebpackPluginInterface {
-
-	/**
-	 * Executed by webpack when the plugin is executed
-	 * @param compiler
-	 */
-	apply(compiler: Compiler): any;
-
-	/**
-	 * If the plugin defines this method it is executed by the plugin loader and supplied with the correct
-	 * worker context instance
-	 * @param context
-	 */
-	setContext?(context: WorkerContext): void;
+export interface AssetBuilderWebpackPluginInterface
+{
+    
+    /**
+     * Executed by webpack when the plugin is executed
+     * @param compiler
+     */
+    apply(compiler: Compiler): any;
+    
+    /**
+     * If the plugin defines this method it is executed by the plugin loader and supplied with the correct
+     * worker context instance
+     * @param context
+     */
+    setContext?(context: WorkerContext): void;
 }
 
-export interface AssetBuilderWebpackPluginStaticInterface {
-
-	new(): AssetBuilderWebpackPluginInterface;
-
-	/**
-	 * Can return the default configuration to apply to the plugin constructor or undefined.
-	 * The default config will be filtered through the plugin config filter event
-	 */
-	getDefaultConfig?(): PlainObject;
-
+export interface AssetBuilderWebpackPluginStaticInterface
+{
+    
+    new(): AssetBuilderWebpackPluginInterface;
+    
+    /**
+     * Can return the default configuration to apply to the plugin constructor or undefined.
+     * The default config will be filtered through the plugin config filter event
+     */
+    getDefaultConfig?(): PlainObject;
+    
 }

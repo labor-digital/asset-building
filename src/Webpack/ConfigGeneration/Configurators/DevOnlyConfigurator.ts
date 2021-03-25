@@ -16,23 +16,27 @@
  * Last modified: 2019.10.06 at 16:06
  */
 
-import {merge} from "webpack-merge";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {merge} from 'webpack-merge';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class DevOnlyConfigurator implements ConfiguratorInterface {
-	public apply(_: string, context: WorkerContext): Promise<WorkerContext> {
-		if (context.isProd) return Promise.resolve(context);
-		context.webpackConfig = merge(context.webpackConfig, {
-			output: {
-				pathinfo: false
-			},
-			optimization: {
-				removeAvailableModules: false,
-				removeEmptyChunks: false,
-				splitChunks: false
-			}
-		});
-		return Promise.resolve(context);
-	}
+export class DevOnlyConfigurator implements ConfiguratorInterface
+{
+    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        if (context.isProd) {
+            return Promise.resolve(context);
+        }
+        context.webpackConfig = merge(context.webpackConfig, {
+            output: {
+                pathinfo: false
+            },
+            optimization: {
+                removeAvailableModules: false,
+                removeEmptyChunks: false,
+                splitChunks: false
+            }
+        });
+        return Promise.resolve(context);
+    }
 }

@@ -16,41 +16,46 @@
  * Last modified: 2021.03.25 at 16:30
  */
 
-import {isArray, PlainObject} from "@labor-digital/helferlein";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import type {WorkerContext} from "../../../Core/WorkerContext";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {isArray, PlainObject} from '@labor-digital/helferlein';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import type {WorkerContext} from '../../../Core/WorkerContext';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class PolyfillConfigurator implements ConfiguratorInterface {
-	public async apply(_: string, context: WorkerContext): Promise<WorkerContext> {
-
-		if (context.app.polyfills === false) return Promise.resolve(context);
-
-		// Prepare the list of poly fills
-		const polyfills = isArray(context.app.polyfills) ? context.app.polyfills : [];
-		polyfills.push("core-js/features/promise/index.js");
-		polyfills.push("core-js/features/set/index.js");
-		polyfills.push("core-js/features/map/index.js");
-		polyfills.push("core-js/features/object/assign.js");
-		polyfills.push("core-js/features/object/entries.js");
-		polyfills.push("core-js/features/object/keys.js");
-		polyfills.push("core-js/features/array/from.js");
-		polyfills.push("core-js/features/symbol/index.js");
-
-		const args = await this.emitFilterEvent(polyfills, context);
-
-		let entry = context.webpackConfig.entry;
-		if (!isArray(entry)) {
-			entry = [entry];
-		}
-		context.webpackConfig.entry = [...args.polyfills, ...entry];
-
-		return Promise.resolve(context);
-	}
-
-	protected async emitFilterEvent(polyfills: Array<any>, context: WorkerContext): Promise<PlainObject> {
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POLYFILLS, {
-			polyfills, context
-		});
-	}
+export class PolyfillConfigurator implements ConfiguratorInterface
+{
+    public async apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        
+        if (context.app.polyfills === false) {
+            return Promise.resolve(context);
+        }
+        
+        // Prepare the list of poly fills
+        const polyfills = isArray(context.app.polyfills) ? context.app.polyfills : [];
+        polyfills.push('core-js/features/promise/index.js');
+        polyfills.push('core-js/features/set/index.js');
+        polyfills.push('core-js/features/map/index.js');
+        polyfills.push('core-js/features/object/assign.js');
+        polyfills.push('core-js/features/object/entries.js');
+        polyfills.push('core-js/features/object/keys.js');
+        polyfills.push('core-js/features/array/from.js');
+        polyfills.push('core-js/features/symbol/index.js');
+        
+        const args = await this.emitFilterEvent(polyfills, context);
+        
+        let entry = context.webpackConfig.entry;
+        if (!isArray(entry)) {
+            entry = [entry];
+        }
+        context.webpackConfig.entry = [...args.polyfills, ...entry];
+        
+        return Promise.resolve(context);
+    }
+    
+    protected async emitFilterEvent(polyfills: Array<any>, context: WorkerContext): Promise<PlainObject>
+    {
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POLYFILLS, {
+            polyfills, context
+        });
+    }
 }

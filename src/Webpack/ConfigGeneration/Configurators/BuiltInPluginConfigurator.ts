@@ -16,76 +16,80 @@
  * Last modified: 2020.10.22 at 10:33
  */
 
-import {isFunction} from "@labor-digital/helferlein";
-import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {AssetBuilderPluginIdentifiers as Ids} from "../../../AssetBuilderPluginIdentifiers";
-import type {WorkerContext} from "../../../Core/WorkerContext";
+import {isFunction} from '@labor-digital/helferlein';
+import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import {AssetBuilderPluginIdentifiers as Ids} from '../../../AssetBuilderPluginIdentifiers';
+import type {WorkerContext} from '../../../Core/WorkerContext';
 import type {
-	AssetBuilderWebpackPluginInterface,
-	AssetBuilderWebpackPluginStaticInterface
-} from "../../Plugins/AssetBuilderWebpackPluginInterface";
-import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from "../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin";
-import {FancyStatsPlugin} from "../../Plugins/FancyStatsPlugin";
-import {GitAddPlugin} from "../../Plugins/GitAddPlugin";
-import {WebpackFixBrokenChunkPlugin} from "../../Plugins/WebpackFixBrokenChunkPlugin";
-import {WebpackPromiseShimPlugin} from "../../Plugins/WebpackPromiseShimPlugin";
-import type {ConfiguratorInterface} from "./ConfiguratorInterface";
+    AssetBuilderWebpackPluginInterface,
+    AssetBuilderWebpackPluginStaticInterface
+} from '../../Plugins/AssetBuilderWebpackPluginInterface';
+import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from '../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin';
+import {FancyStatsPlugin} from '../../Plugins/FancyStatsPlugin';
+import {GitAddPlugin} from '../../Plugins/GitAddPlugin';
+import {WebpackFixBrokenChunkPlugin} from '../../Plugins/WebpackFixBrokenChunkPlugin';
+import {WebpackPromiseShimPlugin} from '../../Plugins/WebpackPromiseShimPlugin';
+import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class BuiltInPluginConfigurator implements ConfiguratorInterface {
-
-	public apply(_: string, context: WorkerContext): Promise<WorkerContext> {
-
-		return Promise.resolve(context)
-			.then(c => this.registerPluginWrapper(Ids.GIT_ADD, c, GitAddPlugin))
-			.then(c => this.registerPluginWrapper(Ids.FANCY_STATS, c, FancyStatsPlugin))
-			.then(c => this.registerPluginWrapper(Ids.FIX_BROKEN_CHUNKS, c, WebpackFixBrokenChunkPlugin))
-			.then(c => this.registerPluginWrapper(Ids.PROMISE_SHIM, c, WebpackPromiseShimPlugin))
-			.then(c => this.registerPluginWrapper(Ids.CUSTOM_SASS_LOADER_CACHE_INVALIDATOR, c, CustomSassLoaderPreCompilerCacheInvalidatePlugin));
-
-	}
-
-	/**
-	 * Internal helper to run the internal plugin lifecycle including all filter functions
-	 * @param identifier
-	 * @param context
-	 * @param plugin
-	 * @protected
-	 */
-	protected registerPluginWrapper(
-		identifier: string,
-		context: WorkerContext,
-		plugin: AssetBuilderWebpackPluginStaticInterface
-	): Promise<WorkerContext> {
-		const config = isFunction(plugin.getDefaultConfig) ? plugin.getDefaultConfig() ?? {} : {};
-
-		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, {
-			identifier,
-			usePlugin: true,
-			config,
-			plugin,
-			context
-		}).then(args => {
-
-			if (args.usePlugin !== true) {
-				return Promise.resolve(context);
-			}
-
-			return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-				config: args.config,
-				identifier: args.identifier,
-				context: args.context
-			}).then(_args => {
-				const i: AssetBuilderWebpackPluginInterface = new args.plugin(_args.config);
-
-				if (isFunction(i.setContext)) {
-					i.setContext(_args.context);
-				}
-
-				_args.context.webpackConfig.plugins.push(i);
-
-				return _args.context;
-			});
-
-		});
-	}
+export class BuiltInPluginConfigurator implements ConfiguratorInterface
+{
+    
+    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    {
+        
+        return Promise.resolve(context)
+                      .then(c => this.registerPluginWrapper(Ids.GIT_ADD, c, GitAddPlugin))
+                      .then(c => this.registerPluginWrapper(Ids.FANCY_STATS, c, FancyStatsPlugin))
+                      .then(c => this.registerPluginWrapper(Ids.FIX_BROKEN_CHUNKS, c, WebpackFixBrokenChunkPlugin))
+                      .then(c => this.registerPluginWrapper(Ids.PROMISE_SHIM, c, WebpackPromiseShimPlugin))
+                      .then(c => this.registerPluginWrapper(Ids.CUSTOM_SASS_LOADER_CACHE_INVALIDATOR, c,
+                          CustomSassLoaderPreCompilerCacheInvalidatePlugin));
+        
+    }
+    
+    /**
+     * Internal helper to run the internal plugin lifecycle including all filter functions
+     * @param identifier
+     * @param context
+     * @param plugin
+     * @protected
+     */
+    protected registerPluginWrapper(
+        identifier: string,
+        context: WorkerContext,
+        plugin: AssetBuilderWebpackPluginStaticInterface
+    ): Promise<WorkerContext>
+    {
+        const config = isFunction(plugin.getDefaultConfig) ? plugin.getDefaultConfig() ?? {} : {};
+        
+        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, {
+            identifier,
+            usePlugin: true,
+            config,
+            plugin,
+            context
+        }).then(args => {
+            
+            if (args.usePlugin !== true) {
+                return Promise.resolve(context);
+            }
+            
+            return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+                config: args.config,
+                identifier: args.identifier,
+                context: args.context
+            }).then(_args => {
+                const i: AssetBuilderWebpackPluginInterface = new args.plugin(_args.config);
+                
+                if (isFunction(i.setContext)) {
+                    i.setContext(_args.context);
+                }
+                
+                _args.context.webpackConfig.plugins.push(i);
+                
+                return _args.context;
+            });
+            
+        });
+    }
 }
