@@ -16,9 +16,8 @@
  * Last modified: 2019.10.05 at 17:23
  */
 
-import {EventBus, isUndefined, PlainObject} from '@labor-digital/helferlein';
+import {isPlainObject, isUndefined, PlainObject} from '@labor-digital/helferlein';
 import {AssetBuilderEventList} from '../AssetBuilderEventList';
-import {ExtensionLoader} from '../Extension/ExtensionLoader';
 import {GeneralHelper} from '../Helpers/GeneralHelper';
 import {CoreContext} from './CoreContext';
 import {CoreFixes} from './CoreFixes';
@@ -51,67 +50,55 @@ export class Bootstrap
      * which in turn will spawn worker processes for each app definition.
      * @param options
      */
-    public initMainProcess(options?: FactoryCoreContextOptions): Promise<CoreContext>
+    public async initMainProcess(options?: FactoryCoreContextOptions): Promise<CoreContext>
     {
-        
         GeneralHelper.renderFancyIntro();
         
-        return this._factory
-                   .makeCoreContext(options)
-                   .then(c => this.applyEnvironmentFixes(c))
-                   .then(c => this.bindMainProcessEventHandlers(c));
+        const context = await this._factory.makeCoreContext(options);
+        this.applyEnvironmentFixes();
+        this.bindMainProcessEventHandlers(context);
         
+        return context;
     }
     
     /**
      * Initializes the worker context object for a single webpack compiler process
      * @param message
      */
-    public initWorkerProcess(message: PlainObject): Promise<WorkerContext>
+    public async initWorkerProcess(message: PlainObject): Promise<WorkerContext>
     {
         // Validate given message
-        if (isUndefined(message.context)) {
-            return Promise.reject(new Error('The worker process did not receive a context!'));
+        if (!isPlainObject(message) || isUndefined(message.context)) {
+            throw new Error('The worker process did not receive a context!');
         }
         if (isUndefined(message.app)) {
-            return Promise.reject(new Error('The worker process did not receive a app definition!'));
+            throw new Error('The worker process did not receive a app definition!');
         }
         
-        // Warm up the core context and create worker context
+        // Warm up the core context
         const coreContext = CoreContext.fromJson(message.context);
         coreContext.process = 'worker';
-        coreContext.eventEmitter = EventBus.getEmitter();
-        coreContext.extensionLoader = new ExtensionLoader();
+        this.applyEnvironmentFixes();
         
         // Create the worker context using the factory
-        return Promise.resolve(coreContext)
-                      .then(c => this.bindWorkerProcessEventHandlers(c))
-                      .then(c =>
-                          this._factory.makeWorkerContext(c, {
-                                  app: JSON.parse(message.app),
-                                  cloneCoreContext: false
-                              })
-                              .then(
-                                  workerContext => this
-                                      .applyEnvironmentFixes(workerContext.parentContext)
-                                      .then(() => workerContext)
-                              )
-                      );
-        
+        this.bindWorkerProcessEventHandlers(coreContext);
+        return await this._factory.makeWorkerContext(coreContext, {
+            app: JSON.parse(message.app),
+            cloneCoreContext: false
+        });
     }
     
     /**
      * Applies some environment fixes that are required to run our package
-     * @param context
      */
-    protected applyEnvironmentFixes(context: CoreContext): Promise<CoreContext>
+    protected applyEnvironmentFixes(): void
     {
         if (fixesApplied) {
-            return Promise.resolve(context);
+            return;
         }
+        
         fixesApplied = true;
         CoreFixes.eventsJsUncaughtErrorFix();
-        return Promise.resolve(context);
     }
     
     /**
@@ -119,15 +106,13 @@ export class Bootstrap
      * @param context
      * @protected
      */
-    protected bindMainProcessEventHandlers(context: CoreContext): Promise<CoreContext>
+    protected bindMainProcessEventHandlers(context: CoreContext): void
     {
-        const shutdownHandler = function () {
+        const shutdownHandler = async function () {
             console.log('Starting main process shutdown...');
-            context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {})
-                                 .then(() => {
-                                     console.log('Good bye!');
-                                     process.exit(0);
-                                 });
+            await context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {});
+            console.log('Good bye!');
+            process.exit(0);
         };
         process.on('SIGTERM', shutdownHandler);
         process.on('SIGINT', shutdownHandler);
@@ -144,8 +129,6 @@ export class Bootstrap
                 process.emit('SIGINT');
             });
         }
-        
-        return Promise.resolve(context);
     }
     
     /**
@@ -153,17 +136,15 @@ export class Bootstrap
      * @param context
      * @protected
      */
-    protected bindWorkerProcessEventHandlers(context: CoreContext): Promise<CoreContext>
+    protected bindWorkerProcessEventHandlers(context: CoreContext): void
     {
-        const shutdownHandler = function () {
+        const shutdownHandler = async function () {
             console.log('Starting worker process shutdown...');
-            context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {})
-                                 .then(() => process.exit(0));
+            await context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {});
+            process.exit(0);
         };
         process.on('SIGTERM', shutdownHandler);
         process.on('SIGINT', shutdownHandler);
-        
-        return Promise.resolve(context);
     }
     
 }

@@ -17,7 +17,7 @@
  */
 
 
-import {isEmpty, isFunction, isPlainObject, isString, isUndefined} from '@labor-digital/helferlein';
+import {isFunction, isPlainObject, isString, isUndefined} from '@labor-digital/helferlein';
 import isDocker from 'is-docker';
 import path from 'path';
 import {merge} from 'webpack-merge';
@@ -56,74 +56,50 @@ export class WebpackConfigGenerator
      * Generates the webpack configuration object based on the given context
      * @param context
      */
-    public generateConfiguration(context: WorkerContext): Promise<WorkerContext>
+    public async generateConfiguration(context: WorkerContext): Promise<WorkerContext>
     {
+        const w = this.configuratorWrapper;
+        
         // Apply the configurators on the context object
-        return Promise.resolve(context)
-                      .then(context => this.configuratorWrapper(Ids.BASE, context, new BaseConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.APP_PATHS, context, new AppPathConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.POLYFILL, context, new PolyfillConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.PROGRESS_BAR_PLUGIN, context,
-                          new ProgressBarPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.HTML_LOADER, context, new HtmlLoaderConfigurator()))
-                      .then(
-                          context => this.configuratorWrapper(Ids.IMAGE_LOADER, context, new ImageLoaderConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.FONT_LOADER, context, new FontLoaderConfigurator()))
-                      .then(
-                          context => this.configuratorWrapper(Ids.JS_PRE_LOADER, context, new JsPreloadConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.TYPESCRIPT_LOADER, context,
-                          new TypescriptLoaderConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.JS_COMPAT_LOADER, context,
-                          new JsCompatConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.LESS_LOADER, context, new LessLoaderConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.SASS_LOADER, context, new SassLoaderConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.CSS_EXTRACT_PLUGIN, context,
-                          new CssExtractPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.PROVIDE_PLUGIN, context,
-                          new ProvidePluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.COPY_PLUGIN, context, new CopyPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.CLEAN_OUTPUT_DIR_PLUGIN, context,
-                          new CleanOutputDirPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.MIN_CHUNK_SIZE_PLUGIN, context,
-                          new MinChunkSizePluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.FILTER_WARNINGS_PLUGIN, context,
-                          new FilterWarningsPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.DEV_ONLY, context, new DevOnlyConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.PROD_ONLY, context, new ProdOnlyConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.BUNDLE_ANALYZER_PLUGIN, context,
-                          new BundleAnalyzerPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.HTML_PLUGIN, context, new HtmlPluginConfigurator()))
-                      .then(context => this.configuratorWrapper(Ids.BUILT_IN_PLUGIN, context,
-                          new BuiltInPluginConfigurator()))
-            
-            // Allow filtering
-                      .then(context => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.APPLY_EXTENSION_WEBPACK_CONFIG, {
-                              context
-                          }).then(() => context);
-                      })
-            
-            // Add the additional webpack config
-                      .then(context => this.mergeAdditionalConfig(context))
-            
-            // Allow filtering
-                      .then(context => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_CONFIG, {
-                              context
-                          }).then(() => {
-                    
-                              // Check if we are running in docker and having to watch for changes -> Enable polling
-                              if (context.webpackConfig.watch && isDocker()) {
-                                  if (isUndefined(context.webpackConfig.watchOptions)) {
-                                      context.webpackConfig.watchOptions = {};
-                                  }
-                                  context.webpackConfig.watchOptions.poll = 600;
-                              }
-                    
-                              // Done
-                              return context;
-                          });
-                      });
+        await w(Ids.BASE, context, new BaseConfigurator());
+        await w(Ids.APP_PATHS, context, new AppPathConfigurator());
+        await w(Ids.POLYFILL, context, new PolyfillConfigurator());
+        await w(Ids.PROGRESS_BAR_PLUGIN, context, new ProgressBarPluginConfigurator());
+        await w(Ids.HTML_LOADER, context, new HtmlLoaderConfigurator());
+        await w(Ids.IMAGE_LOADER, context, new ImageLoaderConfigurator());
+        await w(Ids.FONT_LOADER, context, new FontLoaderConfigurator());
+        await w(Ids.JS_PRE_LOADER, context, new JsPreloadConfigurator());
+        await w(Ids.TYPESCRIPT_LOADER, context, new TypescriptLoaderConfigurator());
+        await w(Ids.JS_COMPAT_LOADER, context, new JsCompatConfigurator());
+        await w(Ids.LESS_LOADER, context, new LessLoaderConfigurator());
+        await w(Ids.SASS_LOADER, context, new SassLoaderConfigurator());
+        await w(Ids.CSS_EXTRACT_PLUGIN, context, new CssExtractPluginConfigurator());
+        await w(Ids.PROVIDE_PLUGIN, context, new ProvidePluginConfigurator());
+        await w(Ids.COPY_PLUGIN, context, new CopyPluginConfigurator());
+        await w(Ids.CLEAN_OUTPUT_DIR_PLUGIN, context, new CleanOutputDirPluginConfigurator());
+        await w(Ids.MIN_CHUNK_SIZE_PLUGIN, context, new MinChunkSizePluginConfigurator());
+        await w(Ids.FILTER_WARNINGS_PLUGIN, context, new FilterWarningsPluginConfigurator());
+        await w(Ids.DEV_ONLY, context, new DevOnlyConfigurator());
+        await w(Ids.PROD_ONLY, context, new ProdOnlyConfigurator());
+        await w(Ids.BUNDLE_ANALYZER_PLUGIN, context, new BundleAnalyzerPluginConfigurator());
+        await w(Ids.HTML_PLUGIN, context, new HtmlPluginConfigurator());
+        await w(Ids.BUILT_IN_PLUGIN, context, new BuiltInPluginConfigurator());
+        
+        // Allow filtering
+        await context.eventEmitter.emitHook(AssetBuilderEventList.APPLY_EXTENSION_WEBPACK_CONFIG, {context});
+        
+        // Add the additional webpack config
+        await this.mergeAdditionalConfig(context);
+        
+        // Check if we are running in docker and having to watch for changes -> Enable polling
+        if (context.webpackConfig.watch && isDocker()) {
+            if (isUndefined(context.webpackConfig.watchOptions)) {
+                context.webpackConfig.watchOptions = {};
+            }
+            context.webpackConfig.watchOptions.poll = 600;
+        }
+        
+        return context;
     }
     
     /**
@@ -133,42 +109,28 @@ export class WebpackConfigGenerator
      * @param context
      * @param configurator
      */
-    protected configuratorWrapper(
+    protected async configuratorWrapper(
         identifier: string,
         context: WorkerContext,
         configurator: ConfiguratorInterface
-    ): Promise<WorkerContext>
+    ): Promise<void>
     {
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_CONFIGURATOR, {
-            identifier,
-            configurator,
-            useConfigurator: true,
-            context
-        }).then(args => {
-            // Skip the configurator
-            if (args.useConfigurator !== true) {
-                return Promise.resolve(context);
-            }
-            
-            // Run through configuration lifecycle
-            return context.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_CONFIGURATOR, {
-                              identifier,
-                              configurator: args.configurator,
-                              context
-                          })
-                          .then(args => args.configurator.apply(identifier, args.context)).then(res => {
-                    if (isEmpty(res)) {
-                        console.log(configurator);
-                        process.exit();
-                    }
-                    return res;
-                })
-                          .then(context => context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_CONFIGURATOR, {
-                              identifier,
-                              context
-                          }))
-                          .then(args => args.context);
+        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_CONFIGURATOR, {
+            identifier, configurator, useConfigurator: true, context
         });
+        
+        // Skip the configurator
+        if (args.useConfigurator !== true) {
+            return;
+        }
+        
+        args = await context.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_CONFIGURATOR, {
+            identifier, configurator: args.configurator, context
+        });
+        
+        await args.configurator.apply(identifier, args.context);
+        
+        await context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_CONFIGURATOR, {identifier, context});
     }
     
     /**
@@ -176,17 +138,17 @@ export class WebpackConfigGenerator
      * to the app definition
      * @param context
      */
-    protected mergeAdditionalConfig(context: WorkerContext): Promise<WorkerContext>
+    protected async mergeAdditionalConfig(context: WorkerContext): Promise<void>
     {
         // Ignore if there is no webpack config
         if (isUndefined(context.app.webpackConfig)) {
-            return Promise.resolve(context);
+            return;
         }
         
         // Check if we got an object
         if (isPlainObject(context.app.webpackConfig)) {
             context.webpackConfig = merge(context.webpackConfig, context.app.webpackConfig as any);
-            return Promise.resolve(context);
+            return;
         }
         
         // Check if we got true -> webpack.config.js in the source directory
@@ -196,29 +158,32 @@ export class WebpackConfigGenerator
         
         // Check if we got a reference
         if (isString(context.app.webpackConfig)) {
-            const customWebpackConfigPath = path.resolve(context.parentContext.sourcePath,
-                (context.app.webpackConfig as string));
+            const customWebpackConfigPath =
+                path.resolve(context.parentContext.sourcePath, (context.app.webpackConfig as string));
+            
             try {
                 const customWebpackConfig = require(customWebpackConfigPath);
                 if (isPlainObject(customWebpackConfig)) {
                     context.webpackConfig = merge(context.webpackConfig, customWebpackConfig);
-                    return Promise.resolve(context!);
-                } else if (isFunction(customWebpackConfig)) {
-                    context.eventEmitter.unbindAll(
-                        AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
-                    context.eventEmitter.bind(
-                        AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, () => customWebpackConfig(context));
-                    return context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {})
-                                  .then(() => context) as Promise<WorkerContext>;
+                    return;
                 }
-                return Promise.reject(new Error('The default export of ' + customWebpackConfigPath +
-                                                ' has to be an object or a function!')) as Promise<WorkerContext>;
+                
+                if (isFunction(customWebpackConfig)) {
+                    context.eventEmitter.unbindAll(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
+                    context.eventEmitter.bind(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING,
+                        () => customWebpackConfig(context));
+                    await context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {});
+                    return;
+                }
+                
+                throw new Error(
+                    'The default export of ' + customWebpackConfigPath + ' has to be an object or a function!');
+                
             } catch (e) {
-                return Promise.reject(
-                    new Error('Could not resolve the custom webpack config at: "' + customWebpackConfigPath + '"'));
+                throw new Error(
+                    'Could not resolve the custom webpack config at: "' + customWebpackConfigPath + '". \n' +
+                    'The following error occured: ' + e);
             }
         }
-        
-        return Promise.reject(context);
     }
 }

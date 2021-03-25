@@ -113,6 +113,11 @@ export interface AppDefinitionInterface extends PlainObject
     useTypeChecker?: boolean;
     
     /**
+     * If set, the path to the tsconfig.json to use instead of the bundled default config
+     */
+    tsConfig?: string | true;
+    
+    /**
      * Additional definitions for the imports-loader
      */
     jsCompat?: Array<{ rule: string, fix?: string, options?: RuleSetRule }>

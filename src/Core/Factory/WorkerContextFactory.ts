@@ -16,7 +16,6 @@
  * Last modified: 2020.10.21 at 20:19
  */
 
-import type {PlainObject} from '@labor-digital/helferlein';
 import {cloneList, forEach, isArray, isNumber, isUndefined, makeOptions} from '@labor-digital/helferlein';
 import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {AppDefinitionInterface} from '../../Interfaces/AppDefinitionInterface';
@@ -38,19 +37,18 @@ export class WorkerContextFactory
      * @param coreContext
      * @param options
      */
-    public make(coreContext: CoreContext, options?: FactoryWorkerContextOptions): Promise<WorkerContext>
+    public async make(coreContext: CoreContext, options?: FactoryWorkerContextOptions): Promise<WorkerContext>
     {
         this._options = options ?? {};
         
-        return this.cloneCoreContextIfRequired(coreContext)
-                   .then(c => this.makeNewContextInstance(c))
-                   .then(c => this.loadExtensions(c))
-                   .then(c => this.applyAppSchema(c))
-                   .then(c => this.applyAppConfig(c))
-                   .then(context =>
-                       context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_WORKER_INIT_DONE, {context})
-                              .then(() => context)
-                   );
+        const localCoreContext = this.cloneCoreContextIfRequired(coreContext);
+        const context = await this.makeNewContextInstance(localCoreContext);
+        await this.loadExtensions(context);
+        await this.applyAppSchema(context);
+        this.applyAppConfig(context);
+        await context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_WORKER_INIT_DONE, {context});
+        
+        return context;
     }
     
     /**
@@ -58,17 +56,17 @@ export class WorkerContextFactory
      * @param coreContext
      * @protected
      */
-    protected cloneCoreContextIfRequired(coreContext: CoreContext): Promise<CoreContext>
+    protected cloneCoreContextIfRequired(coreContext: CoreContext): CoreContext
     {
         if (this._options.cloneCoreContext === false) {
-            return Promise.resolve(coreContext);
+            return coreContext;
         }
         
         const clone = CoreContext.fromJson(coreContext.toJson());
         clone.eventEmitter = coreContext.eventEmitter;
         clone.extensionLoader = coreContext.extensionLoader;
         
-        return Promise.resolve(clone);
+        return clone;
     }
     
     /**
@@ -109,11 +107,9 @@ export class WorkerContextFactory
      * Creates a new, empty context instance with only the most basic settings applied
      * @protected
      */
-    protected makeNewContextInstance(coreContext: CoreContext): Promise<WorkerContext>
+    protected makeNewContextInstance(coreContext: CoreContext): WorkerContext
     {
-        return Promise.resolve(
-            new WorkerContext(coreContext, this.resolveApp(coreContext))
-        );
+        return new WorkerContext(coreContext, this.resolveApp(coreContext));
     }
     
     /**
@@ -122,49 +118,40 @@ export class WorkerContextFactory
      * @param context
      * @protected
      */
-    protected loadExtensions(context: WorkerContext): Promise<WorkerContext>
+    protected async loadExtensions(context: WorkerContext): Promise<void>
     {
         const coreContext = context.parentContext;
         
         // Only load the "global" extensions if we are in a separate worker process
-        return (
-            () => {
-                if (coreContext.process === 'worker') {
-                    return context.extensionLoader
-                                  .loadExtensionsFromDefinition('global', coreContext, coreContext.laborConfig);
-                } else {
-                    return Promise.resolve();
-                }
-            }
-        )().then(() =>
-               coreContext.extensionLoader
-                          .loadExtensionsFromDefinition('app', context, context.app)
-           )
-           .then(() => context);
+        if (coreContext.process === 'worker') {
+            await context.extensionLoader
+                         .loadExtensionsFromDefinition(
+                             'global', coreContext, coreContext.laborConfig);
+        }
+        
+        await coreContext.extensionLoader
+                         .loadExtensionsFromDefinition('app', context, context.app);
     }
     
     /**
      * Applies the app definition schema to the apps defined in the labor config
      * @param context
      */
-    protected applyAppSchema(context: WorkerContext): Promise<WorkerContext>
+    protected async applyAppSchema(context: WorkerContext): Promise<void>
     {
-        // Allow extensions to add their own properties to the schema
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_APP_DEFINITION_SCHEMA, {
-                          schema: AppDefinitionSchema,
-                          context,
-                          app: cloneList(context.app)
-                      })
-                      .then((args: PlainObject) => {
-                          // Don't validate the entry and output options
-                          if (this._options.noEntryOutputValidation) {
-                              delete args.schema.entry;
-                              delete args.schema.output;
-                          }
-            
-                          context.app = makeOptions(context.app, args.schema, {allowUnknown: true});
-                      })
-                      .then(() => context);
+        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_APP_DEFINITION_SCHEMA, {
+            schema: AppDefinitionSchema,
+            context,
+            app: cloneList(context.app)
+        });
+        
+        // Don't validate the entry and output options
+        if (this._options.noEntryOutputValidation) {
+            delete args.schema.entry;
+            delete args.schema.output;
+        }
+        
+        context.app = makeOptions(context.app, args.schema, {allowUnknown: true});
     }
     
     /**
@@ -172,15 +159,12 @@ export class WorkerContextFactory
      * @param context
      * @protected
      */
-    protected applyAppConfig(context: WorkerContext): Promise<WorkerContext>
+    protected applyAppConfig(context: WorkerContext): void
     {
-        
         if (isArray(context.app.additionalResolverPaths)) {
             forEach(context.app.additionalResolverPaths, path => {
                 context.parentContext.additionalResolverPaths.add(path);
             });
         }
-        
-        return Promise.resolve(context);
     }
 }

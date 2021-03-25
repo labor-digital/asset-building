@@ -16,7 +16,7 @@
  * Last modified: 2020.10.21 at 19:12
  */
 
-import {isArray, isBool, isUndefined, PlainObject} from '@labor-digital/helferlein';
+import {isArray, isBool, isUndefined} from '@labor-digital/helferlein';
 import fs from 'fs';
 import path from 'path';
 import {isPlainObject} from 'webpack-merge/dist/utils';
@@ -24,7 +24,7 @@ import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import {FileHelpers} from '../../Helpers/FileHelpers';
 import {CoreContext} from '../CoreContext';
 import {CoreFixes} from '../CoreFixes';
-import type {FactoryCoreContextOptions} from '../Factory.interfaces';
+import type {FactoryCoreContextOptions, TBuilderMode} from '../Factory.interfaces';
 
 export class CoreContextFactory
 {
@@ -39,17 +39,22 @@ export class CoreContextFactory
      * Creates a new instance of the core context object based on the given options
      * @param options
      */
-    public make(options?: FactoryCoreContextOptions): Promise<CoreContext>
+    public async make(options?: FactoryCoreContextOptions): Promise<CoreContext>
     {
         this._options = options ?? {};
         
-        return this.makeNewContextInstance()
-                   .then(c => this.applyConfig(c))
-                   .then(c => this.loadExtensions(c))
-                   .then(c => this.findMode(c))
-                   .then(c => this.ensureWorkDirectory(c))
-                   .then(c => this.applyDummyAppIfRequired(c))
-                   .then(c => this.applyLateHook(c));
+        const context = this.makeNewContextInstance();
+        this.loadConfig(context);
+        this.applyModuleResolverFix(context);
+        await this.loadExtensions(context);
+        await this.filterLaborConfig(context);
+        this.applyLaborConfig(context);
+        await this.findMode(context);
+        this.ensureWorkDirectory(context);
+        this.applyDummyAppIfRequired(context);
+        await this.emitInitDone(context);
+        
+        return context;
     }
     
     /**
@@ -58,20 +63,15 @@ export class CoreContextFactory
      * IMPORTANT: Note to self -> This has to be synchronous so storybook does not break!
      * @protected
      */
-    protected makeNewContextInstance(): Promise<CoreContext>
+    protected makeNewContextInstance(): CoreContext
     {
-        const context = new CoreContext(
+        return new CoreContext(
             this._options.cwd ?? process.cwd(),
             path.dirname(path.dirname(__dirname)),
             this._options.environment ?? 'standalone',
             require('../../../package.json').version,
             this._options.watch ?? false
         );
-        
-        this.loadConfig(context);
-        this.applyModuleResolverFix(context);
-        
-        return Promise.resolve(context);
     }
     
     /**
@@ -109,25 +109,13 @@ export class CoreContextFactory
     protected applyModuleResolverFix(context: CoreContext): void
     {
         context.extensionLoader.resolveAdditionalResolverPaths(context,
-            isPlainObject(this._options.laborConfig) ? this._options.laborConfig! : {});
-        context.extensionLoader.resolveAdditionalResolverPaths(context,
-            isPlainObject(this._options.additionalResolversForApp) ? this._options.additionalResolversForApp! : {});
-        CoreFixes.resolveFilenameFix(context);
-    }
-    
-    /**
-     * Applys the global labor configuration to the new context instance
-     * @param context
-     * @protected
-     */
-    protected applyConfig(context: CoreContext): Promise<CoreContext>
-    {
-        // Check if we are running in sequential mode
-        context.runWorkersSequential = isBool(context.laborConfig.runWorkersSequential) ?
-            context.laborConfig.runWorkersSequential :
-            false;
+            this._options.laborConfig?.additionalResolverPaths ?? {});
         
-        return Promise.resolve(context);
+        context.extensionLoader.resolveAdditionalResolverPaths(context,
+            isPlainObject(this._options.additionalResolversForApp)
+                ? this._options.additionalResolversForApp! : {});
+        
+        CoreFixes.resolveFilenameFix(context);
     }
     
     /**
@@ -135,68 +123,75 @@ export class CoreContextFactory
      * @param context
      * @protected
      */
-    protected loadExtensions(context: CoreContext): Promise<CoreContext>
+    protected async loadExtensions(context: CoreContext): Promise<void>
     {
-        return context.extensionLoader
-                      .loadExtensionsFromDefinition('global', context, context.laborConfig)
-                      .then(() =>
-                          context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LABOR_CONFIG, {
-                              laborConfig: context.laborConfig,
-                              context: context
-                          })
-                      )
-                      .then((args) => {
-                          context.laborConfig = args.laborConfig;
-                          return context;
-                      });
+        await context.extensionLoader
+                     .loadExtensionsFromDefinition('global', context, context.laborConfig);
+    }
+    
+    /**
+     * Emits the FILTER_LABOR_CONFIG hook to allow extensions to filter the labor config
+     * @param context
+     * @protected
+     */
+    protected async filterLaborConfig(context: CoreContext): Promise<void>
+    {
+        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LABOR_CONFIG, {
+            laborConfig: context.laborConfig,
+            context: context
+        });
+        
+        context.laborConfig = args.laborConfig;
+    }
+    
+    /**
+     * Applys the global labor configuration to the new context instance
+     * @param context
+     * @protected
+     */
+    protected applyLaborConfig(context: CoreContext): void
+    {
+        // Check if we are running in sequential mode
+        context.runWorkersSequential = isBool(context.laborConfig.runWorkersSequential) ?
+            context.laborConfig.runWorkersSequential : false;
     }
     
     /**
      * Finds and validates the given mode we should build the config for
      * @param context
      */
-    protected findMode(context: CoreContext): Promise<CoreContext>
+    protected async findMode(context: CoreContext): Promise<void>
     {
-        return context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODES, {
+        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODES, {
             modes: ['dev', 'production', 'analyze']
-        }).then((args: PlainObject) => {
-            
-            const modes = args.modes;
-            let mode = this._options.mode ?? context.mode;
-            
-            return context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODE, {
-                              mode: mode,
-                              context: context,
-                              modes
-                          })
-                          .then((args: PlainObject) => {
-                              const mode = args.mode;
-                
-                              // Validate mode
-                              if (mode === '') {
-                                  return Promise.reject(new Error(
-                                      'You did not transfer a mode parameter (e.g. dev, production) to the call!'));
-                              }
-                              if (modes.indexOf(mode) === -1) {
-                                  return Promise.reject(
-                                      'Invalid mode given: "' + mode + '", valid modes are: "' + modes.join(', ') +
-                                      '"!');
-                              }
-                
-                              // Set mode
-                              context.mode = mode;
-                
-                              return context.eventEmitter.emitHook(AssetBuilderEventList.IS_PROD, {
-                                  isProd: mode === 'production' || mode === 'analyze',
-                                  mode,
-                                  modes,
-                                  coreContext: context
-                              });
-                          }).then((args: PlainObject) => {
-                    context.isProd = args.isProd;
-                    return context;
-                });
         });
+        
+        const modes: Array<TBuilderMode> = args.modes;
+        let mode: TBuilderMode = this._options.mode ?? context.mode;
+        
+        args = await context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODE, {
+            mode, context: context, modes
+        });
+        mode = args.mode;
+        
+        // Validate mode
+        if (mode === '') {
+            throw new Error('You did not transfer a mode parameter (e.g. dev, production) to the call!');
+        }
+        if (modes.indexOf(mode) === -1) {
+            throw new Error('Invalid mode given: "' + mode + '", valid modes are: "' + modes.join(', ') + '"!');
+        }
+        
+        context.mode = mode;
+        
+        args = await context.eventEmitter.emitHook(AssetBuilderEventList.IS_PROD, {
+            isProd: mode === 'production' || mode === 'analyze',
+            mode,
+            modes,
+            coreContext: context
+        });
+        
+        context.isProd = args.isProd;
     }
     
     /**
@@ -204,10 +199,10 @@ export class CoreContextFactory
      * running other tasks, like copying files e.g. in that case we create a dummy application
      * @param context
      */
-    protected applyDummyAppIfRequired(context: CoreContext): Promise<CoreContext>
+    protected applyDummyAppIfRequired(context: CoreContext): void
     {
         if (isArray(context.laborConfig.apps) && context.laborConfig.apps.length > 0) {
-            return Promise.resolve(context);
+            return;
         }
         
         FileHelpers.touch(context.workDirectoryPath + 'dummy.js');
@@ -218,7 +213,7 @@ export class CoreContextFactory
                 output: path.relative(context.sourcePath, context.workDirectoryPath + 'dist' + path.sep + 'dummy.js')
             }
         ];
-        return Promise.resolve(context);
+        
     };
     
     /**
@@ -226,11 +221,10 @@ export class CoreContextFactory
      * @param context
      * @protected
      */
-    protected ensureWorkDirectory(context: CoreContext): Promise<CoreContext>
+    protected ensureWorkDirectory(context: CoreContext): void
     {
         FileHelpers.mkdir(context.workDirectoryPath);
         FileHelpers.flushDirectory(context.workDirectoryPath);
-        return Promise.resolve(context);
     };
     
     /**
@@ -238,10 +232,9 @@ export class CoreContextFactory
      * @param context
      * @protected
      */
-    protected applyLateHook(context: CoreContext): Promise<CoreContext>
+    protected emitInitDone(context: CoreContext): Promise<any>
     {
         return context.eventEmitter
-                      .emitHook(AssetBuilderEventList.AFTER_MAIN_INIT_DONE, {context})
-                      .then(() => context);
+                      .emitHook(AssetBuilderEventList.AFTER_MAIN_INIT_DONE, {context});
     }
 }

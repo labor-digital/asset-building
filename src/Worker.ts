@@ -23,16 +23,16 @@ import {GeneralHelper} from './Helpers/GeneralHelper';
 
 let isRunning = false;
 
-function init(message: PlainObject)
+async function init(message: PlainObject)
 {
-    (new Bootstrap())
-        .initWorkerProcess(message)
-        .then(context => context.do.runCompiler())
-        .then(res => res.promise)
-        .then((exitCode: number) => process.exit(exitCode))
-        .catch(err => {
-            GeneralHelper.renderError(err, 'ERROR IN WORKER PROCESS:');
-        });
+    try {
+        const bootstrap = new Bootstrap();
+        const context = await bootstrap.initWorkerProcess(message);
+        const res = await context.do.runCompiler();
+        process.exit(await res.promise);
+    } catch (e) {
+        GeneralHelper.renderError(e, 'ERROR IN WORKER PROCESS:');
+    }
 }
 
 process.on('message', (message: PlainObject) => {

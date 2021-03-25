@@ -96,6 +96,10 @@ export default {
         type: ['undefined', 'string', 'plainObject', 'true'],
         default: undefined
     },
+    tsConfig: {
+        type: ['undefined', 'string', 'true'],
+        default: undefined
+    },
     additionalResolverPaths: {
         type: ['undefined', 'array', 'string'],
         default: undefined,

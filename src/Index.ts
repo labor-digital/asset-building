@@ -13,6 +13,7 @@ program.option('-w, --watch', 'if set, webpack will watch your files for changes
 program.option('-d, --devServer', 'enables the webpack dev server');
 
 program.arguments('[mode]');
+
 program.action(async function (mode, args) {
     try {
         const bootstrap = new Bootstrap();
