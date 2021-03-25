@@ -1,8 +1,10 @@
 {
-  "compilerOptions": {
-	"sourceMap": true
-  },
-  "files": [
-	"./a-file-which-is-hopefully-never-there.ts"
-  ]
+	"compilerOptions": {
+		"sourceMap": true,
+		"allowJs": true,
+		"target": "es5",
+		"moduleResolution": "node",
+		"module": "esnext",
+		"jsx": "react"
+	}
 }

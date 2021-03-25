@@ -24,16 +24,16 @@ import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class ProgressBarPluginConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
     {
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                          config: {},
-                          identifier,
-                          context
-                      })
-                      .then(args => {
-                          context.webpackConfig.plugins.push(new WebpackBar(args.config));
-                          return context;
-                      });
+        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+            config: {},
+            identifier,
+            context
+        });
+        
+        context.webpackConfig.plugins.push(new WebpackBar(args.config));
+        
+        return context;
     }
 }

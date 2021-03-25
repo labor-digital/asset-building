@@ -13,24 +13,18 @@ program.option('-w, --watch', 'if set, webpack will watch your files for changes
 program.option('-d, --devServer', 'enables the webpack dev server');
 
 program.arguments('[mode]');
-program.action(function (mode, args) {
-    console.log('mode', mode, args.watch ?? false);
-    (new Bootstrap())
-        .initMainProcess({
-            watch: args.watch ?? false,
-            mode
-        })
-        .then(context =>
-            (new ProcessManager(context.eventEmitter))
-                .startWorkerProcessesForCoreContext(context)
-        )
-        .then(() => {
-            process.exit(0);
-        })
-        .catch(err => {
-            GeneralHelper.renderError(err);
+program.action(async function (mode, args) {
+    try {
+        const bootstrap = new Bootstrap();
+        const context = await bootstrap.initMainProcess({
+            watch: args.watch ?? false, mode
         });
-    
+        const manager = new ProcessManager(context.eventEmitter);
+        await manager.startWorkerProcessesForCoreContext(context);
+        process.exit(0);
+    } catch (e) {
+        GeneralHelper.renderError(e);
+    }
 });
 
 program.parse();
