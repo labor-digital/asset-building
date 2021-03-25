@@ -16,25 +16,27 @@
  * Last modified: 2019.10.06 at 16:10
  */
 
-import OptimizeCssAssetsPlugin from "optimize-css-assets-webpack-plugin";
+import type {PlainObject} from "@labor-digital/helferlein";
+// @ts-ignore
+import CssMinimizerPlugin from "css-minimizer-webpack-plugin";
+// @ts-ignore
 import TerserPlugin from "terser-webpack-plugin";
 import {merge} from "webpack-merge";
 import {AssetBuilderConfiguratorIdentifiers} from "../../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class ProdOnlyConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
+	public apply(_: string, context: WorkerContext): Promise<WorkerContext> {
 		if (!context.isProd) return Promise.resolve(context);
-		let jsUglifyPluginConfig = null;
-		let cssUglifyPluginConfig = null;
+
+		let jsUglifyPluginConfig: PlainObject | null = null;
+		let cssUglifyPluginConfig: PlainObject | null = null;
 
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
 				config: {
-					cache: true,
 					parallel: true,
-					sourceMap: true,
 					extractComments: true,
 					terserOptions: {
 						mangle: true,
@@ -50,14 +52,7 @@ export class ProdOnlyConfigurator implements ConfiguratorInterface {
 			.then(args => {
 				jsUglifyPluginConfig = args.config;
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-					config: {
-						cssProcessorOptions: {
-							map: {
-								inline: false,
-								annotation: true
-							}
-						}
-					},
+					config: {},
 					identifier: AssetBuilderConfiguratorIdentifiers.CSS_UGLIFY_PLUGIN,
 					context
 				});
@@ -69,7 +64,7 @@ export class ProdOnlyConfigurator implements ConfiguratorInterface {
 						minimize: true,
 						minimizer: [
 							new TerserPlugin(jsUglifyPluginConfig),
-							new OptimizeCssAssetsPlugin(cssUglifyPluginConfig)
+							new CssMinimizerPlugin(cssUglifyPluginConfig)
 						]
 					}
 				});

@@ -17,8 +17,8 @@
  */
 
 import {Factory} from "../../Core/Factory";
-import {WorkerContext} from "../../Core/WorkerContext";
-import {ExpressAssetBuildingPluginOptions} from "./expressAssetBuildingPlugin";
+import type {WorkerContext} from "../../Core/WorkerContext";
+import type {ExpressAssetBuildingPluginOptions} from "./expressAssetBuildingPlugin";
 
 export default class ExpressFactory {
 	/**
@@ -48,7 +48,7 @@ export default class ExpressFactory {
 	 */
 	public getWorkerContext(): Promise<WorkerContext> {
 		return this._factory.makeCoreContext({
-			mode: this._options.mode,
+			mode: this._options.mode ?? "build",
 			packageJsonPath: this._options.packageJsonDirectory,
 			environment: "express"
 		}).then(coreContext => this._factory.makeWorkerContext(coreContext, {

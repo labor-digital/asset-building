@@ -16,7 +16,7 @@
  * Last modified: 2019.10.04 at 23:53
  */
 
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isString, PlainObject} from "@labor-digital/helferlein";
 
 let fallbackAppCounter = 0;
 const chars = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
@@ -32,7 +32,7 @@ export default {
 	},
 	appName: {
 		type: "string",
-		default: (field, data) => {
+		default: (_: any, data: PlainObject) => {
 			return "App - " + (data.id ?? chars[fallbackAppCounter++] ?? "X");
 		}
 	},
@@ -61,7 +61,7 @@ export default {
 	minChunkSize: {
 		type: "number",
 		default: 10000,
-		validator: (v) => {
+		validator: (v: number) => {
 			return !(v < 0);
 		}
 	},
@@ -84,7 +84,7 @@ export default {
 	imageCompressionQuality: {
 		type: "number",
 		default: 80,
-		validator: (v) => {
+		validator: (v: number) => {
 			return v > 0 && v <= 100;
 		}
 	},
@@ -99,7 +99,7 @@ export default {
 	additionalResolverPaths: {
 		type: ["undefined", "array", "string"],
 		default: undefined,
-		filter: function (v) {
+		filter: function (v: string | undefined | Array<any>) {
 			if (isString(v)) return [v];
 			return v;
 		}

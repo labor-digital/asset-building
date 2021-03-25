@@ -16,17 +16,17 @@
  * Last modified: 2019.10.05 at 21:44
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import type {PlainObject} from "@labor-digital/helferlein";
 import {AssetBuilderConfiguratorIdentifiers} from "../../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../Core/WorkerContext";
 
 export abstract class AbstractStyleLoaderConfigurator {
 	/**
 	 * Defines the post css configuration for sass and less loaders
 	 */
 	protected makePostcssConfig(identifier: string, context: WorkerContext): Promise<PlainObject> {
-		let resolveReference = undefined;
+		let resolveReference: any = undefined;
 		return Promise.resolve()
 			.then(() => {
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BROWSER_LIST, {
@@ -60,10 +60,8 @@ export abstract class AbstractStyleLoaderConfigurator {
 					config: {
 						loader: "postcss-loader",
 						options: {
-							ident: "postcss",
-							plugins: (loader) => {
-								resolveReference = loader.resolve;
-								return args.plugins;
+							postcssOptions: {
+								plugins: args.plugins
 							}
 						}
 					},

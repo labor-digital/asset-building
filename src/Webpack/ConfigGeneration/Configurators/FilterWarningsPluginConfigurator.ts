@@ -16,13 +16,12 @@
  * Last modified: 2019.10.06 at 15:55
  */
 
-import {map} from "@labor-digital/helferlein/lib/Lists/map";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isArray, isString, map} from "@labor-digital/helferlein";
+// @ts-ignore
 import WebpackFilterWarningsPlugin from "webpack-filter-warnings-plugin";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class FilterWarningsPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
@@ -32,7 +31,7 @@ export class FilterWarningsPluginConfigurator implements ConfiguratorInterface {
 		)) as Array<any>;
 
 		// Make sure everything is a regex
-		warningsToIgnore = map(warningsToIgnore, (v, k) => {
+		warningsToIgnore = map(warningsToIgnore, (v) => {
 			if (isString(v)) return new RegExp(v);
 			return v;
 		});

@@ -15,7 +15,8 @@
  *
  * Last modified: 2018.10.19 at 18:27
  */
-import {
+import type {Compiler} from "webpack";
+import type {
 	AssetBuilderWebpackPluginInterface,
 	AssetBuilderWebpackPluginStaticInterface
 } from "./AssetBuilderWebpackPluginInterface";
@@ -33,12 +34,13 @@ import {
  * This plugin provides a tiny polyfill to make sure the script runs correctly...
  */
 export const WebpackFixBrokenChunkPlugin: AssetBuilderWebpackPluginStaticInterface =
+	// @todo is this still required?
 	class implements AssetBuilderWebpackPluginInterface {
-		apply(compiler) {
+		apply(compiler: Compiler) {
 			compiler.hooks.compilation.tap("WebpackFixBrokenChunkPlugin", compilation => {
-				compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (_, chunk, hash, chunkIdVar) {
-					_ += "\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== 'function') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n";
-					return _;
+				compilation.mainTemplate.hooks.requireExtensions.tap("WebpackFixBrokenChunkPlugin", function (content: string) {
+					content += "\r\n// Fix dynamic code import breakage\r\nif(typeof __webpack_require__.e !== 'function') __webpack_require__.e = function(e){return Promise.resolve(e);};\r\n";
+					return content;
 				});
 			});
 		}

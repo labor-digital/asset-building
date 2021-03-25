@@ -16,13 +16,13 @@
  * Last modified: 2020.10.21 at 21:29
  */
 
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
+import {isArray, PlainObject} from "@labor-digital/helferlein";
+import type {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {AssetBuilderPluginIdentifiers as PluginIds} from "../../AssetBuilderPluginIdentifiers";
-import {WorkerContext} from "../../Core/WorkerContext";
+import type {AssetBuilderPluginIdentifiers as PluginIds} from "../../AssetBuilderPluginIdentifiers";
+import type {WorkerContext} from "../../Core/WorkerContext";
 import {WebpackConfigGenerator} from "../ConfigGeneration/WebpackConfigGenerator";
-import {WorkerActionInterface} from "./WorkerActionInterface";
+import type {WorkerActionInterface} from "./WorkerActionInterface";
 
 export interface MakeConfigurationActionOptions {
 	/**
@@ -66,17 +66,19 @@ export class MakeConfigurationAction implements WorkerActionInterface {
 	 * @protected
 	 */
 	protected bindDisalbedElementListener(context: WorkerContext, options?: MakeConfigurationActionOptions): void {
+		if (!options) return;
+
 		if (isArray(options.disableConfigurators)) {
-			context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e) => {
-				if (options.disableConfigurators.indexOf(e.args.identifier) === -1) {
+			context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e: PlainObject) => {
+				if (options.disableConfigurators!.indexOf(e.args.identifier) === -1) {
 					return;
 				}
 				e.args.useConfigurator = false;
 			});
 		}
 		if (isArray(options.disablePlugins)) {
-			context.eventEmitter.bind(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, (e) => {
-				if (options.disablePlugins.indexOf(e.args.identifier) === -1) {
+			context.eventEmitter.bind(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, (e: PlainObject) => {
+				if (options.disablePlugins!.indexOf(e.args.identifier) === -1) {
 					return;
 				}
 				e.args.usePlugin = false;

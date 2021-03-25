@@ -16,18 +16,13 @@
  * Last modified: 2020.10.21 at 20:19
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {cloneList} from "@labor-digital/helferlein/lib/Lists/cloneList";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import makeOptions from "@labor-digital/helferlein/lib/Misc/makeOptions";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isNumber} from "@labor-digital/helferlein/lib/Types/isNumber";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import type {PlainObject} from "@labor-digital/helferlein";
+import {cloneList, forEach, isArray, isNumber, isUndefined, makeOptions} from "@labor-digital/helferlein";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
+import type {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
 import AppDefinitionSchema from "../AppDefinitionSchema";
 import {CoreContext} from "../CoreContext";
-import {FactoryWorkerContextOptions} from "../Factory.interfaces";
+import type {FactoryWorkerContextOptions} from "../Factory.interfaces";
 import {WorkerContext} from "../WorkerContext";
 
 export class WorkerContextFactory {
@@ -35,7 +30,7 @@ export class WorkerContextFactory {
 	 * The options used to create the context with
 	 * @protected
 	 */
-	protected _options: FactoryWorkerContextOptions;
+	protected _options: FactoryWorkerContextOptions = {};
 
 	/**
 	 * Creates a new worker context instance based on the core context and given options
@@ -89,7 +84,7 @@ export class WorkerContextFactory {
 
 		if (isNumber(app)) {
 			const appId = app as number;
-			app = coreContext.laborConfig.apps[appId];
+			app = coreContext.laborConfig!.apps![appId];
 			app.id = appId;
 
 			if (isUndefined(app)) {

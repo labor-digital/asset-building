@@ -16,6 +16,7 @@
  * Last modified: 2019.12.04 at 15:59
  */
 
+// @ts-ignore
 module.exports = function (source) {
 	return source.replace(/\s+\/deep\/\s+/gmi, " ");
 };

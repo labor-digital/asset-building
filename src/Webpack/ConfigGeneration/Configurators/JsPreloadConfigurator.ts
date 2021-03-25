@@ -16,58 +16,19 @@
  * Last modified: 2019.10.05 at 20:50
  */
 
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
-import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class JsPreloadConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		
+
 		// Storage for temporary values
-		let excludePattern = undefined;
-		let loaders = [];
+		let excludePattern: RegExp | undefined = undefined;
+		let loaders: Array<any> = [];
 
 		// Loop through the preloader configuration
 		return Promise.resolve(context)
-
-			// Add additional polyfills
-			.then(() => {
-				if (context.app.polyfills === false) return Promise.reject("SKIP");
-
-				// Prepare the list of poly fills
-				const polyfills = isArray(context.app.polyfills) ? context.app.polyfills : [];
-				polyfills.push("core-js/features/promise/index.js");
-				polyfills.push("core-js/features/set/index.js");
-				polyfills.push("core-js/features/map/index.js");
-				polyfills.push("core-js/features/object/assign.js");
-				polyfills.push("core-js/features/object/entries.js");
-				polyfills.push("core-js/features/object/keys.js");
-				polyfills.push("core-js/features/array/from.js");
-				polyfills.push("core-js/features/symbol/index.js");
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POLYFILLS, {
-					polyfills: polyfills, context
-				});
-			})
-			.then(args => {
-				loaders.push({
-					loader: path.resolve(context.parentContext.assetBuilderPath, "./Webpack/Loaders/PolyfillLoader/PolyfillLoader.js"),
-					options: {
-						entry: path.resolve(context.parentContext.sourcePath, context.app.entry),
-						polyfills: args.polyfills
-					}
-				});
-				return context;
-			})
-			.catch(err => {
-				if (err !== "SKIP") {
-					if (isObject(err)) throw err;
-					throw new Error(err);
-				}
-				return context;
-			})
 
 			// Allow filtering of the loaders
 			.then(() => {
@@ -84,11 +45,9 @@ export class JsPreloadConfigurator implements ConfiguratorInterface {
 
 			// Prepare exclude pattern
 			.then(() => {
-				const baseExcludePattern = /node_modules(?![\\/\\\\]@labor(?:-digital)?[\\/\\\\])/;
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_EXCLUDE_PATTERN, {
-					pattern: context.builderVersion === 1 ? baseExcludePattern : undefined,
+					pattern: /node_modules/,
 					identifier,
-					basePattern: baseExcludePattern,
 					context
 				});
 			})
@@ -104,7 +63,7 @@ export class JsPreloadConfigurator implements ConfiguratorInterface {
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
 					config: {
 						test: args.test,
-						exclude: excludePattern === null ? undefined : excludePattern,
+						exclude: excludePattern ?? undefined,
 						enforce: "pre",
 						use: loaders
 					},
@@ -113,8 +72,9 @@ export class JsPreloadConfigurator implements ConfiguratorInterface {
 				});
 			})
 			.then(args => {
-				if (args.config.use.length === 0) return context;
-				context.webpackConfig.module.rules.push(args.config);
+				if (args.config.use.length !== 0) {
+					context.webpackConfig.module.rules.push(args.config);
+				}
 				return context;
 			});
 

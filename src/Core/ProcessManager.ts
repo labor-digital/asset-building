@@ -16,17 +16,12 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
-import {asArray} from "@labor-digital/helferlein/lib/FormatAndConvert/asArray";
-import {filter} from "@labor-digital/helferlein/lib/Lists/filter";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import {asArray, EventEmitter, filter, forEach, isPlainObject, isUndefined} from "@labor-digital/helferlein";
 import Chalk from "chalk";
 import childProcess from "child_process";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";
-import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
-import {CoreContext} from "./CoreContext";
+import type {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
+import type {CoreContext} from "./CoreContext";
 
 export class ProcessManager {
 
@@ -49,7 +44,7 @@ export class ProcessManager {
 	 *
 	 * @param coreContext
 	 */
-	public startWorkerProcessesForCoreContext(coreContext: CoreContext): Promise<any> {
+	public startWorkerProcessesForCoreContext(coreContext: CoreContext): Promise<any | void> {
 		console.log("Beginning to spawn worker processes...");
 		const processes = [];
 		let counter = 0;
@@ -61,8 +56,8 @@ export class ProcessManager {
 			console.log(Chalk.yellowBright("\r\n================================================\r\n"));
 
 			// Wait for one process before calling the next...
-			const sequencePromise = new Promise<any>(resolve => {
-				const apps = asArray(coreContext.laborConfig.apps);
+			const sequencePromise = new Promise<void>(resolve => {
+				const apps = asArray(coreContext.laborConfig.apps ?? []);
 				let i = 0;
 
 				/**
@@ -92,7 +87,7 @@ export class ProcessManager {
 					});
 
 					// Go to next app if the worker is still running but webpack did it's initial build
-					if ( coreContext.mode === 'watch' ) {
+					if (coreContext.mode === "watch") {
 						coreContext.eventEmitter.bind(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE, () => {
 							if (isResolved) return;
 							isResolved = true;
@@ -104,10 +99,12 @@ export class ProcessManager {
 				// Start the listener loop
 				next(next);
 			});
+
 			processes.push(sequencePromise);
+
 		} else {
 			// Starting the workers in async mode
-			forEach(coreContext.laborConfig.apps, (app: AppDefinitionInterface) => {
+			forEach(coreContext.laborConfig.apps ?? [], (app: AppDefinitionInterface) => {
 				app.id = counter++;
 				processes.push(this.startSingleWorkerProcess(coreContext, app));
 			});
@@ -122,10 +119,10 @@ export class ProcessManager {
 	 * @param coreContext
 	 * @param app
 	 */
-	public startSingleWorkerProcess(coreContext: CoreContext, app: AppDefinitionInterface): Promise<any> {
+	public startSingleWorkerProcess(coreContext: CoreContext, app: AppDefinitionInterface): Promise<void> {
 
 		// Start the process
-		return new Promise<any>((resolve, reject) => {
+		return new Promise<void>((resolve, reject) => {
 
 			// Check if the app is disabled
 			if (app.disabled) {
@@ -147,7 +144,7 @@ export class ProcessManager {
 
 			// Register shutdown handler for this worker
 			this.shutdownList.push(() => {
-				return new Promise(resolve1 => {
+				return new Promise<void>(resolve1 => {
 					if (stopped) return resolve1();
 					console.log("Shutting down worker process: " + app.id + " (" + worker.pid + ")");
 					// Stop the work process
@@ -175,7 +172,7 @@ export class ProcessManager {
 			// Wait for a response!
 			if (coreContext.runWorkersSequential) {
 				worker.on("message", message => {
-					if (isPlainObject(message) && (message as any).WEBPACK_DONE === true)
+					if (isPlainObject(message) && (message as any).WEBPACK_DONE)
 						coreContext.eventEmitter.emit(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE);
 					else
 						console.log("worker responded with message", message);
@@ -183,7 +180,7 @@ export class ProcessManager {
 			}
 
 			// Resolve the promise if the child was closed
-			worker.on("exit", (code, signal) => {
+			worker.on("exit", (code) => {
 				if (stopped) return;
 				stopped = true;
 

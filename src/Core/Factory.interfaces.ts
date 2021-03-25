@@ -16,8 +16,11 @@
  * Last modified: 2020.10.21 at 17:40
  */
 
-import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
-import {LaborConfigInterface} from "../Interfaces/LaborConfigInterface";
+import type {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
+import type {LaborConfigInterface} from "../Interfaces/LaborConfigInterface";
+
+export type TBuilderMode = "production" | "dev" | "analyze" | string;
+export type TBuilderEnvironment = "standalone" | "nuxt" | "express" | "storybook" | string;
 
 export interface FactoryCoreContextOptions {
 	/**
@@ -28,16 +31,23 @@ export interface FactoryCoreContextOptions {
 
 	/**
 	 * A valid mode to boot the asset builder with
-	 * If omitted "watch" is used
+	 * "production" to build the script as a production ready bundle
+	 * "dev" to build the bundle with a (much faster) development mode
+	 * "analyze" to run the webpack bundle analyzer
 	 * @see https://asset-building.labor.tools/guide/CoreFeatures.html#commands-modes
 	 */
-	mode?: string;
+	mode?: TBuilderMode;
+
+	/**
+	 * If set to true, webpack will run in watch mode
+	 */
+	watch?: boolean;
 
 	/**
 	 * A speaking identifier to allow the configurator to see from which context it was instantiated.
 	 * This can be something like "storybook", "nuxt", "express", a custom string or "standalone" if omitted
 	 */
-	environment?: string;
+	environment?: TBuilderEnvironment;
 
 	/**
 	 * The path to the asset builder's package.json file.

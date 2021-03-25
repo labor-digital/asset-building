@@ -1,18 +1,6 @@
 {
+	"extends": "./tsconfig.common.json",
 	"compilerOptions": {
-		"target": "es6",
-		"moduleResolution": "node",
-		"module": "commonjs",
-		"outDir": "dist",
-		"esModuleInterop": true,
-		"declaration": true,
-		"pretty": true,
-		"sourceMap": false
-	},
-	"include": [
-		"src/**/*.ts"
-	],
-	"exclude": [
-		"node_modules"
-	]
+		"sourceMap": true
+	}
 }

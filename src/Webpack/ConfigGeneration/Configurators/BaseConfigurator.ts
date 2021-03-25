@@ -16,30 +16,28 @@
  * Last modified: 2019.10.05 at 20:06
  */
 
-import {asArray} from "@labor-digital/helferlein/lib/FormatAndConvert/asArray";
-import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
-import {inflectToUnderscore} from "@labor-digital/helferlein/lib/Strings/Inflector/inflectToUnderscore";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import {asArray, inflectToUnderscore, md5} from "@labor-digital/helferlein";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export const resolveFileExtensions = [".ts", ".tsx", ".js", ".jsx", ".json"];
 
 export class BaseConfigurator implements ConfiguratorInterface {
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
+	public apply(_: string, context: WorkerContext): Promise<WorkerContext> {
 		// Build the json-p function name
 		const jsonPName = "labor_webpack_" + md5(
 			context.parentContext.packageJsonPath +
 			(context.isProd ? Math.random() : "") +
 			context.appId +
-			JSON.stringify(context.app)) + "_" + inflectToUnderscore(context.app.appName);
+			JSON.stringify(context.app)) + "_" + inflectToUnderscore(context.app.appName!);
 
 		// Populate the basic webpack configuration
 		context.webpackConfig = {
 			name: context.app.appName + "",
 			mode: context.isProd ? "production" : "development",
-			target: "web",
-			watch: context.mode === "watch" || context.mode === "analyze",
-			devtool: context.isProd ? "source-map" : "cheap-module-eval-source-map",
+			target: ["web", "es5"],
+			watch: context.parentContext.watch,
+			devtool: context.isProd ? "source-map" : "eval",
 			entry: {},
 			plugins: [],
 			module: {
@@ -56,7 +54,7 @@ export class BaseConfigurator implements ConfiguratorInterface {
 				modules: asArray(context.parentContext.additionalResolverPaths)
 			},
 			output: {
-				jsonpFunction: jsonPName
+				chunkLoadingGlobal: jsonPName
 			}
 		};
 

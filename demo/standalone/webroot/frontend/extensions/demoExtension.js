@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 LABOR.digital
+ * Copyright 2019 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2020.04.24 at 11:46
+ * Last modified: 2019.10.06 at 17:41
  */
 
-// DEPRECATED: use /Interop/Express/ExpressContext instead!
-export * from "../Interop/Express/ExpressContext";
+module.exports = function demoExtension(context, scope) {
+	console.log("[EXTENSION]: Loaded demoExtension.js for scope: " + scope + " context type: " + context.type + " in process: " + context.process);
+};

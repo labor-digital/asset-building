@@ -16,11 +16,11 @@
  * Last modified: 2020.10.22 at 10:33
  */
 
-import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
+import {isFunction} from "@labor-digital/helferlein";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
 import {AssetBuilderPluginIdentifiers as Ids} from "../../../AssetBuilderPluginIdentifiers";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {
 	AssetBuilderWebpackPluginInterface,
 	AssetBuilderWebpackPluginStaticInterface
 } from "../../Plugins/AssetBuilderWebpackPluginInterface";
@@ -29,11 +29,11 @@ import {FancyStatsPlugin} from "../../Plugins/FancyStatsPlugin";
 import {GitAddPlugin} from "../../Plugins/GitAddPlugin";
 import {WebpackFixBrokenChunkPlugin} from "../../Plugins/WebpackFixBrokenChunkPlugin";
 import {WebpackPromiseShimPlugin} from "../../Plugins/WebpackPromiseShimPlugin";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class BuiltInPluginConfigurator implements ConfiguratorInterface {
 
-	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
+	public apply(_: string, context: WorkerContext): Promise<WorkerContext> {
 
 		return Promise.resolve(context)
 			.then(c => this.registerPluginWrapper(Ids.GIT_ADD, c, GitAddPlugin))

@@ -16,8 +16,9 @@
  * Last modified: 2019.08.01 at 15:15
  */
 
-import {WorkerContext} from "../../Core/WorkerContext";
-import {
+import type {Compiler} from "webpack";
+import type {WorkerContext} from "../../Core/WorkerContext";
+import type {
 	AssetBuilderWebpackPluginInterface,
 	AssetBuilderWebpackPluginStaticInterface
 } from "./AssetBuilderWebpackPluginInterface";
@@ -28,16 +29,16 @@ import {
  */
 export const WebpackPromiseShimPlugin: AssetBuilderWebpackPluginStaticInterface =
 	class implements AssetBuilderWebpackPluginInterface {
-		protected _context: WorkerContext;
+		protected _context?: WorkerContext;
 
 		public setContext(context: WorkerContext): void {
 			this._context = context;
 		}
 
-		public apply(compiler) {
-			if (this._context.app.polyfills !== false) {
+		public apply(compiler: Compiler) {
+			if (this._context!.app.polyfills !== false) {
 				compiler.hooks.compilation.tap("WebpackPromiseShimPlugin", compilation => {
-					compilation.mainTemplate.hooks.bootstrap.tap("WebpackPromiseShimPlugin", function (_, chunk, hash, chunkIdVar) {
+					compilation.mainTemplate.hooks.bootstrap.tap("WebpackPromiseShimPlugin", function (_) {
 						/*
 						 * @see https://github.com/taylorhakes/promise-polyfill
 						 */

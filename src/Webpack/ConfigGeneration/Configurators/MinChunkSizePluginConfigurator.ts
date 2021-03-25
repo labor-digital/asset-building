@@ -18,8 +18,8 @@
 
 import webpack from "webpack";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class MinChunkSizePluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {

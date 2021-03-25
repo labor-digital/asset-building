@@ -16,11 +16,11 @@
  * Last modified: 2020.02.17 at 20:29
  */
 
-import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
-import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
+import {EventBus, EventEmitter} from "@labor-digital/helferlein";
 import express, {Application} from "express";
-import {Compiler} from "webpack";
-import {WorkerContext} from "../../Core/WorkerContext";
+import type {Compiler} from "webpack";
+import type {WorkerContext} from "../../Core/WorkerContext";
+import type {ExpressAssetBuildingPluginOptions} from "./expressAssetBuildingPlugin";
 import ExpressFactory from "./ExpressFactory";
 
 export default class ExpressContext {
@@ -71,13 +71,16 @@ export default class ExpressContext {
 	 */
 	public compiler?: Compiler;
 
-	public constructor(appId: number, expressApp: Application, isProd: boolean, packageJsonDirectory: string) {
+	public constructor(expressApp: Application, options?: ExpressAssetBuildingPluginOptions) {
+		options = options ?? {};
+		this.isProd = process.env.NODE_ENV !== "development";
 		this.type = "express";
-		this.appId = appId;
+		this.appId = options.appId ?? 0;
 		this.expressApp = expressApp;
-		this.isProd = isProd;
-		this.packageJsonDirectory = packageJsonDirectory;
+		this.packageJsonDirectory = options.packageJsonDirectory ?? process.cwd();
+		options.packageJsonDirectory = this.packageJsonDirectory;
 		this.eventEmitter = EventBus.getEmitter();
+		this.factory = new ExpressFactory(options);
 	}
 
 	/**

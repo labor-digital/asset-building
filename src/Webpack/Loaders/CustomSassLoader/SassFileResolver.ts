@@ -16,12 +16,11 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
-import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isString, md5} from "@labor-digital/helferlein";
 import fs from "fs";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
 import {SassFile} from "./Entities/SassFile";
-import {SassFileResolverContext} from "./Entities/SassFileResolverContext";
+import type {SassFileResolverContext} from "./Entities/SassFileResolverContext";
 import {SassFilePreCompiler} from "./SassFilePreCompiler";
 
 const cache = new Map();
@@ -45,7 +44,7 @@ export class SassFileResolver {
 		// Create a new sass file instance
 		const file = new SassFile();
 		file.hash = contentHash;
-		file.content = content;
+		file.content = content!;
 		file.filename = filename;
 		file.extension = FileHelpers.getFileExtension(filename);
 

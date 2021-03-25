@@ -16,8 +16,7 @@
  * Last modified: 2019.10.04 at 12:28
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {AppDefinitionInterface} from "./AppDefinitionInterface";
+import type {AppDefinitionInterface} from "./AppDefinitionInterface";
 
 export interface LaborConfigInterface {
 	/**
@@ -48,24 +47,6 @@ export interface LaborConfigInterface {
 	 * The list of apps that is used in the configuration builder
 	 */
 	apps?: Array<AppDefinitionInterface>;
-
-	/**
-	 * The legacy copy definition
-	 * @deprecated
-	 */
-	copy?: Array<PlainObject>;
-
-	/**
-	 * The legacy definition of css entry points
-	 * @deprecated
-	 */
-	css?: Array<string>;
-
-	/**
-	 * The legacy definition of js entry points
-	 * @deprecated
-	 */
-	js?: Array<string>;
 
 	/**
 	 * Additional, configured lookup paths to find imports in

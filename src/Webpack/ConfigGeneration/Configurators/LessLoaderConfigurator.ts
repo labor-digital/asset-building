@@ -16,16 +16,18 @@
  * Last modified: 2019.10.05 at 21:39
  */
 
+import type {PlainObject} from "@labor-digital/helferlein";
+// @ts-ignore
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../Core/WorkerContext";
 import {AbstractStyleLoaderConfigurator} from "./AbstractStyleLoaderConfigurator";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class LessLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		let postCssConfig = null;
+		let postCssConfig: PlainObject | null = null;
 		return this.makePostcssConfig(identifier, context)
 			.then(config => {
 				postCssConfig = config;
@@ -59,52 +61,6 @@ export class LessLoaderConfigurator extends AbstractStyleLoaderConfigurator impl
 									currentDir: context.parentContext.sourcePath,
 									entry: context.app.entry,
 									ext: ["less", "css"]
-								}
-							}
-						]
-					},
-					identifier,
-					context
-				});
-			}).then(args => {
-				context.webpackConfig.module.rules.push(args.config);
-				return context;
-			});
-	}
-
-	public applyLegacy(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		let postCssConfig = null;
-		return this.makePostcssConfig(identifier, context)
-			.then(config => {
-				postCssConfig = config;
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-					test: /\.less$/,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						use: [
-							{
-								loader: MiniCssExtractPlugin.loader
-							},
-							{
-								loader: "css-loader",
-								options: {
-									url: false
-								}
-							},
-							postCssConfig,
-							{
-								loader: "less-loader",
-								options: {
-									lessOptions: {
-										relativeUrls: false
-									},
-									sourceMap: true
 								}
 							}
 						]

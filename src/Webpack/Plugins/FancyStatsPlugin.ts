@@ -16,16 +16,17 @@
  * Last modified: 2020.10.21 at 17:31
  */
 
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isString, PlainObject} from "@labor-digital/helferlein";
 import Chalk from "chalk";
+// @ts-ignore
 import webpack, {Compiler} from "webpack";
-import {WorkerContext} from "../../Core/WorkerContext";
+import type {WorkerContext} from "../../Core/WorkerContext";
 import {FileHelpers} from "../../Helpers/FileHelpers";
-import {LegacyAdapter} from "../../Legacy/LegacyAdapter";
-import {
+import type {
 	AssetBuilderWebpackPluginInterface,
 	AssetBuilderWebpackPluginStaticInterface
 } from "./AssetBuilderWebpackPluginInterface";
+// @ts-ignore
 import ToJsonOutput = webpack.Stats.ToJsonOutput;
 
 // Define column char lengths
@@ -38,7 +39,7 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
 		 * The worker context this plugin should render the output for
 		 * @protected
 		 */
-		protected _context: WorkerContext;
+		protected _context?: WorkerContext;
 
 		protected _numberOfWarnings = 0;
 		protected _numberOfErrors = 0;
@@ -55,16 +56,11 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
 					publicPath: true
 				});
 
-				// Apply legacy stat filter
-				if (this._context.builderVersion === 1) {
-					stats = LegacyAdapter.statFilter(stats, this._context);
-				}
-
 				this._numberOfErrors = 0;
 				this._numberOfWarnings = 0;
 
 				// Build the output
-				const output = [];
+				const output: Array<string> = [];
 				this.renderHeader(output);
 				this.renderAssetList(output, stats);
 				this.renderWarnings(output, stats);
@@ -94,26 +90,22 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
 		protected renderAssetList(output: Array<string>, stats: ToJsonOutput): void {
 			let time = stats.time > 5000 ? Math.round(stats.time / 100) / 10 + "s" : stats.time + "ms";
 
-			output.push(this._context.app.appName +
-				(
-					isString(this._context.webpackConfig.target)
-						? " (" + this._context.webpackConfig.target + ")"
-						: ""
-				) +
+			output.push(this._context!.app.appName +
+				(isString(this._context!.webpackConfig.target)
+					? " (" + this._context!.webpackConfig.target + ")"
+					: "") +
 				" | Time: " + time);
 			output.push("Asset".padStart(assetColLength, " ") + "  " + "Size".padStart(sizeColLength));
 
 			let ignoredChunks = 0;
 			let ignoredSize = 0;
 
-			const isCopy = this._context.app._legacyCopy === true;
-
-			stats.assets.forEach(asset => {
+			stats.assets.forEach((asset: PlainObject) => {
 				const isMap = asset.name.match(/\.map$/);
 				const isHotUpdate = asset.name.match(/\.hot-update\./);
 				const chunkIsMain = typeof asset.chunks[0] === "string" && (asset.chunks[0] as string).indexOf("main") === 0;
 				const chunkNameIsMain = typeof asset.chunkNames[0] === "string" && asset.chunkNames[0].indexOf("main") === 0;
-				const useAsset = (this._context.app.verboseResult || !isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain)) || isCopy;
+				const useAsset = (this._context!.app.verboseResult || !isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain));
 
 				if (!useAsset) {
 					ignoredChunks++;
@@ -146,15 +138,9 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
 				output.push("");
 				output.push(Chalk.yellowBright("BEWARE! There are warnings!"));
 				output.push("");
-				stats.warnings.forEach(entry => {
-					let isBreak = false;
-					entry.split(/\r?\n/).forEach(line => {
-						if (isBreak || line.match(/\sproblems?\s\(.*?\serrors?,\s.*?\swarnings?\)/)) {
-							isBreak = true;
-							return;
-						}
-						output.push(Chalk.yellowBright(line));
-					});
+				stats.warnings.forEach((entry: PlainObject, i: number) => {
+					if (i > 0) output.push("");
+					output.push(Chalk.yellowBright(this.renderErrorOrWarning(entry)));
 				});
 			}
 		}
@@ -172,19 +158,29 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
 				output.push("");
 				output.push(Chalk.redBright("MISTAKES HAVE BEEN MADE!"));
 				output.push("");
-				stats.errors.forEach((entry, i) => {
-					let isBreak = false;
+				stats.errors.forEach((entry: PlainObject, i: number) => {
 					if (i > 0) output.push("");
-					entry.split(/\r?\n/).forEach(line => {
-						// Strip footer for problems with eslint
-						if (isBreak || line.match(/\sproblems?\s\(.*?\serrors?,\s.*?\swarnings?\)/)) {
-							isBreak = true;
-							return;
-						}
-						output.push(Chalk.redBright(line));
-					});
+					output.push(Chalk.redBright(this.renderErrorOrWarning(entry)));
 				});
 			}
+		}
+
+		/**
+		 * Converts the given error/warning object into a string
+		 * @param msg
+		 * @protected
+		 */
+		protected renderErrorOrWarning(msg: PlainObject): string {
+			const lines: Array<string> = [];
+
+			if (isString(msg.moduleName)) {
+				lines.push("Error in module: " + msg.moduleName);
+			}
+			if (isString(msg.message)) {
+				lines.push(msg.message);
+			}
+
+			return lines.join("\n");
 		}
 
 		/**

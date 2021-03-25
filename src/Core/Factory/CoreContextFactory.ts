@@ -16,21 +16,15 @@
  * Last modified: 2020.10.21 at 19:12
  */
 
-import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isBool} from "@labor-digital/helferlein/lib/Types/isBool";
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import {isArray, isBool, isUndefined, PlainObject} from "@labor-digital/helferlein";
 import fs from "fs";
 import path from "path";
 import {isPlainObject} from "webpack-merge/dist/utils";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {ExtensionLoader} from "../../Extension/ExtensionLoader";
 import {FileHelpers} from "../../Helpers/FileHelpers";
-import {LaborConfigInterface} from "../../Interfaces/LaborConfigInterface";
 import {CoreContext} from "../CoreContext";
 import {CoreFixes} from "../CoreFixes";
-import {FactoryCoreContextOptions} from "../Factory.interfaces";
+import type {FactoryCoreContextOptions} from "../Factory.interfaces";
 
 export class CoreContextFactory {
 
@@ -38,13 +32,13 @@ export class CoreContextFactory {
 	 * The options used to create the context with
 	 * @protected
 	 */
-	protected _options: FactoryCoreContextOptions;
+	protected _options: FactoryCoreContextOptions = {};
 
 	/**
 	 * Creates a new instance of the core context object based on the given options
 	 * @param options
 	 */
-	public make(options: FactoryCoreContextOptions): Promise<CoreContext> {
+	public make(options?: FactoryCoreContextOptions): Promise<CoreContext> {
 		this._options = options ?? {};
 
 		return this.makeNewContextInstance()
@@ -52,7 +46,6 @@ export class CoreContextFactory {
 			.then(c => this.loadExtensions(c))
 			.then(c => this.findMode(c))
 			.then(c => this.ensureWorkDirectory(c))
-			.then(c => this.applyLegacyAdapterIfRequired(c))
 			.then(c => this.applyDummyAppIfRequired(c))
 			.then(c => this.applyLateHook(c));
 	}
@@ -68,13 +61,11 @@ export class CoreContextFactory {
 			this._options.cwd ?? process.cwd(),
 			path.dirname(path.dirname(__dirname)),
 			this._options.environment ?? "standalone",
-			require("../../../package.json").version
+			require("../../../package.json").version,
+			this._options.watch ?? false
 		);
 
-		context.eventEmitter = EventBus.getEmitter();
-		context.extensionLoader = new ExtensionLoader();
-		context.laborConfig = this.loadConfig(context);
-
+		this.loadConfig(context);
 		this.applyModuleResolverFix(context);
 
 		return Promise.resolve(context);
@@ -86,7 +77,7 @@ export class CoreContextFactory {
 	 * @param context
 	 * @protected
 	 */
-	protected loadConfig(context: CoreContext): LaborConfigInterface {
+	protected loadConfig(context: CoreContext): void {
 		if (isUndefined(this._options.laborConfig)) {
 			// Check if we are in the correct directory
 			if (!fs.existsSync(context.packageJsonPath)) {
@@ -98,11 +89,11 @@ export class CoreContextFactory {
 			if (typeof packageJson.labor === "undefined") {
 				throw new Error("There is no \"labor\" node inside your current package json!");
 			}
-			return packageJson.labor;
-
+			context.laborConfig = packageJson.labor;
+			return;
 		}
 
-		return this._options.laborConfig;
+		context.laborConfig = this._options.laborConfig ?? {};
 	}
 
 	/**
@@ -113,9 +104,9 @@ export class CoreContextFactory {
 	 */
 	protected applyModuleResolverFix(context: CoreContext): void {
 		context.extensionLoader.resolveAdditionalResolverPaths(context,
-			isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {});
+			isPlainObject(this._options.laborConfig) ? this._options.laborConfig! : {});
 		context.extensionLoader.resolveAdditionalResolverPaths(context,
-			isPlainObject(this._options.additionalResolversForApp) ? this._options.additionalResolversForApp : {});
+			isPlainObject(this._options.additionalResolversForApp) ? this._options.additionalResolversForApp! : {});
 		CoreFixes.resolveFilenameFix(context);
 	}
 
@@ -125,19 +116,10 @@ export class CoreContextFactory {
 	 * @protected
 	 */
 	protected applyConfig(context: CoreContext): Promise<CoreContext> {
-
-		// Find the builder version
-		context.builderVersion = isUndefined(context.laborConfig.builderVersion) ?
-			2 : parseInt(context.laborConfig.builderVersion + "");
-
-		if (context.builderVersion !== 1 && context.builderVersion !== 2) {
-			return Promise.reject(new Error("An invalid builder version was given!"));
-		}
-
 		// Check if we are running in sequential mode
 		context.runWorkersSequential = isBool(context.laborConfig.runWorkersSequential) ?
 			context.laborConfig.runWorkersSequential :
-			context.builderVersion === 1;
+			false;
 
 		return Promise.resolve(context);
 	}
@@ -168,54 +150,41 @@ export class CoreContextFactory {
 	 */
 	protected findMode(context: CoreContext): Promise<CoreContext> {
 		return context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODES, {
-			modes: ["watch", "build", "analyze"]
-		}).then((args) => {
+			modes: ["dev", "production", "analyze"]
+		}).then((args: PlainObject) => {
 
 			const modes = args.modes;
-			let mode = isString(this._options.mode)
-				? this._options.mode
-				: (typeof process.argv[2] === "undefined" ? "watch" : process.argv[2]);
+			let mode = this._options.mode ?? context.mode;
 
 			return context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODE, {
 					mode: mode,
 					context: context,
 					modes
 				})
-				.then(args => {
+				.then((args: PlainObject) => {
 					const mode = args.mode;
 
 					// Validate mode
 					if (mode === "")
-						return Promise.reject(new Error("You did not transfer a mode parameter (e.g. build, watch) to the call!"));
+						return Promise.reject(new Error("You did not transfer a mode parameter (e.g. dev, production) to the call!"));
 					if (modes.indexOf(mode) === -1)
 						return Promise.reject("Invalid mode given: \"" + mode + "\", valid modes are: \"" + modes.join(", ") + "\"!");
 
 					// Set mode
 					context.mode = mode;
 
-					// Check if this is a production context
-					const isProd = mode === "build" || mode === "analyze";
 					return context.eventEmitter.emitHook(AssetBuilderEventList.IS_PROD, {
-						isProd,
+						isProd: mode === "production" || mode === "analyze",
 						mode,
 						modes,
 						coreContext: context
 					});
-				}).then((args) => {
+				}).then((args: PlainObject) => {
 					context.isProd = args.isProd;
 					return context;
 				});
 		});
 	}
-
-	/**
-	 * Registers the legacy adapter if we got a context with builder version 1
-	 * @param coreContext
-	 */
-	protected applyLegacyAdapterIfRequired(coreContext: CoreContext): Promise<CoreContext> {
-		if (coreContext.builderVersion !== 1) return Promise.resolve(coreContext);
-		return require("../../Legacy/LegacyAdapter").LegacyAdapter.rewriteConfig(coreContext);
-	};
 
 	/**
 	 * There might be cases where there is actually no webpack config involved, but we are
@@ -225,6 +194,7 @@ export class CoreContextFactory {
 	protected applyDummyAppIfRequired(context: CoreContext): Promise<CoreContext> {
 		if (isArray(context.laborConfig.apps) && context.laborConfig.apps.length > 0)
 			return Promise.resolve(context);
+
 		FileHelpers.touch(context.workDirectoryPath + "dummy.js");
 		context.laborConfig.apps = [
 			{

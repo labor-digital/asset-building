@@ -17,19 +17,21 @@
  */
 
 import fs from "fs";
+// @ts-ignore
 import sass from "node-sass";
 import path from "path";
-// noinspection ES6UnusedImports
+// @ts-ignore
 import * as webpack from "webpack";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
 import {SassFileResolverContext} from "./Entities/SassFileResolverContext";
 import {SassFileResolver} from "./SassFileResolver";
+// @ts-ignore
 import Loader = webpack.loader.Loader;
 
-const customSassLoader: Loader = function (source: string) {
+const customSassLoader = function (this: Loader, source: string) {
 	const callback = this.async();
 	const that = this;
-	const errorHandler = function (e) {
+	const errorHandler = function (e: any) {
 		e.hideStack = true;
 		if (e.file) {
 			if (e.file === "stdin") e.file = that.resourcePath;
@@ -52,7 +54,7 @@ const customSassLoader: Loader = function (source: string) {
 			// Helper to create relative paths to our resolved assets,
 			// If we supply absolute path's the css-loader will ignore them
 			// @see https://github.com/webpack-contrib/css-loader/issues/750
-			const pathRelativizer = function (absolutePath) {
+			const pathRelativizer = function (absolutePath: string) {
 				return "./" + FileHelpers.filenameToPosix(path.relative(path.dirname(file.filename), absolutePath));
 			};
 
@@ -63,8 +65,8 @@ const customSassLoader: Loader = function (source: string) {
 				"data": file.content,
 				"sourceComments": true,
 				"outputStyle": "expanded",
-				"importer": function customSassLoaderFileImporter(url) {
-					if (importError !== false) return {contents: ""};
+				"importer": function customSassLoaderFileImporter(url: string) {
+					if (importError) return {contents: ""};
 					try {
 						const importFile = SassFileResolver.getFile(url, null, context);
 						return {contents: importFile.content};
@@ -74,7 +76,7 @@ const customSassLoader: Loader = function (source: string) {
 					}
 				},
 				"functions": {
-					"custom-sass-loader-open-file($file)": function customSassLoaderOpenFile(file) {
+					"custom-sass-loader-open-file($file)": function customSassLoaderOpenFile(file: any) {
 						context.path.push(file.getValue());
 						return sass.types.Null.NULL;
 					},
@@ -82,48 +84,49 @@ const customSassLoader: Loader = function (source: string) {
 						context.path.pop();
 						return sass.types.Null.NULL;
 					},
-					"custom-sass-loader-url-resolver($url: \"\", $filename: \"\")": function customSassLoaderUrlResolver(url, filename, bridge) {
+					"custom-sass-loader-url-resolver($url: \"\", $filename: \"\")":
+						function customSassLoaderUrlResolver(url: any, filename: any) {
 
-						// Extract values
-						url = url.getValue();
-						filename = filename.getValue();
+							// Extract values
+							url = url.getValue();
+							filename = filename.getValue();
 
-						// Check if this is a data url
-						if (url.trim().indexOf("data:") === 0)
-							return new sass.types.String(url);
+							// Check if this is a data url
+							if (url.trim().indexOf("data:") === 0)
+								return new sass.types.String(url);
 
-						// Check if this is a url
-						if (url.trim().match(/^https?:/))
-							return new sass.types.String(url);
+							// Check if this is a url
+							if (url.trim().match(/^https?:/))
+								return new sass.types.String(url);
 
-						// Handle query string
-						const queryString = url.indexOf("?") === -1 && url.indexOf("#") === -1 ? "" : url.replace(/[^?#]*/, "");
-						if (queryString !== "") url = url.replace(/[?#].*$/, "");
+							// Handle query string
+							const queryString = url.indexOf("?") === -1 && url.indexOf("#") === -1 ? "" : url.replace(/[^?#]*/, "");
+							if (queryString !== "") url = url.replace(/[?#].*$/, "");
 
-						// Skip if the url is already readable
-						if (fs.existsSync(url)) return new sass.types.String(pathRelativizer(url) + queryString);
+							// Skip if the url is already readable
+							if (fs.existsSync(url)) return new sass.types.String(pathRelativizer(url) + queryString);
 
-						// Resolve the url relative to the filename where it was written
-						// This will work with urls that are passed to mixins as well.
-						let urlResolved = url;
-						if (context.path.length > 0) {
-							const localPath = context.path[context.path.length - 1];
-							urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(localPath), url));
+							// Resolve the url relative to the filename where it was written
+							// This will work with urls that are passed to mixins as well.
+							let urlResolved = url;
+							if (context.path.length > 0) {
+								const localPath = context.path[context.path.length - 1];
+								urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(localPath), url));
+								if (fs.existsSync(urlResolved)) return new sass.types.String(pathRelativizer(urlResolved) + queryString);
+							}
+
+							// Resolve the url relative to the filename where url() is defined
+							urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(filename), url));
 							if (fs.existsSync(urlResolved)) return new sass.types.String(pathRelativizer(urlResolved) + queryString);
+
+							// Failed to resolve the file
+							return new sass.types.String(urlResolved);
 						}
-
-						// Resolve the url relative to the filename where url() is defined
-						urlResolved = FileHelpers.filenameToPosix(path.resolve(path.dirname(filename), url));
-						if (fs.existsSync(urlResolved)) return new sass.types.String(pathRelativizer(urlResolved) + queryString);
-
-						// Failed to resolve the file
-						return new sass.types.String(urlResolved);
-					}
 				}
 			});
 
 			// Check for import errors
-			if (importError !== false) throw importError;
+			if (importError) throw importError;
 
 			// For debug purposes
 			// let debug = path.dirname(this.resourcePath) + path.sep + ".debug.css";
@@ -132,7 +135,7 @@ const customSassLoader: Loader = function (source: string) {
 
 			// Register dependencies for this sass file
 			if (typeof result.stats === "object" && Array.isArray(result.stats.includedFiles))
-				result.stats.includedFiles.forEach(file => {
+				result.stats.includedFiles.forEach((file: string) => {
 					this.addDependency(file.replace(/\//g, path.sep));
 				});
 

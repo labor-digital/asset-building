@@ -16,15 +16,14 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isString} from "@labor-digital/helferlein";
 import fs from "fs";
 import path from "path";
-// noinspection ES6UnusedImports
-import * as webpack from "webpack";
+// @ts-ignore
+import type {Loader} from "webpack";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
-import Loader = webpack.loader.Loader;
 
-const resourceLoader: Loader = function (source: string) {
+const resourceLoader = function (this: Loader, source: string) {
 	// Make this loader async
 	const callback = this.async();
 
@@ -44,13 +43,13 @@ const resourceLoader: Loader = function (source: string) {
 
 	// Prepare file locations
 	let stylesheetPath = FileHelpers.unifyFilename(FileHelpers.stripOffQuery(this.resourcePath));
-	const possibleResourceLocations = [];
+	const possibleResourceLocations: Array<string> = [];
 
 	// Ignore css files
 	if (FileHelpers.getFileExtension(stylesheetPath) === "css") return callback(null, source);
 
 	// Register root resources
-	this.query.ext.forEach(ext => {
+	this.query.ext.forEach((ext: string) => {
 		const possiblePath = path.resolve(rootPath) + path.sep + "Resources." + ext;
 		possibleResourceLocations.push(possiblePath);
 	});
@@ -76,7 +75,7 @@ const resourceLoader: Loader = function (source: string) {
 		let localPath = "";
 		pathParts.forEach(part => {
 			localPath += part + path.sep;
-			this.query.ext.forEach(ext => {
+			this.query.ext.forEach((ext: string) => {
 				const possiblePath = path.resolve(rootPath + localPath) + path.sep + "Resources." + ext;
 				if (possibleResourceLocations.indexOf(possiblePath) !== -1) return;
 				possibleResourceLocations.push(possiblePath);
@@ -94,7 +93,7 @@ const resourceLoader: Loader = function (source: string) {
 	}
 
 	// Make wrapper to import the required files
-	const wrapper = [];
+	const wrapper: Array<string> = [];
 	existingResourceLocations.forEach(file => {
 		wrapper.push("@import \"" + FileHelpers.unifyFilename(file) + "\";");
 	});

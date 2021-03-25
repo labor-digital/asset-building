@@ -16,11 +16,12 @@
  * Last modified: 2020.10.20 at 17:25
  */
 
+import type {Configuration} from "webpack";
 import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import {NuxtFactory} from "./NuxtFactory";
 
-export default function Module(options) {
-	this.nuxt.hook("webpack:config", function (configs) {
+export default function Module(this: any, options: any) {
+	this.nuxt.hook("webpack:config", function (configs: Configuration[]) {
 		GeneralHelper.renderFancyIntro();
 		return new NuxtFactory(options).enhanceWebpackConfigs(configs);
 	});

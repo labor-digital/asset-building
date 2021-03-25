@@ -16,7 +16,8 @@
  * Last modified: 2019.10.04 at 19:21
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import type {PlainObject} from "@labor-digital/helferlein";
+import type {RuleSetRule} from "webpack";
 
 export interface AppCopyDefinition {
 	from: string;
@@ -112,7 +113,7 @@ export interface AppDefinitionInterface extends PlainObject {
 	/**
 	 * Additional definitions for the imports-loader
 	 */
-	jsCompat?: Array<{ rule: string, fix: string }>
+	jsCompat?: Array<{ rule: string, fix?: string, options?: RuleSetRule }>
 
 	/**
 	 * If this is set to true we will keep the output directory of this app when we build the sources
@@ -147,28 +148,4 @@ export interface AppDefinitionInterface extends PlainObject {
 	 * These are used by require() to resolve node modules
 	 */
 	additionalResolverPaths?: Array<string>;
-
-	/**
-	 * The legacy set name we use for the legacy adapter. Internal only
-	 * @deprecated
-	 */
-	_legacySetName?: string;
-
-	/**
-	 * True if this app is used for a style asset by the legacy adapter. Internal only
-	 * @deprecated
-	 */
-	_legacyStyle?: boolean;
-
-	/**
-	 * True if this app is used for a copy definition by the legacy adapter. Internal only
-	 * @deprecated
-	 */
-	_legacyCopy?: boolean;
-
-	/**
-	 * The legacy configuration object before the legacy adapter created an app from it. Internal only
-	 * @deprecated
-	 */
-	_legacyConfig?: PlainObject;
 }

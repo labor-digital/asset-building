@@ -17,9 +17,9 @@
  */
 
 
-import {Compiler, Configuration} from "webpack";
-import {WorkerContext} from "../../Core/WorkerContext";
-import {MakeConfigurationActionOptions} from "./MakeConfigurationAction";
+import type {Compiler, Configuration} from "webpack";
+import type {WorkerContext} from "../../Core/WorkerContext";
+import type {MakeConfigurationActionOptions} from "./MakeConfigurationAction";
 
 export interface RunCompilerOptions {
 

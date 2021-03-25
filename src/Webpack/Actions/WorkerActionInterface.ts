@@ -16,7 +16,7 @@
  * Last modified: 2020.10.21 at 21:30
  */
 
-import {WorkerContext} from "../../Core/WorkerContext";
+import type {WorkerContext} from "../../Core/WorkerContext";
 
 export interface WorkerActionInterface {
 

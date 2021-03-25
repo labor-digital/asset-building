@@ -17,10 +17,11 @@
  */
 
 import Chalk from "chalk";
-import path from "path";
-import {Compiler} from "webpack";
+import type {Compiler} from "webpack";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
+// @ts-ignore
 import {WorkerContext} from "../../Core/WorkerContext";
+// @ts-ignore
 import {
 	AssetBuilderWebpackPluginInterface,
 	AssetBuilderWebpackPluginStaticInterface
@@ -29,7 +30,7 @@ import {
 export const GitAddPlugin: AssetBuilderWebpackPluginStaticInterface =
 	class implements AssetBuilderWebpackPluginInterface {
 
-		protected _context: WorkerContext;
+		protected _context?: WorkerContext;
 
 		public setContext(context: WorkerContext): void {
 			this._context = context;
@@ -39,7 +40,7 @@ export const GitAddPlugin: AssetBuilderWebpackPluginStaticInterface =
 
 			// Don't add files to git if we are watching
 			// Or if git add was disabled
-			if (this._context.webpackConfig.watch || this._context.app.disableGitAdd === true) {
+			if (!this._context || this._context.webpackConfig.watch || this._context.app.disableGitAdd === true) {
 				return;
 			}
 
@@ -50,18 +51,14 @@ export const GitAddPlugin: AssetBuilderWebpackPluginStaticInterface =
 					publicPath: true
 				});
 
-				return this._context.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_GIT_ADD, {
+				return this._context!.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_GIT_ADD, {
 					context: this._context
 				}).then(() => {
 					try {
-						if (this._context.builderVersion === 1) {
-							stats.outputPath = path.resolve(this._context.parentContext.sourcePath);
-						}
-
 						const childProcess = require("child_process");
 						childProcess.execSync("git add " + stats.outputPath, {stdio: "pipe"});
 						console.log(
-							Chalk.greenBright("The built files in " + stats.outputPath.substr(-50) + " were added to git!")
+							Chalk.greenBright("The built files in " + stats.outputPath!.substr(-50) + " were added to git!")
 						);
 					} catch (e) {
 						console.log(

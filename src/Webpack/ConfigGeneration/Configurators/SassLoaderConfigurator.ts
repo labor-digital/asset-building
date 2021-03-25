@@ -16,17 +16,19 @@
  * Last modified: 2019.10.06 at 11:34
  */
 
+import type {PlainObject} from "@labor-digital/helferlein";
+// @ts-ignore
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../Core/WorkerContext";
 import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from "../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin";
 import {AbstractStyleLoaderConfigurator} from "./AbstractStyleLoaderConfigurator";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		let postCssConfig = null;
+		let postCssConfig: PlainObject | null = null;
 
 		// Register cache clear plugin for custom sass compiler
 		context.webpackConfig.plugins.push(new CustomSassLoaderPreCompilerCacheInvalidatePlugin());
@@ -85,52 +87,4 @@ export class SassLoaderConfigurator extends AbstractStyleLoaderConfigurator impl
 				return context;
 			});
 	}
-
-	public applyLegacy(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		let postCssConfig = null;
-		return this.makePostcssConfig(identifier, context)
-			.then(config => {
-				postCssConfig = config;
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
-					test: /\.(sa|sc|c)ss$/,
-					identifier,
-					context
-				});
-			})
-			.then(args => {
-				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-					config: {
-						test: args.test,
-						use: [
-							{
-								loader: MiniCssExtractPlugin.loader
-							},
-							{
-								loader: "css-loader?url=false&-url",
-								options: {
-									import: false,
-									url: false
-								}
-							},
-							postCssConfig,
-							{
-								loader: "sass-loader?sourceMapRoot=foo",
-								options: {
-									sourceMap: true,
-									sassOptions: {
-										outputStyle: "expanded"
-									}
-								}
-							}
-						]
-					},
-					identifier,
-					context
-				});
-			}).then(args => {
-				context.webpackConfig.module.rules.push(args.config);
-				return context;
-			});
-	}
-
 }

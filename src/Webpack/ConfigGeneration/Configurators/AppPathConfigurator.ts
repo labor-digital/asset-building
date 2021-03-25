@@ -18,12 +18,12 @@
 
 import path from "path";
 import {merge} from "webpack-merge";
-import {WorkerContext} from "../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../Core/WorkerContext";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class AppPathConfigurator implements ConfiguratorInterface {
-	apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
+	apply(_: string, context: WorkerContext): Promise<WorkerContext> {
 		// Add the relative entry point
 		context.webpackConfig.entry = "." + path.sep + path.relative(
 			context.parentContext.sourcePath, path.resolve(context.parentContext.sourcePath, context.app.entry));
@@ -38,10 +38,10 @@ export class AppPathConfigurator implements ConfiguratorInterface {
 		context.webpackConfig.output.path = outputDirectory;
 		context.webpackConfig.output.filename = outputFile;
 		context.webpackConfig.output.chunkFilename = "js/" + outputFileWithoutExtension +
-			(context.isProd ? "-[id]-[hash].js" : "-[id].js");
+			(context.isProd ? "-[id]-[fullhash].js" : "-[id].js");
 
 		// Automatically generate public path if non was given via configuration
-		let publicPath = null;
+		let publicPath;
 		if (typeof context.app.publicPath !== "string" || context.app.publicPath.trim() === "") {
 			let publicPathRoot = inputDirectory;
 			if (path.basename(publicPathRoot) === "src")
@@ -55,13 +55,10 @@ export class AppPathConfigurator implements ConfiguratorInterface {
 			publicPath = context.app.publicPath;
 		}
 
-		// Don't set a public path for legacy configuration
-		if (context.builderVersion === 1) return Promise.resolve(context);
-
 		context.webpackConfig.output.publicPath = publicPath;
 
 		// Add dev public path if given
-		if (context.isProd === false && typeof context.app.publicPathDev === "string"
+		if (!context.isProd && typeof context.app.publicPathDev === "string"
 			&& context.app.publicPathDev.trim() !== "")
 			context.webpackConfig.output.publicPath = context.app.publicPathDev;
 

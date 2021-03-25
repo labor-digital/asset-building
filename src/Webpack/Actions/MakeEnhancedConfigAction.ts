@@ -16,21 +16,25 @@
  * Last modified: 2020.10.21 at 21:38
  */
 
-import {ComponentProxy} from "@labor-digital/helferlein/lib/Entities/ComponentProxy";
-import {cloneList} from "@labor-digital/helferlein/lib/Lists/cloneList";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {getPath} from "@labor-digital/helferlein/lib/Lists/Paths/getPath";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
-import {Configuration, Options, RuleSetRule} from "webpack";
+import {
+	cloneList,
+	ComponentProxy,
+	forEach,
+	getPath,
+	isArray,
+	isFunction,
+	isPlainObject,
+	isUndefined
+} from "@labor-digital/helferlein";
+import type {Configuration} from "webpack";
+// @ts-ignore
+import {Options} from "webpack";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {WorkerContext} from "../../Core/WorkerContext";
+import type {WorkerContext} from "../../Core/WorkerContext";
 import {resolveFileExtensions} from "../ConfigGeneration/Configurators/BaseConfigurator";
-import {MakeEnhancedConfigActionOptions} from "./MakeEnhancedConfigAction.interfaces";
-import {WorkerActionInterface} from "./WorkerActionInterface";
+import type {MakeEnhancedConfigActionOptions} from "./MakeEnhancedConfigAction.interfaces";
+import type {WorkerActionInterface} from "./WorkerActionInterface";
 
 export class MakeEnhancedConfigAction implements WorkerActionInterface {
 
@@ -80,11 +84,11 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface {
 				if (!isArray(config.resolveLoader.modules)) config.resolveLoader.modules = [];
 				config.resolveLoader.modules.unshift(context.parentContext.buildingNodeModulesPath);
 				forEach(context.parentContext.additionalResolverPaths, (path: string) => {
-					if (config.resolve.modules.indexOf(path) === -1) {
-						config.resolve.modules.push(path);
+					if (config.resolve!.modules!.indexOf(path) === -1) {
+						config.resolve!.modules!.push(path);
 					}
-					if (config.resolveLoader.modules.indexOf(path) === -1) {
-						config.resolveLoader.modules.push(path);
+					if (config.resolveLoader!.modules!.indexOf(path) === -1) {
+						config.resolveLoader!.modules!.push(path);
 					}
 				});
 				config.resolve.modules.push(context.parentContext.sourcePath);
@@ -92,49 +96,51 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface {
 				// Merge the resolve extensions
 				if (!isArray(config.resolve.extensions)) config.resolve.extensions = [];
 				// Inherit from the base config
-				if (isArray(getPath(baseConfig, "resolve.extensions"))) {
-					forEach(baseConfig.resolve.extensions, ext => {
-						if (config.resolve.extensions.indexOf(ext) === -1) {
-							config.resolve.extensions.push(ext);
+				if (isArray(getPath(baseConfig!, "resolve.extensions"))) {
+					forEach(baseConfig!.resolve!.extensions!, ext => {
+						if (config.resolve!.extensions!.indexOf(ext) === -1) {
+							config.resolve!.extensions!.push(ext);
 						}
 					});
 				}
 				// Inherit from our own base step
 				forEach(resolveFileExtensions, ext => {
-					if (config.resolve.extensions.indexOf(ext) === -1) {
-						config.resolve.extensions.push(ext);
+					if (config.resolve!.extensions!.indexOf(ext) === -1) {
+						config.resolve!.extensions!.push(ext);
 					}
 				});
 
 				// Register fallback filter -> Don't use any of the already registered patterns
-				if (!isFunction(options.ruleFilter)) {
-					const knownPatterns = [];
-					forEach(config.module.rules, (v) => {
-						knownPatterns.push((v.test as RegExp) + "");
+				if (!isFunction(options!.ruleFilter)) {
+					const knownPatterns: Array<string> = [];
+					forEach(config.module!.rules!, (v: any) => {
+						if (v.test) {
+							knownPatterns.push((v.test as RegExp) + "");
+						}
 					});
-					options.ruleFilter = function (test) {
+					options!.ruleFilter = function (test) {
 						return knownPatterns.indexOf(test) !== -1;
 					};
 				}
 
 				// Merge the module rule sets based on the registered filter
-				forEach(baseConfig.module.rules, (rule: RuleSetRule) => {
-					if (options.ruleFilter(rule.test + "", rule, baseConfig, config)) {
-						config.module.rules.push(rule);
+				forEach(baseConfig!.module!.rules!, (rule: any) => {
+					if (options!.ruleFilter!(rule.test + "", rule, baseConfig!, config)) {
+						config.module!.rules!.push(rule);
 					}
 				});
 
 				// Merge in the plugins of the base confic into the new config
-				forEach(baseConfig.plugins, (v, k) => {
-					if (!isFunction(options.pluginFilter)
-						|| options.pluginFilter(v.constructor.name + "", v, k, baseConfig, config)) {
-						config.plugins.push(v);
+				forEach(baseConfig!.plugins!, (v, k) => {
+					if (!isFunction(options!.pluginFilter)
+						|| options!.pluginFilter(v.constructor.name + "", v, k, baseConfig!, config)) {
+						config.plugins!.push(v);
 					}
 				});
 
 				// Allow manual merging
-				if (isFunction(options.configMerger)) {
-					config = options.configMerger(baseConfig, config);
+				if (isFunction(options!.configMerger)) {
+					config = options!.configMerger(baseConfig!, config);
 				}
 
 				// Unbind all handlers

@@ -16,11 +16,12 @@
  * Last modified: 2019.10.06 at 15:18
  */
 
+// @ts-ignore
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../Core/WorkerContext";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class CssExtractPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
@@ -29,7 +30,7 @@ export class CssExtractPluginConfigurator implements ConfiguratorInterface {
 				config: {
 					filename: "css/" + outputFileWithoutExtension + ".css",
 					chunkFilename: "css/" + outputFileWithoutExtension +
-						(context.isProd ? "-[id]-[hash].css" : "-[id].css"),
+						(context.isProd ? "-[id]-[fullhash].css" : "-[id].css"),
 					ignoreOrder: true
 				},
 				identifier,

@@ -16,17 +16,15 @@
  * Last modified: 2019.10.05 at 17:23
  */
 
-import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import {EventBus, isUndefined, PlainObject} from "@labor-digital/helferlein";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";
 import {ExtensionLoader} from "../Extension/ExtensionLoader";
 import {GeneralHelper} from "../Helpers/GeneralHelper";
 import {CoreContext} from "./CoreContext";
 import {CoreFixes} from "./CoreFixes";
 import {Factory} from "./Factory";
-import {FactoryCoreContextOptions} from "./Factory.interfaces";
-import {WorkerContext} from "./WorkerContext";
+import type {FactoryCoreContextOptions} from "./Factory.interfaces";
+import type {WorkerContext} from "./WorkerContext";
 
 let fixesApplied = false;
 
@@ -117,7 +115,7 @@ export class Bootstrap {
 	protected bindMainProcessEventHandlers(context: CoreContext): Promise<CoreContext> {
 		const shutdownHandler = function () {
 			console.log("Starting main process shutdown...");
-			context.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
+			context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {})
 				.then(() => {
 					console.log("Good bye!");
 					process.exit(0);
@@ -150,7 +148,7 @@ export class Bootstrap {
 	protected bindWorkerProcessEventHandlers(context: CoreContext): Promise<CoreContext> {
 		const shutdownHandler = function () {
 			console.log("Starting worker process shutdown...");
-			context.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
+			context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {})
 				.then(() => process.exit(0));
 		};
 		process.on("SIGTERM", shutdownHandler);

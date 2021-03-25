@@ -16,11 +16,12 @@
  * Last modified: 2019.10.06 at 16:18
  */
 
+// @ts-ignore
 import {BundleAnalyzerPlugin} from "webpack-bundle-analyzer";
 import {merge} from "webpack-merge";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class BundleAnalyzerPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {

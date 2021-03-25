@@ -13,27 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.03.18 at 15:12
+ * Last modified: 2019.10.06 at 17:35
  */
-const fs = require("fs");
-const path = require("path");
 
-function rmdirRecursive(dirname, removeSelf) {
-	if (fs.existsSync(dirname)) {
-		fs.readdirSync(dirname).forEach(function (file, index) {
-			var curPath = dirname + path.sep + file;
-			if (fs.lstatSync(curPath).isDirectory()) { // recurse
-				rmdirRecursive(curPath);
-			} else { // delete file
-				fs.unlinkSync(curPath);
-			}
-		});
-		if (removeSelf !== false) fs.rmdirSync(dirname);
-	}
-}
-
-try {
-	rmdirRecursive(__dirname + "/dist", false);
-} catch (e) {
-	console.error("Failed to clear dist!");
-}
+module.exports = function (context) {
+	console.log("[WEBPACK CONFIG]: Loaded custom config in webpack.config.js!");
+};

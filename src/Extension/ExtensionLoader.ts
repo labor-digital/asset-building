@@ -16,18 +16,13 @@
  * Last modified: 2019.10.04 at 20:05
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
-import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import type {PlainObject} from "@labor-digital/helferlein";
+import {forEach, isArray, isFunction, isNull, isPlainObject, isUndefined} from "@labor-digital/helferlein";
 import fs from "fs";
 import path from "path";
 import {AssetBuilderEventList} from "../AssetBuilderEventList";
-import {CoreContext} from "../Core/CoreContext";
-import {WorkerContext} from "../Core/WorkerContext";
+import type {CoreContext} from "../Core/CoreContext";
+import type {WorkerContext} from "../Core/WorkerContext";
 
 export class ExtensionLoader {
 
@@ -51,7 +46,7 @@ export class ExtensionLoader {
 	 */
 	public loadExtensions(scope: "global" | "app", context: CoreContext | WorkerContext, extensionPaths: Array<string>): Promise<any> {
 		context.eventEmitter.unbindAll(AssetBuilderEventList.EXTENSION_LOADING);
-		const extensions = [];
+		const extensions: Array<Function> = [];
 		forEach(extensionPaths, (extensionPath: string) => {
 			const extension = this.resolveExtensionPath(context, extensionPath);
 			// Ignore if this extension is already known
@@ -135,7 +130,7 @@ export class ExtensionLoader {
 		// Validate extension
 		if (isNull(extension)) throw new Error("Invalid extension path given! Missing extension: \"" + extensionPath + "\"");
 		if (!isFunction(extension)) {
-			if (isPlainObject(extension) && isFunction(extension.default)) extension = extension.default;
+			if (isPlainObject(extension) && isFunction((extension as any).default)) extension = (extension as any).default;
 			else throw new Error("The defined extension: \"" + extensionPath + "\" isn't a function!");
 		}
 

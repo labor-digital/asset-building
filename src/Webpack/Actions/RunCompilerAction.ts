@@ -16,15 +16,14 @@
  * Last modified: 2020.10.21 at 21:48
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
-import webpack, {Configuration, Stats} from "webpack";
+import type {PlainObject} from "@labor-digital/helferlein";
+import {isObject, isUndefined} from "@labor-digital/helferlein";
+import {Configuration, Stats, webpack} from "webpack";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {WorkerContext} from "../../Core/WorkerContext";
-import {WebpackCompilerCallbackInterface} from "../../Interfaces/WebpackCompilerCallbackInterface";
-import {RunCompilerOptions, RunCompilerResult} from "./RunCompilerAction.interfaces";
-import {WorkerActionInterface} from "./WorkerActionInterface";
+import type {WorkerContext} from "../../Core/WorkerContext";
+import type {WebpackCompilerCallbackInterface} from "../../Interfaces/WebpackCompilerCallbackInterface";
+import type {RunCompilerOptions, RunCompilerResult} from "./RunCompilerAction.interfaces";
+import type {WorkerActionInterface} from "./WorkerActionInterface";
 
 export class RunCompilerAction implements WorkerActionInterface {
 
@@ -43,11 +42,12 @@ export class RunCompilerAction implements WorkerActionInterface {
 	 * @protected
 	 */
 	protected prepareConfig(context: WorkerContext, options?: RunCompilerOptions): Promise<Configuration> {
+		options = options ?? {};
 
 		// Use the given configuration if possible
 		if (isObject(options.config)) {
-			context.webpackConfig = options.config;
-			return Promise.resolve(options.config);
+			context.webpackConfig = options.config!;
+			return Promise.resolve(options.config!);
 		}
 
 		return context.do.makeConfiguration(options.configOptions);
@@ -67,7 +67,7 @@ export class RunCompilerAction implements WorkerActionInterface {
 		context: WorkerContext,
 		options?: RunCompilerOptions
 	): Promise<RunCompilerResult> {
-		let compilerInstance = null;
+		let compilerInstance: any | null = null;
 
 		return new Promise((resolveCompiler, rejectCompiler) => {
 			const callbackPromise = (new Promise<number>((resolveCallback, rejectCallback) => {
@@ -77,14 +77,14 @@ export class RunCompilerAction implements WorkerActionInterface {
 						const context: WorkerContext = args.context;
 						const callback: WebpackCompilerCallbackInterface = args.callback;
 
-						compilerInstance = compiler(context.webpackConfig, (err, stats) => {
+						compilerInstance = compiler(config, (err: any, stats: any) => {
 
 							if (err !== null) {
 								return rejectCallback(err);
 							}
 
 							if (context.parentContext.process === "worker") {
-								process.send({WEBPACK_DONE: true});
+								process!.send!({WEBPACK_DONE: true});
 							}
 
 							callback(context, stats, resolveCallback, rejectCallback);
@@ -96,8 +96,8 @@ export class RunCompilerAction implements WorkerActionInterface {
 							webpackCompiler: compilerInstance
 						});
 
-						if (!isUndefined(compilerInstance.compiler)) {
-							compilerInstance = compilerInstance.compiler;
+						if (!isUndefined(compilerInstance!.compiler)) {
+							compilerInstance = compilerInstance!.compiler;
 						}
 
 						resolveCompiler({
@@ -123,7 +123,7 @@ export class RunCompilerAction implements WorkerActionInterface {
 	): Promise<PlainObject> {
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_COMPILER, {
 			compiler: webpack,
-			callback: (context, stats, resolve, reject): void => {
+			callback: (context: any, stats: any, resolve: any, reject: any): void => {
 				this.webpackCallback(context, stats, resolve, reject);
 			},
 			options,

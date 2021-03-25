@@ -16,18 +16,17 @@
  * Last modified: 2020.10.21 at 21:39
  */
 
-import {EventEmitterEventListener} from "@labor-digital/helferlein/lib/Events/EventEmitter";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {Configuration, RuleSetRule} from "webpack";
-import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
-import {AssetBuilderPluginIdentifiers as PluginIds} from "../../AssetBuilderPluginIdentifiers";
+import type {EventEmitterEventListener, PlainObject} from "@labor-digital/helferlein";
+import type {Configuration, RuleSetRule} from "webpack";
+import type {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
+import type {AssetBuilderPluginIdentifiers as PluginIds} from "../../AssetBuilderPluginIdentifiers";
 
 export interface ModuleRuleFilter {
 	(test: string, rule: RuleSetRule, baseConfig: Configuration, buildConfig: Configuration): boolean
 }
 
 export interface PluginFilter {
-	(constructor: string, plugin, index: number, baseConfig: Configuration, buildConfig: Configuration): boolean;
+	(constructor: string, plugin: any, index: number, baseConfig: Configuration, buildConfig: Configuration): boolean;
 }
 
 export interface ConfigMerger {

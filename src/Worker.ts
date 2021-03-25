@@ -16,15 +16,14 @@
  * Last modified: 2019.10.05 at 17:02
  */
 
-import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
+import {EventBus, PlainObject} from "@labor-digital/helferlein";
 import {AssetBuilderEventList} from "./AssetBuilderEventList";
 import {Bootstrap} from "./Core/Bootstrap";
 import {GeneralHelper} from "./Helpers/GeneralHelper";
 
 let isRunning = false;
 
-function init(message) {
+function init(message: PlainObject) {
 	(new Bootstrap())
 		.initWorkerProcess(message)
 		.then(context => context.do.runCompiler())

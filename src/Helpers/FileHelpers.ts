@@ -15,7 +15,7 @@
  *
  * Last modified: 2019.02.18 at 18:55
  */
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {isString} from "@labor-digital/helferlein";
 import fs from "fs";
 import path from "path";
 
@@ -68,7 +68,7 @@ export class FileHelpers {
 	 * @see https://gist.github.com/bpedro/742162#gistcomment-828133
 	 * @param {string} directory The directory to create
 	 */
-	static mkdir(directory): void {
+	static mkdir(directory: string): void {
 		if (!isString(directory)) return;
 		var path = directory.replace(/[\\\/]/g, "/").replace(/\/$/, "").split("/");
 
@@ -79,7 +79,7 @@ export class FileHelpers {
 		}
 	}
 
-	static flushDirectory(directory): void {
+	static flushDirectory(directory: string): void {
 		if (!isString(directory)) return;
 		try {
 			var files = fs.readdirSync(directory);
@@ -99,7 +99,7 @@ export class FileHelpers {
 		}
 	};
 
-	static touch(filename): void {
+	static touch(filename: string): void {
 		if (!isString(filename)) return;
 		if (!fs.existsSync(filename)) fs.writeFileSync(filename, "");
 		fs.utimesSync(filename, new Date(), new Date());

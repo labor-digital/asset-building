@@ -16,26 +16,26 @@
  * Last modified: 2020.10.21 at 12:05
  */
 
-import {EventEmitterEvent} from "@labor-digital/helferlein/lib/Events/EventEmitter";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {cloneList} from "@labor-digital/helferlein/lib/Lists/cloneList";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
-import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
-import {isNumber} from "@labor-digital/helferlein/lib/Types/isNumber";
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
+import {
+	cloneList,
+	EventEmitterEvent,
+	forEach,
+	isArray,
+	isNumber,
+	isString,
+	PlainObject
+} from "@labor-digital/helferlein";
 import path from "path";
-import {Configuration} from "webpack";
-import {merge} from "webpack-merge";
+import type {Configuration} from "webpack";
 import {isPlainObject} from "webpack-merge/dist/utils";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
-import {CoreContext} from "../../Core/CoreContext";
+import type {CoreContext} from "../../Core/CoreContext";
 import {Factory} from "../../Core/Factory";
-import {WorkerContext} from "../../Core/WorkerContext";
-import {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
-import {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
+import type {WorkerContext} from "../../Core/WorkerContext";
+import type {AppDefinitionInterface} from "../../Interfaces/AppDefinitionInterface";
+import type {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
 
 export class NuxtFactory {
 
@@ -113,12 +113,11 @@ export class NuxtFactory {
 			}
 		).then(context =>
 				context.do
-					.makeEnhancedConfig(config, this.getEnhancerOptions())
+					.makeEnhancedConfig(config!, this.getEnhancerOptions())
 					.then(config => this.applyAdditionalServerConfiguration(type, config, context))
-					.then(config => this.applyAdditionalConfiguration(config))
 			)
 			.then(config => {
-				configs[key] = config;
+				configs[key!] = config;
 			});
 	}
 
@@ -156,12 +155,10 @@ export class NuxtFactory {
 					e.args.options.compilerOptions.jsxFactory = "h";
 				},
 				[AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
-					const context: WorkerContext = e.args.context;
-
 					switch (e.args.identifier) {
 						case Ids.SASS_LOADER:
 						case Ids.LESS_LOADER:
-							return this.modifyStyleLoader(e, context);
+							return this.modifyStyleLoader(e);
 					}
 				},
 				[AssetBuilderEventList.FILTER_POSTCSS_PLUGINS]: (e) => {
@@ -190,16 +187,15 @@ export class NuxtFactory {
 	/**
 	 * Modify the style loader to match the vue.js requirements
 	 * @param e
-	 * @param context
 	 * @protected
 	 */
-	protected modifyStyleLoader(e: EventEmitterEvent, context: WorkerContext): void {
+	protected modifyStyleLoader(e: EventEmitterEvent): void {
 		const cssExtractorPluginRegex = new RegExp("mini-css-extract-plugin");
 
 		// Register additional loader to strip out all /deep/ selectors we need for component nesting,
 		// but that are not wanted in a browser environment
 		const deepRemoverPath = path.resolve(__dirname, "DeepRemoverLoader.js");
-		e.args.config.use.forEach((v, k) => {
+		e.args.config.use.forEach((v: any, k: any) => {
 			if (typeof v === "string") v = {loader: v};
 			if (typeof v.loader === "undefined") return;
 
@@ -217,7 +213,7 @@ export class NuxtFactory {
 
 		// Rewrite sass and less loader
 		const cssLoaderRegex = /^css-loader/;
-		e.args.config.use.forEach((v, k) => {
+		e.args.config.use.forEach((v: any, k: any) => {
 			if (typeof v === "string") v = {loader: v};
 			if (typeof v.loader === "undefined") return;
 
@@ -299,13 +295,15 @@ export class NuxtFactory {
 		}
 
 		// Remove the externals plugin of nuxt
-		const filteredExternals = [];
-		forEach(config.externals as Array<any>, (external) => {
-			if (isFunction(external) && external.toString().indexOf("mark this module as external") !== false) {
-				return;
-			}
-		});
-		config.externals = filteredExternals;
+		// @todo why do we have this?
+		// const filteredExternals = [];
+		// forEach(config.externals as Array<any>, (external) => {
+		// 	if (isFunction(external) && external.toString().indexOf("mark this module as external") !== false) {
+		// 		return;
+		// 	}
+		// });
+		// config.externals = filteredExternals;
+		config.externals = [];
 
 		// Allow to filter the extension pattern and inject the new instance of the plugin
 		return context.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_VUE_EXTERNAL_EXTENSION_PATTERN,
@@ -314,7 +312,7 @@ export class NuxtFactory {
 			.then((pattern: RegExp) => {
 				(config.externals as Array<any>).unshift(
 					require("webpack-node-externals")({
-						allowlist: (modulePath): boolean => {
+						allowlist: (modulePath: string): boolean => {
 							try {
 								return !(require.resolve(modulePath) + "").match(pattern);
 							} catch (e) {
@@ -325,27 +323,5 @@ export class NuxtFactory {
 				);
 				return config;
 			});
-	}
-
-	/**
-	 * Adds additional, recommended configuration to the webpack setup
-	 * @param config
-	 * @protected
-	 */
-	protected applyAdditionalConfiguration(config: Configuration): Configuration {
-		return merge(config, {
-			node: {
-				// Prevent webpack from injecting useless setImmediate polyfill because Vue
-				// source contains it (although only uses it if it's native).
-				setImmediate: false,
-				// Prevent webpack from injecting mocks to Node native modules
-				// that does not make sense for the client
-				dgram: "empty",
-				fs: "empty",
-				net: "empty",
-				tls: "empty",
-				child_process: "empty"
-			}
-		});
 	}
 }

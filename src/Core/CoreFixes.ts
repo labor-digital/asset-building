@@ -15,13 +15,11 @@
  *
  * Last modified: 2019.10.04 at 20:40
  */
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
+import {isNull, isPlainObject, PlainObject} from "@labor-digital/helferlein";
 import Chalk from "chalk";
 import Module from "module";
 import * as path from "path";
-import {CoreContext} from "./CoreContext";
+import type {CoreContext} from "./CoreContext";
 
 export class CoreFixes {
 	/**
@@ -45,7 +43,7 @@ export class CoreFixes {
 			// Try to load events to apply fix
 			const EventEmitter = require("events");
 			const _realEmit = EventEmitter.prototype.emit;
-			EventEmitter.prototype.emit = function (type) {
+			EventEmitter.prototype.emit = function () {
 				try {
 					return _realEmit.apply(this, arguments);
 				} catch (e) {
@@ -77,7 +75,7 @@ export class CoreFixes {
 		// Make sure we can supply modules from our build context
 		const resolveFilenameOrig = (Module as any)._resolveFilename;
 		const resolverCache = {};
-		(Module as any)._resolveFilename = function resolveFilenameOverride(request, parent, isMain, options) {
+		(Module as any)._resolveFilename = function resolveFilenameOverride(request: string, parent: PlainObject, isMain: string, options?: any) {
 			// Prepare cache key to make sure to prevent caching overlay's
 			const cacheKey = request + parent.id + isMain;
 			const isCacheable = typeof options === "undefined" || options === null;

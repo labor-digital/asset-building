@@ -15,13 +15,12 @@
  *
  * Last modified: 2019.02.20 at 19:04
  */
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
+import {forEach, isNull} from "@labor-digital/helferlein";
 import fs from "fs";
 import path from "path";
 import {FileHelpers} from "../../../Helpers/FileHelpers";
-import {SassFile} from "./Entities/SassFile";
-import {SassFileResolverContext} from "./Entities/SassFileResolverContext";
+import type {SassFile} from "./Entities/SassFile";
+import type {SassFileResolverContext} from "./Entities/SassFileResolverContext";
 
 export class SassFilePreCompiler {
 	/**
@@ -31,11 +30,11 @@ export class SassFilePreCompiler {
 	static apply(file: SassFile, context: SassFileResolverContext): void {
 		// Check if we have to convert sass files to scss
 		if (file.extension === "sass")
-			file.content = SassFilePreCompiler.sass2scss(file.content);
+			file.content = SassFilePreCompiler.sass2scss(file.content) ?? "";
 
 		// Resolve imports
 		file.content = file.content.replace(/((?:^|^(?:[^\S\n]+))@import\s+["'])([^"']*?)(["'];?(?:[^\S\n]+)?)/gm,
-			(a, before, importPath) => {
+			(_: string, _1: string, importPath) => {
 				const importFilename = SassFilePreCompiler.resolveImportFilename(context, importPath, file.filename);
 				const posixImportFilename = FileHelpers.filenameToPosix(importFilename);
 
@@ -163,7 +162,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		let lastIndentBeforeBlockComment = 0;
 
 		// The previous indents to check how many blocks were closed
-		let indentHistory = [];
+		let indentHistory: Array<number> = [];
 
 		// True if currently looping over a block comment
 		let inBlockComment = false;
@@ -245,12 +244,10 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 				}
 
 				// Try to fix empty selectors on the previous line
-				let skip = false;
 				if (parsedLines[lastLineWithContent].text.match(/^\s*[^@+:,{()\n]*?$/g)) {
 					if (parsedLines[lastLineWithContent].text.trim() !== "" &&
 						!parsedLines[lastLineWithContent].text.match(/^\/\//)) {
 						parsedLines[lastLineWithContent].text += "{}";
-						skip = true;
 					}
 				}
 
@@ -268,7 +265,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		parsedLines.pop();
 
 		// Rebuild parsed lines into a list of scss lines
-		const outputLines = [];
+		const outputLines: Array<string> = [];
 		forEach(parsedLines, (line) => {
 			if (line.empty !== true) {
 				// Try to find empty selectors which may break the process
@@ -292,7 +289,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 		let output = outputLines.join("\r\n");
 
 		// Replace mixin definitions
-		output = output.replace(/(^\s*)([+=])(\s*)/gm, (a, before, char, after) => {
+		output = output.replace(/(^\s*)([+=])(\s*)/gm, (_, before, char, after) => {
 			return before + (char === "+" ? "@include " : "@mixin ") + after;
 		});
 

@@ -16,12 +16,12 @@
  * Last modified: 2019.10.06 at 16:37
  */
 
-import {isNull} from "@labor-digital/helferlein/lib/Types/isNull";
+import {isNull} from "@labor-digital/helferlein";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class HtmlPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
@@ -30,13 +30,13 @@ export class HtmlPluginConfigurator implements ConfiguratorInterface {
 		// Apply a basic configuration
 		let template = context.app.htmlTemplate;
 		if (template === true) template = {};
-		if (typeof template.template === "undefined") {
-			template.template = path.resolve(
+		if (typeof template!.template === "undefined") {
+			template!.template = path.resolve(
 				path.join(__dirname, "../../../../static/HtmlDefaultTemplate.ejs")
 			);
-			if (typeof template.inject === "undefined") template.inject = false;
-			if (!Array.isArray(template.meta)) {
-				template.meta = [
+			if (typeof template!.inject === "undefined") template!.inject = false;
+			if (!Array.isArray(template!.meta)) {
+				template!.meta = [
 					{
 						"http-equiv": "X-UA-Compatible",
 						content: "IE=edge,chrome=1"
@@ -47,7 +47,7 @@ export class HtmlPluginConfigurator implements ConfiguratorInterface {
 				];
 			}
 		}
-		if (typeof template.appMountId === "undefined") template.appMountId = "app";
+		if (typeof template!.appMountId === "undefined") template!.appMountId = "app";
 
 		// Allow filtering
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_HTML_PLUGIN_TEMPLATE, {

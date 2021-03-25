@@ -16,16 +16,15 @@
  * Last modified: 2019.10.06 at 15:35
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {isArray} from "@labor-digital/helferlein/lib/Types/isArray";
+import {forEach, isArray, PlainObject} from "@labor-digital/helferlein";
+// @ts-ignore
 import CopyWebpackPlugin from "copy-webpack-plugin";
 import fs from "fs";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {AppCopyDefinition} from "../../../Interfaces/AppDefinitionInterface";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {AppCopyDefinition} from "../../../Interfaces/AppDefinitionInterface";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class CopyPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {

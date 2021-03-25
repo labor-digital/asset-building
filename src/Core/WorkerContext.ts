@@ -15,13 +15,14 @@
  *
  * Last modified: 2019.10.05 at 18:28
  */
-import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {Configuration} from "webpack";
-import {ExtensionLoader} from "../Extension/ExtensionLoader";
-import {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
+import type {EventEmitter, PlainObject} from "@labor-digital/helferlein";
+
+import type {Configuration} from "webpack";
+import type {ExtensionLoader} from "../Extension/ExtensionLoader";
+import type {AppDefinitionInterface} from "../Interfaces/AppDefinitionInterface";
 import {WebpackWorkerActions} from "../Webpack/WebpackWorkerActions";
-import {CoreContext} from "./CoreContext";
+import type {CoreContext} from "./CoreContext";
+import type {TBuilderMode} from "./Factory.interfaces";
 
 export class WorkerContext {
 	/**
@@ -84,18 +85,12 @@ export class WorkerContext {
 		return this.parentContext.extensionLoader;
 	}
 
-	/**
-	 * The version number of the current config builder
-	 */
-	public get builderVersion(): number {
-		return this.parentContext.builderVersion;
-	}
 
 	/**
 	 * The numeric zero-based index of the app which is currently configured.
 	 */
 	public get appId(): number {
-		return this.app.id;
+		return this.app.id ?? 0;
 	}
 
 	/**
@@ -108,7 +103,7 @@ export class WorkerContext {
 	/**
 	 * The mode key which was given as cli parameter
 	 */
-	public get mode(): string {
+	public get mode(): TBuilderMode {
 		return this.parentContext.mode;
 	}
 

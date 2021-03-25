@@ -16,17 +16,18 @@
  * Last modified: 2019.10.05 at 21:15
  */
 
+import type {PlainObject} from "@labor-digital/helferlein";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class TypescriptLoaderConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
 
 		// Storage for temporary values
-		let excludePattern = undefined;
-		let typescriptOptions = {};
+		let excludePattern: RegExp | undefined = undefined;
+		let typescriptOptions: PlainObject = {};
 
 		return Promise.resolve(context)
 
@@ -59,11 +60,9 @@ export class TypescriptLoaderConfigurator implements ConfiguratorInterface {
 
 			// Prepare exclude pattern
 			.then(() => {
-				const baseExcludePattern = /node_modules(?![\\/\\\\]@labor(?:-digital)?[\\/\\\\])/;
 				return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_EXCLUDE_PATTERN, {
-					pattern: context.builderVersion === 1 ? baseExcludePattern : undefined,
+					pattern: /node_modules/,
 					identifier,
-					basePattern: baseExcludePattern,
 					context
 				});
 			})

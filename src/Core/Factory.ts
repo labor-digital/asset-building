@@ -16,11 +16,11 @@
  * Last modified: 2020.10.21 at 17:33
  */
 
-import {CoreContext} from "./CoreContext";
-import {FactoryCoreContextOptions, FactoryWorkerContextOptions} from "./Factory.interfaces";
+import type {CoreContext} from "./CoreContext";
+import type {FactoryCoreContextOptions, FactoryWorkerContextOptions} from "./Factory.interfaces";
 import {CoreContextFactory} from "./Factory/CoreContextFactory";
 import {WorkerContextFactory} from "./Factory/WorkerContextFactory";
-import {WorkerContext} from "./WorkerContext";
+import type {WorkerContext} from "./WorkerContext";
 
 export class Factory {
 

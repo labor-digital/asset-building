@@ -16,8 +16,7 @@
  * Last modified: 2020.10.22 at 12:33
  */
 
-import {isObject} from "@labor-digital/helferlein/lib/Types/isObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import {isObject, isUndefined} from "@labor-digital/helferlein";
 import Chalk from "chalk";
 
 export class GeneralHelper {
@@ -53,9 +52,9 @@ export class GeneralHelper {
 	 * @param title An optional title to render above the error
 	 * @param kill The method kills the script by default, you can set this to false to disable that feature
 	 */
-	public static renderError(err, title?: string, kill?: boolean): never | void {
-		if (isObject(err) && !isUndefined(err.stack)) {
-			err = err.stack;
+	public static renderError(err: object | string, title?: string, kill?: boolean): never | void {
+		if (isObject(err) && !isUndefined((err as any).stack)) {
+			err = (err as any).stack;
 		}
 
 		console.error("");

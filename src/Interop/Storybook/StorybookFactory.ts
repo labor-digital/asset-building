@@ -16,18 +16,15 @@
  * Last modified: 2020.04.23 at 20:11
  */
 
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {forEach} from "@labor-digital/helferlein/lib/Lists/forEach";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
-import {Configuration} from "webpack";
+import type {PlainObject} from "@labor-digital/helferlein";
+import {forEach, isPlainObject, isString, isUndefined} from "@labor-digital/helferlein";
+import type {Configuration} from "webpack";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
 import {AssetBuilderPluginIdentifiers} from "../../AssetBuilderPluginIdentifiers";
-import {CoreContext} from "../../Core/CoreContext";
+import type {CoreContext} from "../../Core/CoreContext";
 import {Factory} from "../../Core/Factory";
-import {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
+import type {MakeEnhancedConfigActionOptions} from "../../Webpack/Actions/MakeEnhancedConfigAction.interfaces";
 
 export class StorybookFactory {
 
@@ -43,7 +40,7 @@ export class StorybookFactory {
 	 */
 	protected _factory: Factory;
 
-	protected coreContextPromise: Promise<CoreContext>;
+	protected coreContextPromise?: Promise<CoreContext>;
 
 	/**
 	 * Injects the factory instance and options
@@ -64,7 +61,7 @@ export class StorybookFactory {
 			mode: "watch",
 			environment: "storyBook",
 			laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {},
-			additionalResolversForApp: isPlainObject(this._options.app) ? this._options.app : {}
+			additionalResolversForApp: (isPlainObject(this._options.app) ? this._options.app : {}) as any
 		});
 	}
 

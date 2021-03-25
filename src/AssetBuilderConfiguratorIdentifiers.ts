@@ -18,6 +18,7 @@
 export enum AssetBuilderConfiguratorIdentifiers {
 	BASE = "base",
 	APP_PATHS = "appPaths",
+	POLYFILL = "polyfill",
 	DEV_ONLY = "devOnly",
 	PROD_ONLY = "prodOnly",
 	PROGRESS_BAR_PLUGIN = "progressBarPlugin",

@@ -17,23 +17,19 @@
  */
 
 
-import {isEmpty} from "@labor-digital/helferlein/lib/Types/isEmpty";
-import {isFunction} from "@labor-digital/helferlein/lib/Types/isFunction";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isString} from "@labor-digital/helferlein/lib/Types/isString";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
+import {isEmpty, isFunction, isPlainObject, isString, isUndefined} from "@labor-digital/helferlein";
 import isDocker from "is-docker";
 import path from "path";
 import {merge} from "webpack-merge";
 import {AssetBuilderConfiguratorIdentifiers as Ids} from "../../AssetBuilderConfiguratorIdentifiers";
 import {AssetBuilderEventList} from "../../AssetBuilderEventList";
-import {WorkerContext} from "../../Core/WorkerContext";
+import type {WorkerContext} from "../../Core/WorkerContext";
 import {AppPathConfigurator} from "./Configurators/AppPathConfigurator";
 import {BaseConfigurator} from "./Configurators/BaseConfigurator";
 import {BuiltInPluginConfigurator} from "./Configurators/BuiltInPluginConfigurator";
 import {BundleAnalyzerPluginConfigurator} from "./Configurators/BundleAnalyzerPluginConfigurator";
 import {CleanOutputDirPluginConfigurator} from "./Configurators/CleanOutputDirPluginConfigurator";
-import {ConfiguratorInterface} from "./Configurators/ConfiguratorInterface";
+import type {ConfiguratorInterface} from "./Configurators/ConfiguratorInterface";
 import {CopyPluginConfigurator} from "./Configurators/CopyPluginConfigurator";
 import {CssExtractPluginConfigurator} from "./Configurators/CssExtractPluginConfigurator";
 import {DevOnlyConfigurator} from "./Configurators/DevOnlyConfigurator";
@@ -46,6 +42,7 @@ import {JsCompatConfigurator} from "./Configurators/JsCompatConfigurator";
 import {JsPreloadConfigurator} from "./Configurators/JsPreloadConfigurator";
 import {LessLoaderConfigurator} from "./Configurators/LessLoaderConfigurator";
 import {MinChunkSizePluginConfigurator} from "./Configurators/MinChunkSizePluginConfigurator";
+import {PolyfillConfigurator} from "./Configurators/PolyfillConfigurator";
 import {ProdOnlyConfigurator} from "./Configurators/ProdOnlyConfigurator";
 import {ProgressBarPluginConfigurator} from "./Configurators/ProgressBarPluginConfigurator";
 import {ProvidePluginConfigurator} from "./Configurators/ProvidePluginConfigurator";
@@ -63,6 +60,7 @@ export class WebpackConfigGenerator {
 		return Promise.resolve(context)
 			.then(context => this.configuratorWrapper(Ids.BASE, context, new BaseConfigurator()))
 			.then(context => this.configuratorWrapper(Ids.APP_PATHS, context, new AppPathConfigurator()))
+			.then(context => this.configuratorWrapper(Ids.POLYFILL, context, new PolyfillConfigurator()))
 			.then(context => this.configuratorWrapper(Ids.PROGRESS_BAR_PLUGIN, context, new ProgressBarPluginConfigurator()))
 			.then(context => this.configuratorWrapper(Ids.HTML_LOADER, context, new HtmlLoaderConfigurator()))
 			.then(context => this.configuratorWrapper(Ids.IMAGE_LOADER, context, new ImageLoaderConfigurator()))
@@ -136,13 +134,7 @@ export class WebpackConfigGenerator {
 					configurator: args.configurator,
 					context
 				})
-				.then(args => {
-					// Check if we should apply a legacy configuration
-					if (context.builderVersion === 1 && isFunction(configurator.applyLegacy)) {
-						return args.configurator.applyLegacy(identifier, args.context);
-					}
-					return args.configurator.apply(identifier, args.context);
-				}).then(res => {
+				.then(args => args.configurator.apply(identifier, args.context)).then(res => {
 					if (isEmpty(res)) {
 						console.log(configurator);
 						process.exit();
@@ -183,16 +175,21 @@ export class WebpackConfigGenerator {
 				const customWebpackConfig = require(customWebpackConfigPath);
 				if (isPlainObject(customWebpackConfig)) {
 					context.webpackConfig = merge(context.webpackConfig, customWebpackConfig);
-					return Promise.resolve(context);
+					return Promise.resolve(context!);
 				} else if (isFunction(customWebpackConfig)) {
-					context.eventEmitter.unbindAll(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
-					context.eventEmitter.bind(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, () => customWebpackConfig(context));
-					return context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {}).then(() => context);
+					context.eventEmitter.unbindAll(
+						AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
+					context.eventEmitter.bind(
+						AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, () => customWebpackConfig(context));
+					return context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {})
+						.then(() => context) as Promise<WorkerContext>;
 				}
-				return Promise.reject(new Error("The default export of " + customWebpackConfigPath + " has to be an object or a function!"));
+				return Promise.reject(new Error("The default export of " + customWebpackConfigPath + " has to be an object or a function!")) as Promise<WorkerContext>;
 			} catch (e) {
 				return Promise.reject(new Error("Could not resolve the custom webpack config at: \"" + customWebpackConfigPath + "\""));
 			}
 		}
+
+		return Promise.reject(context);
 	}
 }

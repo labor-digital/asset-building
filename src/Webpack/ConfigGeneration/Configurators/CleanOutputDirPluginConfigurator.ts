@@ -19,8 +19,8 @@
 import {CleanWebpackPlugin} from "clean-webpack-plugin";
 import path from "path";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
@@ -32,7 +32,9 @@ export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface {
 
 		// Add plugin to clean the output directory when the app is compiled
 		// But make sure to keep all sources which have been defined in there
-		const sourceToExclude = path.relative(outputDirectory, inputDirectory).split(/\\\//).shift()
+		const sourceToExclude = path.relative(outputDirectory, inputDirectory)
+			.split(/\\\//)!
+			.shift()!
 			.replace(/^[.\\\/]+/g, "");
 		const cleanOnceBeforeBuildPatterns = ["**/*"];
 		if (sourceToExclude.length > 0) {
@@ -55,10 +57,4 @@ export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface {
 				return context;
 			});
 	}
-
-	public applyLegacy(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		// Noop in legacy mode
-		return Promise.resolve(context);
-	}
-
 }

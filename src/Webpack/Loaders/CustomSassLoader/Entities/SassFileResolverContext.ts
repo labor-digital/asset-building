@@ -16,12 +16,14 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
+// @ts-ignore
 import LoaderUtils from "loader-utils";
-// noinspection ES6UnusedImports
+// @ts-ignore
 import * as webpack from "webpack";
 import {AssetBuilderEventList} from "../../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../../Core/WorkerContext";
 import {FileHelpers} from "../../../../Helpers/FileHelpers";
+// @ts-ignore
 import LoaderContext = webpack.loader.LoaderContext;
 
 export class SassFileResolverContext {

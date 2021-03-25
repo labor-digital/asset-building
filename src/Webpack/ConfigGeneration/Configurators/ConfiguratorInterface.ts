@@ -15,10 +15,8 @@
  *
  * Last modified: 2019.10.05 at 15:34
  */
-import {WorkerContext} from "../../../Core/WorkerContext";
+import type {WorkerContext} from "../../../Core/WorkerContext";
 
 export interface ConfiguratorInterface {
 	apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
-
-	applyLegacy?(identifier: string, context: WorkerContext): Promise<WorkerContext>
 }

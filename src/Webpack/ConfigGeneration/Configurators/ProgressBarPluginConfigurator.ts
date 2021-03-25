@@ -16,11 +16,11 @@
  * Last modified: 2019.10.06 at 15:23
  */
 
+// @ts-ignore
 import WebpackBar from "webpackbar";
-//import ProgressBarPlugin from "progress-bar-webpack-plugin";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class ProgressBarPluginConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {

@@ -15,9 +15,9 @@
  *
  * Last modified: 2020.04.23 at 20:03
  */
-import {PlainObject} from "@labor-digital/helferlein/lib/Interfaces/PlainObject";
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {Configuration} from "webpack";
+import type {PlainObject} from "@labor-digital/helferlein";
+import {isPlainObject} from "@labor-digital/helferlein";
+import type {Configuration} from "webpack";
 import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import {StorybookFactory} from "./StorybookFactory";
 
@@ -48,7 +48,7 @@ export function makeAssetBuilder(options?: PlainObject) {
  */
 export const webpack = (
 	webpackConfig: Configuration = {},
-	options
+	options: PlainObject
 ): Promise<Configuration> => {
 	GeneralHelper.renderFancyIntro();
 	return (new StorybookFactory(options))

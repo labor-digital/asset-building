@@ -16,12 +16,9 @@
  * Last modified: 2019.10.15 at 09:03
  */
 
-import {isPlainObject} from "@labor-digital/helferlein/lib/Types/isPlainObject";
-import {isUndefined} from "@labor-digital/helferlein/lib/Types/isUndefined";
-import {Application} from "express";
+import type {Application} from "express";
 import {GeneralHelper} from "../../Helpers/GeneralHelper";
 import ExpressContext from "./ExpressContext";
-import ExpressFactory from "./ExpressFactory";
 
 export interface ExpressAssetBuildingPluginOptions {
 	/**
@@ -51,18 +48,10 @@ export interface ExpressAssetBuildingPluginOptions {
 module.exports = function expressAssetBuildingPlugin(expressApp: Application, options?: ExpressAssetBuildingPluginOptions): Promise<ExpressContext> {
 	GeneralHelper.renderFancyIntro();
 
-	const isProd = process.env.NODE_ENV !== "development";
-
-	if (!isPlainObject(options)) options = {};
-	if (isUndefined(options.mode)) options.mode = "build";
-	if (isUndefined(options.appId)) options.appId = 0;
-	if (isUndefined(options.packageJsonDirectory)) options.packageJsonDirectory = process.cwd();
-	
-	const context = new ExpressContext(options.appId, expressApp, isProd, options.packageJsonDirectory);
-	context.factory = new ExpressFactory(options);
+	const context = new ExpressContext(expressApp, options);
 
 	// Be done if we are in production context
-	if (isProd) {
+	if (context.isProd) {
 		return Promise.resolve(context);
 	}
 

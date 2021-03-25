@@ -16,14 +16,14 @@
  * Last modified: 2019.10.05 at 20:41
  */
 
-import {md5} from "@labor-digital/helferlein/lib/Misc/md5";
+import {md5} from "@labor-digital/helferlein";
 import {AssetBuilderEventList} from "../../../AssetBuilderEventList";
-import {WorkerContext} from "../../../Core/WorkerContext";
-import {ConfiguratorInterface} from "./ConfiguratorInterface";
+import type {WorkerContext} from "../../../Core/WorkerContext";
+import type {ConfiguratorInterface} from "./ConfiguratorInterface";
 
 export class FontLoaderConfigurator implements ConfiguratorInterface {
 	public apply(identifier: string, context: WorkerContext): Promise<WorkerContext> {
-		if (context.builderVersion === 1) return Promise.resolve(context);
+
 		return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
 			test: /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/,
 			identifier,
@@ -36,8 +36,8 @@ export class FontLoaderConfigurator implements ConfiguratorInterface {
 						{
 							loader: "file-loader",
 							options: {
-								name: (file) => {
-									if (context.isProd) return "[name]-[hash].[ext]";
+								name: (file: string) => {
+									if (context.isProd) return "[name]-[fullhash].[ext]";
 									// Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
 									return "[name]-" + md5(file) + ".[ext]";
 								},

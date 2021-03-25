@@ -16,13 +16,13 @@
  * Last modified: 2020.10.21 at 21:29
  */
 
-import {Configuration} from "webpack";
-import {WorkerContext} from "../Core/WorkerContext";
+import type {Configuration} from "webpack";
+import type {WorkerContext} from "../Core/WorkerContext";
 import {MakeConfigurationAction, MakeConfigurationActionOptions} from "./Actions/MakeConfigurationAction";
 import {MakeEnhancedConfigAction} from "./Actions/MakeEnhancedConfigAction";
-import {MakeEnhancedConfigActionOptions} from "./Actions/MakeEnhancedConfigAction.interfaces";
+import type {MakeEnhancedConfigActionOptions} from "./Actions/MakeEnhancedConfigAction.interfaces";
 import {RunCompilerAction} from "./Actions/RunCompilerAction";
-import {RunCompilerOptions, RunCompilerResult} from "./Actions/RunCompilerAction.interfaces";
+import type {RunCompilerOptions, RunCompilerResult} from "./Actions/RunCompilerAction.interfaces";
 
 export class WebpackWorkerActions {
 
