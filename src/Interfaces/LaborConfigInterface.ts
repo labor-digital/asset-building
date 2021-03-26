@@ -27,15 +27,6 @@ export interface LaborConfigInterface
     builderVersion?: number;
     
     /**
-     * By default the build processes / app definitions will be called async and in parallel. Which leads to much
-     * faster build times as webpack runs on separate threads.
-     *
-     * If you want the worker to run sequential (finish app 1, then start app 2, finish app 2 then start app 3...),
-     * you can set this to TRUE. This is TRUE by default for builderVersion 1 and FALSE by default for version 2.
-     */
-    runWorkersSequential?: boolean;
-    
-    /**
      * A list of configuration extensions that should be used on a global scale.
      * The extension definition should be a file path that can be resolved by node.js.
      * The extension should be a function that is exported as default.

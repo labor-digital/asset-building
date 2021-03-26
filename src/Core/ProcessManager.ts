@@ -16,11 +16,10 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {asArray, EventEmitter, filter, forEach, isPlainObject, isUndefined} from '@labor-digital/helferlein';
+import {EventEmitter, filter, isPlainObject} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 import childProcess from 'child_process';
 import {EventList} from '../EventList';
-import type {AppDefinitionInterface} from '../Interfaces/AppDefinitionInterface';
 import type {CoreContext} from './CoreContext';
 
 export class ProcessManager
@@ -46,75 +45,15 @@ export class ProcessManager
      *
      * @param coreContext
      */
-    public startWorkerProcessesForCoreContext(coreContext: CoreContext): Promise<any | void>
+    public startWorkers(coreContext: CoreContext): Promise<any | void>
     {
         console.log('Beginning to spawn worker processes...');
-        const processes = [];
-        let counter = 0;
+        const processes: Array<Promise<any | void>> = [];
         
-        // Check if we are running in sequential mode
-        if (coreContext.runWorkersSequential) {
-            console.log(Chalk.yellowBright('\r\n================================================'));
-            console.log(Chalk.yellowBright('\r\nRUNNING WORKERS SEQUENTIAL!'));
-            console.log(Chalk.yellowBright('\r\n================================================\r\n'));
-            
-            // Wait for one process before calling the next...
-            const sequencePromise = new Promise<void>(resolve => {
-                const apps = asArray(coreContext.laborConfig.apps ?? []);
-                let i = 0;
-                
-                /**
-                 * Helper to iterate over the app list
-                 * @param next
-                 */
-                const next = (next: Function): void => {
-                    
-                    // Check if we have a next app
-                    const app = apps[i++];
-                    if (isUndefined(app)) {
-                        resolve();
-                        return;
-                    }
-                    app.id = counter++;
-                    let isResolved = false;
-                    
-                    // Start the worker
-                    const workerPromise = this.startSingleWorkerProcess(coreContext, app);
-                    processes.push(workerPromise);
-                    
-                    // Go to next app if the worker finished
-                    workerPromise.then(() => {
-                        if (isResolved) {
-                            return;
-                        }
-                        isResolved = true;
-                        next(next);
-                    });
-                    
-                    // Go to next app if the worker is still running but webpack did it's initial build
-                    if (coreContext.mode === 'watch') {
-                        coreContext.eventEmitter.bind(EventList.SEQUENTIAL_WORKER_QUEUE, () => {
-                            if (isResolved) {
-                                return;
-                            }
-                            isResolved = true;
-                            next(next);
-                        });
-                    }
-                };
-                
-                // Start the listener loop
-                next(next);
-            });
-            
-            processes.push(sequencePromise);
-            
-        } else {
-            // Starting the workers in async mode
-            forEach(coreContext.laborConfig.apps ?? [], (app: AppDefinitionInterface) => {
-                app.id = counter++;
-                processes.push(this.startSingleWorkerProcess(coreContext, app));
-            });
+        // Starting the workers in async mode
+        const apps = coreContext.laborConfig.apps ?? [];
+        for (let i = 0; i < apps.length; i++) {
+            processes.push(this.startSingleWorker(coreContext, i));
         }
         
         // Return the combined promise
@@ -124,10 +63,21 @@ export class ProcessManager
     /**
      * Creates a new worker process for a given app definition
      * @param coreContext
-     * @param app
+     * @param appIndex
      */
-    public startSingleWorkerProcess(coreContext: CoreContext, app: AppDefinitionInterface): Promise<void>
+    public startSingleWorker(coreContext: CoreContext, appIndex: number): Promise<void>
     {
+        const apps = coreContext.laborConfig.apps ?? [];
+        const app = apps[appIndex] ?? null;
+        
+        if (!isPlainObject(app)) {
+            throw new Error('Failed to spawn worker for app with index: ' + appIndex +
+                            ' because it does not exist in the "apps" definition!');
+        }
+        
+        if (!app.id) {
+            app.id = appIndex;
+        }
         
         // Start the process
         return new Promise<void>((resolve, reject) => {
@@ -178,17 +128,6 @@ export class ProcessManager
                 context: coreContext.toJson(),
                 app: JSON.stringify(app)
             });
-            
-            // Wait for a response!
-            if (coreContext.runWorkersSequential) {
-                worker.on('message', message => {
-                    if (isPlainObject(message) && (message as any).WEBPACK_DONE) {
-                        coreContext.eventEmitter.emit(EventList.SEQUENTIAL_WORKER_QUEUE);
-                    } else {
-                        console.log('worker responded with message', message);
-                    }
-                });
-            }
             
             // Resolve the promise if the child was closed
             worker.on('exit', (code) => {

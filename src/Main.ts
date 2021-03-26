@@ -17,6 +17,7 @@
  * Last modified: 2021.03.26 at 12:10
  */
 
+import {isUndefined} from '@labor-digital/helferlein';
 import {Command} from 'commander';
 import {Bootstrap} from './Core/Bootstrap';
 import {ProcessManager} from './Core/ProcessManager';
@@ -25,8 +26,9 @@ import {GeneralHelper} from './Helpers/GeneralHelper';
 const program = new Command();
 program.version(require('../package.json').version);
 
-program.option('-w, --watch', 'if set, webpack will watch your files for changes and automatically recompile');
-program.option('-d, --devServer', 'enables the webpack dev server');
+program.option('--watch', 'if set, webpack will watch your files for changes and automatically recompile');
+program.option('--devServer', 'enables the webpack dev server');
+program.option('--app', 'the numeric index of an app inside of "apps". Allows to build only a single app');
 
 program.arguments('[mode]');
 
@@ -34,10 +36,18 @@ program.action(async function (mode, args) {
     try {
         const bootstrap = new Bootstrap();
         const context = await bootstrap.initMainProcess({
-            watch: args.watch ?? false, mode
+            watch: args.watch ?? false,
+            devServer: args.devServer ?? false,
+            mode
         });
         const manager = new ProcessManager(context.eventEmitter);
-        await manager.startWorkerProcessesForCoreContext(context);
+        
+        if (!isUndefined(args.app)) {
+            await manager.startSingleWorker(context, parseInt(args.app));
+        } else {
+            await manager.startWorkers(context);
+        }
+        
         process.exit(0);
     } catch (e) {
         GeneralHelper.renderError(e);
