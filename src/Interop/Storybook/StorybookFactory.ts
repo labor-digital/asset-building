@@ -19,9 +19,9 @@
 import type {PlainObject} from '@labor-digital/helferlein';
 import {forEach, isPlainObject, isString, isUndefined} from '@labor-digital/helferlein';
 import type {Configuration} from 'webpack';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
+import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
 import type {MakeEnhancedConfigActionOptions} from '../../Webpack/Actions/MakeEnhancedConfigAction.interfaces';
 
@@ -122,7 +122,7 @@ export class StorybookFactory
                        ].indexOf(test) === -1;
             },
             events: {
-                [AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
+                [EventList.FILTER_LOADER_CONFIG]: (e) => {
                     const cssExtractorPluginRegex = new RegExp('mini-css-extract-plugin');
                     if (e.args.identifier === LoaderIdentifier.SASS ||
                         e.args.identifier === LoaderIdentifier.LESS) {

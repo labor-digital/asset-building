@@ -20,7 +20,7 @@ import {isArray, isBool, isUndefined} from '@labor-digital/helferlein';
 import fs from 'fs';
 import path from 'path';
 import {isPlainObject} from 'webpack-merge/dist/utils';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
+import {EventList} from '../../EventList';
 import {FileHelpers} from '../../Helpers/FileHelpers';
 import {CoreContext} from '../CoreContext';
 import {CoreFixes} from '../CoreFixes';
@@ -136,7 +136,7 @@ export class CoreContextFactory
      */
     protected async filterLaborConfig(context: CoreContext): Promise<void>
     {
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LABOR_CONFIG, {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_LABOR_CONFIG, {
             laborConfig: context.laborConfig,
             context: context
         });
@@ -162,14 +162,14 @@ export class CoreContextFactory
      */
     protected async findMode(context: CoreContext): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODES, {
+        let args = await context.eventEmitter.emitHook(EventList.GET_MODES, {
             modes: ['dev', 'production', 'analyze']
         });
         
         const modes: Array<TBuilderMode> = args.modes;
         let mode: TBuilderMode = this._options.mode ?? context.mode;
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.GET_MODE, {
+        args = await context.eventEmitter.emitHook(EventList.GET_MODE, {
             mode, context: context, modes
         });
         mode = args.mode;
@@ -184,7 +184,7 @@ export class CoreContextFactory
         
         context.mode = mode;
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.IS_PROD, {
+        args = await context.eventEmitter.emitHook(EventList.IS_PROD, {
             isProd: mode === 'production' || mode === 'analyze',
             mode,
             modes,
@@ -235,6 +235,6 @@ export class CoreContextFactory
     protected emitInitDone(context: CoreContext): Promise<any>
     {
         return context.eventEmitter
-                      .emitHook(AssetBuilderEventList.AFTER_MAIN_INIT_DONE, {context});
+                      .emitHook(EventList.AFTER_MAIN_INIT_DONE, {context});
     }
 }

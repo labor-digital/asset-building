@@ -17,8 +17,8 @@
  */
 
 import {isArray, PlainObject} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import type {Identifier} from '../../Identifier';
 import {WebpackConfigGenerator} from '../ConfigGeneration/WebpackConfigGenerator';
 import type {WorkerActionInterface} from './WorkerActionInterface';
@@ -46,7 +46,7 @@ export class MakeConfigurationAction implements WorkerActionInterface
         return (new WebpackConfigGenerator())
             .generateConfiguration(context)
             .then(context =>
-                context.parentContext.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_WEBPACK_CONFIG, {
+                context.parentContext.eventEmitter.emitHook(EventList.INTEROP_WEBPACK_CONFIG, {
                     environment: context.parentContext.environment,
                     context,
                     config: context.webpackConfig
@@ -68,7 +68,7 @@ export class MakeConfigurationAction implements WorkerActionInterface
         }
         
         if (isArray(options.disable)) {
-            context.eventEmitter.bind(AssetBuilderEventList.CHECK_IDENTIFIER_STATE, (e: PlainObject) => {
+            context.eventEmitter.bind(EventList.CHECK_IDENTIFIER_STATE, (e: PlainObject) => {
                 if (options.disable!.indexOf(e.args.identifier) === -1) {
                     return;
                 }

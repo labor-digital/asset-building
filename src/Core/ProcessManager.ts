@@ -19,7 +19,7 @@
 import {asArray, EventEmitter, filter, forEach, isPlainObject, isUndefined} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 import childProcess from 'child_process';
-import {AssetBuilderEventList} from '../AssetBuilderEventList';
+import {EventList} from '../EventList';
 import type {AppDefinitionInterface} from '../Interfaces/AppDefinitionInterface';
 import type {CoreContext} from './CoreContext';
 
@@ -36,7 +36,7 @@ export class ProcessManager
         this.shutdownList = [];
         
         // Allow synchronous shutdown of all worker processes
-        eventEmitter.bind(AssetBuilderEventList.SHUTDOWN, () => {
+        eventEmitter.bind(EventList.SHUTDOWN, () => {
             return Promise.all(filter(this.shutdownList, (v) => v()));
         });
     }
@@ -93,7 +93,7 @@ export class ProcessManager
                     
                     // Go to next app if the worker is still running but webpack did it's initial build
                     if (coreContext.mode === 'watch') {
-                        coreContext.eventEmitter.bind(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE, () => {
+                        coreContext.eventEmitter.bind(EventList.SEQUENTIAL_WORKER_QUEUE, () => {
                             if (isResolved) {
                                 return;
                             }
@@ -144,7 +144,7 @@ export class ProcessManager
             let stopped = false;
             
             // Allow custom actions on the worker
-            coreContext.eventEmitter.emit(AssetBuilderEventList.PROCESS_CREATED, {
+            coreContext.eventEmitter.emit(EventList.PROCESS_CREATED, {
                 process: worker,
                 app: app,
                 context: coreContext
@@ -183,7 +183,7 @@ export class ProcessManager
             if (coreContext.runWorkersSequential) {
                 worker.on('message', message => {
                     if (isPlainObject(message) && (message as any).WEBPACK_DONE) {
-                        coreContext.eventEmitter.emit(AssetBuilderEventList.SEQUENTIAL_WORKER_QUEUE);
+                        coreContext.eventEmitter.emit(EventList.SEQUENTIAL_WORKER_QUEUE);
                     } else {
                         console.log('worker responded with message', message);
                     }
@@ -199,7 +199,7 @@ export class ProcessManager
                 
                 // Check if we got an error
                 if (code !== 0 && code !== null) {
-                    coreContext.eventEmitter.emitHook(AssetBuilderEventList.SHUTDOWN, {})
+                    coreContext.eventEmitter.emitHook(EventList.SHUTDOWN, {})
                                .then(() => {
                                    reject(new Error(
                                        'The worker process no. ' + app.id + ' was closed with a non-zero exit code!'));

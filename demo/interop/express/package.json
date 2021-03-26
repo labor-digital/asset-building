@@ -1,0 +1,29 @@
+{
+	"name": "demo",
+	"version": "1.0.0",
+	"description": "A demoproject to show how the buildprocess works",
+	"scripts": {
+		"build": "labor-asset-building",
+		"prod": "cross-env NODE_ENV=production node ./index.js",
+		"watch": "cross-env NODE_ENV=development node ./index.js",
+		"analyze": "labor-asset-building analyze"
+	},
+	"keywords": [],
+	"author": "LABOR GmbH",
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"@labor-digital/asset-building": "file:../../.."
+	},
+	"labor": {
+		"apps": [
+			{
+				"entry": "./frontend/src/app.js",
+				"output": "./frontend/dist/bundle.js"
+			}
+		]
+	},
+	"dependencies": {
+		"cross-env": "^7.0.3",
+		"express": "^4.17.1"
+	}
+}

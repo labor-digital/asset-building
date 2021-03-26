@@ -17,8 +17,8 @@
  */
 
 import webpack from 'webpack';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
@@ -28,7 +28,7 @@ export class ProvideConfigurator implements ConfiguratorInterface
     public async apply(context: WorkerContext): Promise<void>
     {
         const args = await context.eventEmitter.emitHook(
-            AssetBuilderEventList.GET_JS_PROVIDES, {provides: {}, context});
+            EventList.GET_JS_PROVIDES, {provides: {}, context});
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.PROVIDE, context, args.provides,
             config => new webpack.ProvidePlugin(config));

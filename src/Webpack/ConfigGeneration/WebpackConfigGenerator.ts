@@ -21,8 +21,8 @@ import {isFunction, isPlainObject, isString, isUndefined} from '@labor-digital/h
 import isDocker from 'is-docker';
 import path from 'path';
 import {merge} from 'webpack-merge';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier as Id} from '../../Identifier';
 import {AppPathConfigurator} from './Configurators/AppPathConfigurator';
 import {BaseConfigurator} from './Configurators/BaseConfigurator';
@@ -84,7 +84,7 @@ export class WebpackConfigGenerator
         await w(Id.BUILT_IN_PLUGIN, context, new BuiltInPluginConfigurator());
         
         // Allow filtering
-        await context.eventEmitter.emitHook(AssetBuilderEventList.APPLY_EXTENSION_WEBPACK_CONFIG, {context});
+        await context.eventEmitter.emitHook(EventList.APPLY_EXTENSION_WEBPACK_CONFIG, {context});
         
         // Add the additional webpack config
         await this.mergeAdditionalConfig(context);
@@ -97,7 +97,7 @@ export class WebpackConfigGenerator
             context.webpackConfig.watchOptions.poll = 600;
         }
         
-        await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_CONFIG, {context});
+        await context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_CONFIG, {context});
         
         return context;
     }
@@ -115,7 +115,7 @@ export class WebpackConfigGenerator
         configurator: ConfiguratorInterface
     ): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.CHECK_IDENTIFIER_STATE, {
+        let args = await context.eventEmitter.emitHook(EventList.CHECK_IDENTIFIER_STATE, {
             identifier, configurator, enabled: true, context
         });
         
@@ -123,13 +123,13 @@ export class WebpackConfigGenerator
             return;
         }
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_CONFIGURATOR, {
+        args = await context.eventEmitter.emitHook(EventList.BEFORE_CONFIGURATOR, {
             identifier, configurator: args.configurator, context
         });
         
         await args.configurator.apply(args.context);
         
-        await context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_CONFIGURATOR, {identifier, context});
+        await context.eventEmitter.emitHook(EventList.AFTER_CONFIGURATOR, {identifier, context});
     }
     
     /**
@@ -168,10 +168,10 @@ export class WebpackConfigGenerator
                 }
                 
                 if (isFunction(customWebpackConfig)) {
-                    context.eventEmitter.unbindAll(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING);
-                    context.eventEmitter.bind(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING,
+                    context.eventEmitter.unbindAll(EventList.CUSTOM_WEBPACK_CONFIG_LOADING);
+                    context.eventEmitter.bind(EventList.CUSTOM_WEBPACK_CONFIG_LOADING,
                         () => customWebpackConfig(context));
-                    await context.eventEmitter.emitHook(AssetBuilderEventList.CUSTOM_WEBPACK_CONFIG_LOADING, {});
+                    await context.eventEmitter.emitHook(EventList.CUSTOM_WEBPACK_CONFIG_LOADING, {});
                     return;
                 }
                 

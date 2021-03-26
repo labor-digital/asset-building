@@ -29,8 +29,8 @@ import {
 import type {Configuration} from 'webpack';
 // @ts-ignore
 import {Options} from 'webpack';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier} from '../../Identifier';
 import {resolveFileExtensions} from '../ConfigGeneration/Configurators/BaseConfigurator';
 import type {MakeEnhancedConfigActionOptions} from './MakeEnhancedConfigAction.interfaces';
@@ -64,7 +64,7 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface
         }
         
         // Disable the base configuration generation
-        proxy.bind(context.eventEmitter, AssetBuilderEventList.CHECK_IDENTIFIER_STATE, (e) => {
+        proxy.bind(context.eventEmitter, EventList.CHECK_IDENTIFIER_STATE, (e) => {
             if (e.args.identifier === ConfiguratorIdentifier.BASE) {
                 e.args.enabled = false;
             }

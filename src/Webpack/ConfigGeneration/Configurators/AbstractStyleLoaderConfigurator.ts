@@ -17,8 +17,8 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
 
 export abstract class AbstractStyleLoaderConfigurator
@@ -30,14 +30,14 @@ export abstract class AbstractStyleLoaderConfigurator
     {
         let resolveReference: any = undefined;
         
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BROWSER_LIST, {
+        let args = await context.eventEmitter.emitHook(EventList.FILTER_BROWSER_LIST, {
             browserList: '> 1%, last 10 versions',
             parent: identifier,
             isPostcssLoader: true,
             context
         });
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POSTCSS_PLUGINS, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_POSTCSS_PLUGINS, {
             plugins: [
                 require('autoprefixer')({
                     overrideBrowserslist: args.browserList
@@ -55,7 +55,7 @@ export abstract class AbstractStyleLoaderConfigurator
         
         const plugins: Array<any> = args.plugins;
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_CONFIG, {
             config: {
                 loader: 'postcss-loader',
                 options: {

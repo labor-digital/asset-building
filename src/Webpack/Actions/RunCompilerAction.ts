@@ -19,8 +19,8 @@
 import type {PlainObject} from '@labor-digital/helferlein';
 import {isObject, isUndefined} from '@labor-digital/helferlein';
 import {Configuration, Stats, webpack} from 'webpack';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import type {WebpackCompilerCallbackInterface} from '../../Interfaces/WebpackCompilerCallbackInterface';
 import type {RunCompilerOptions, RunCompilerResult} from './RunCompilerAction.interfaces';
 import type {WorkerActionInterface} from './WorkerActionInterface';
@@ -101,7 +101,7 @@ export class RunCompilerAction implements WorkerActionInterface
                             return;
                         }
                     
-                        context.eventEmitter.emit(AssetBuilderEventList.WEBPACK_COMPILER, {
+                        context.eventEmitter.emit(EventList.WEBPACK_COMPILER, {
                             compilerDefinition: compiler,
                             context,
                             webpackCompiler: compilerInstance
@@ -137,7 +137,7 @@ export class RunCompilerAction implements WorkerActionInterface
         options?: RunCompilerOptions
     ): Promise<PlainObject>
     {
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_COMPILER, {
+        return context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_COMPILER, {
             compiler: webpack,
             callback: (context: any, stats: any, resolve: any, reject: any): void => {
                 this.webpackCallback(context, stats, resolve, reject);
@@ -165,7 +165,7 @@ export class RunCompilerAction implements WorkerActionInterface
             publicPath: true
         });
         
-        context.eventEmitter.emitHook(AssetBuilderEventList.COMPILING_DONE, {
+        context.eventEmitter.emitHook(EventList.COMPILING_DONE, {
                    stats,
                    statsRaw,
                    context
@@ -174,7 +174,7 @@ export class RunCompilerAction implements WorkerActionInterface
                    args.stats.warnings.length > 0 || args.stats.errors.length > 0 ? 1 : 0
                )
                .then(exitCode =>
-                   context.eventEmitter.emitHook(AssetBuilderEventList.CALLBACK_DONE, {
+                   context.eventEmitter.emitHook(EventList.CALLBACK_DONE, {
                        exitWorker: true,
                        stats,
                        exitCode,

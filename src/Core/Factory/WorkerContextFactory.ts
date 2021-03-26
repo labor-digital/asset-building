@@ -17,7 +17,7 @@
  */
 
 import {cloneList, forEach, isArray, isNumber, isUndefined, makeOptions} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
+import {EventList} from '../../EventList';
 import type {AppDefinitionInterface} from '../../Interfaces/AppDefinitionInterface';
 import AppDefinitionSchema from '../AppDefinitionSchema';
 import {CoreContext} from '../CoreContext';
@@ -46,7 +46,7 @@ export class WorkerContextFactory
         await this.loadExtensions(context);
         await this.applyAppSchema(context);
         this.applyAppConfig(context);
-        await context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_WORKER_INIT_DONE, {context});
+        await context.eventEmitter.emitHook(EventList.AFTER_WORKER_INIT_DONE, {context});
         
         return context;
     }
@@ -139,7 +139,7 @@ export class WorkerContextFactory
      */
     protected async applyAppSchema(context: WorkerContext): Promise<void>
     {
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_APP_DEFINITION_SCHEMA, {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_APP_DEFINITION_SCHEMA, {
             schema: AppDefinitionSchema,
             context,
             app: cloneList(context.app)

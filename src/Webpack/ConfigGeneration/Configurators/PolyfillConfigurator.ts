@@ -17,8 +17,8 @@
  */
 
 import {isArray} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class PolyfillConfigurator implements ConfiguratorInterface
@@ -41,7 +41,7 @@ export class PolyfillConfigurator implements ConfiguratorInterface
         polyfills.push('core-js/features/array/from.js');
         polyfills.push('core-js/features/symbol/index.js');
         
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POLYFILLS, {polyfills, context});
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_POLYFILLS, {polyfills, context});
         
         let entry = context.webpackConfig.entry;
         if (!isArray(entry)) {

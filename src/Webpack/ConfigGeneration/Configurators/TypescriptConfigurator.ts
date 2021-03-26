@@ -21,8 +21,8 @@ import {isString} from '@labor-digital/helferlein';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import * as fs from 'fs';
 import path from 'path';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import {LoaderIdentifier, PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
@@ -40,7 +40,7 @@ export class TypescriptConfigurator implements ConfiguratorInterface
         }
         
         let args;
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_TYPESCRIPT_OPTIONS, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_TYPESCRIPT_OPTIONS, {
             options: {
                 context: path.dirname(configFilePath),
                 configFile: configFilePath,

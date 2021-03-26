@@ -17,27 +17,11 @@
  */
 
 import type {Application} from 'express';
+import path from 'path';
+import {CoreFixes} from '../../Core/CoreFixes';
+import type {FactoryCoreContextOptions} from '../../Core/Factory.interfaces';
 import {GeneralHelper} from '../../Helpers/GeneralHelper';
 import ExpressContext from './ExpressContext';
-
-export interface ExpressAssetBuildingPluginOptions
-{
-    /**
-     * The numeric index of the "apps" array in the package.json we should build.
-     */
-    appId?: number;
-    
-    /**
-     * The path to the package json to read the "labor" config from
-     */
-    packageJsonDirectory?: string;
-    
-    /**
-     * The mode to run the asset builder in.
-     * This would normally be defined using the CLI parameters
-     */
-    mode?: string;
-}
 
 /**
  * Use this function to create an express context object that can be used by asset-builder extensions to run
@@ -46,25 +30,18 @@ export interface ExpressAssetBuildingPluginOptions
  * @param expressApp
  * @param options
  */
-module.exports = function expressAssetBuildingPlugin(
+export function expressAssetBuildingPlugin(
     expressApp: Application,
-    options?: ExpressAssetBuildingPluginOptions
-): Promise<ExpressContext> {
+    options?: FactoryCoreContextOptions
+): Promise<ExpressContext>
+{
     GeneralHelper.renderFancyIntro();
+    CoreFixes.resolveFilenameFix([process.cwd(), path.resolve(__dirname, '../../')]);
     
-    const context = new ExpressContext(expressApp, options);
-    
-    // Be done if we are in production context
-    if (context.isProd) {
-        return Promise.resolve(context);
+    try {
+        return Promise.resolve(new ExpressContext(expressApp, options));
+    } catch (err) {
+        GeneralHelper.renderError(err);
+        process.exit(1);
     }
-    
-    // Create the worker process
-    return context.factory.getWorkerContext()
-                  .then(context => context.do.runCompiler())
-                  .then(res => {
-                      context.compiler = res.compiler;
-                      context.parentContext = res.context;
-                      return context;
-                  });
-};
+}

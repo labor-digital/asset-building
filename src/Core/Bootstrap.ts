@@ -17,7 +17,7 @@
  */
 
 import {isPlainObject, isUndefined, PlainObject} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../AssetBuilderEventList';
+import {EventList} from '../EventList';
 import {GeneralHelper} from '../Helpers/GeneralHelper';
 import {CoreContext} from './CoreContext';
 import {CoreFixes} from './CoreFixes';
@@ -110,7 +110,7 @@ export class Bootstrap
     {
         const shutdownHandler = async function () {
             console.log('Starting main process shutdown...');
-            await context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {});
+            await context.eventEmitter!.emitHook(EventList.SHUTDOWN, {});
             console.log('Good bye!');
             process.exit(0);
         };
@@ -140,7 +140,7 @@ export class Bootstrap
     {
         const shutdownHandler = async function () {
             console.log('Starting worker process shutdown...');
-            await context.eventEmitter!.emitHook(AssetBuilderEventList.SHUTDOWN, {});
+            await context.eventEmitter!.emitHook(EventList.SHUTDOWN, {});
             process.exit(0);
         };
         process.on('SIGTERM', shutdownHandler);

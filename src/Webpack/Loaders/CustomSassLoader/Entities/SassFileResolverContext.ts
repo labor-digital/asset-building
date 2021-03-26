@@ -20,8 +20,8 @@
 import LoaderUtils from 'loader-utils';
 // @ts-ignore
 import * as webpack from 'webpack';
-import {AssetBuilderEventList} from '../../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../../Core/WorkerContext';
+import {EventList} from '../../../../EventList';
 import {FileHelpers} from '../../../../Helpers/FileHelpers';
 // @ts-ignore
 import LoaderContext = webpack.loader.LoaderContext;
@@ -59,7 +59,7 @@ export class SassFileResolverContext
             }// Still not? Check if we got help somewhere... /o\
             else {
                 return this.parentContext.eventEmitter.emitHook(
-                    AssetBuilderEventList.SASS_LOADER_FILE_EXTENSION_FALLBACK, {
+                    EventList.SASS_LOADER_FILE_EXTENSION_FALLBACK, {
                         extension: this.baseExt,
                         resourceQuery: this.loader.resourceQuery,
                         context: this

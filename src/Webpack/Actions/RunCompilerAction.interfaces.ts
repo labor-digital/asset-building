@@ -23,7 +23,6 @@ import type {MakeConfigurationActionOptions} from './MakeConfigurationAction';
 
 export interface RunCompilerOptions
 {
-    
     /**
      * Allows you to manually supply the configuration to run the compiler with.
      * If this is omitted a new configuration is build by the config generator

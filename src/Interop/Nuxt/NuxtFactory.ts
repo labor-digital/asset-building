@@ -28,10 +28,10 @@ import {
 import path from 'path';
 import type {Configuration} from 'webpack';
 import {isPlainObject} from 'webpack-merge/dist/utils';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
 import type {AppDefinitionInterface} from '../../Interfaces/AppDefinitionInterface';
 import type {MakeEnhancedConfigActionOptions} from '../../Webpack/Actions/MakeEnhancedConfigAction.interfaces';
@@ -153,24 +153,24 @@ export class NuxtFactory
                        ].indexOf(test) !== -1;
             },
             events: {
-                [AssetBuilderEventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
+                [EventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
                     e.args.options.compilerOptions.jsxFactory = 'h';
                 },
-                [AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
+                [EventList.FILTER_LOADER_CONFIG]: (e) => {
                     switch (e.args.identifier) {
                         case LoaderIdentifier.SASS:
                         case LoaderIdentifier.LESS:
                             return this.modifyStyleLoader(e);
                     }
                 },
-                [AssetBuilderEventList.FILTER_POSTCSS_PLUGINS]: (e) => {
+                [EventList.FILTER_POSTCSS_PLUGINS]: (e) => {
                     const context = e.args.context;
                     if (!context.isProd) {
                         return;
                     }
                     e.args.plugins.push(require('cssnano'));
                 },
-                [AssetBuilderEventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
+                [EventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
                     // We adjust the typescript options here to match
                     // https://github.com/nuxt/typescript/blob/master/packages/typescript-build/src/index.ts#L65
                     // and
@@ -323,7 +323,7 @@ export class NuxtFactory
         config.externals = [];
         
         // Allow to filter the extension pattern and inject the new instance of the plugin
-        return context.eventEmitter.emitHook(AssetBuilderEventList.INTEROP_VUE_EXTERNAL_EXTENSION_PATTERN,
+        return context.eventEmitter.emitHook(EventList.INTEROP_VUE_EXTERNAL_EXTENSION_PATTERN,
             {pattern: /\.jso?n?$/i})
                       .then(args => args.pattern)
                       .then((pattern: RegExp) => {

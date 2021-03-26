@@ -16,7 +16,7 @@
  * Last modified: 2019.10.04 at 14:36
  */
 
-export enum AssetBuilderEventList
+export enum EventList
 {
     // Events for global extensions
     SHUTDOWN = 'assetBuilder__shutdown',

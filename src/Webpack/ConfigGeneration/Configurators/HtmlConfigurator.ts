@@ -19,8 +19,8 @@
 import {isNull} from '@labor-digital/helferlein';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import {LoaderIdentifier, PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
@@ -82,7 +82,7 @@ export class HtmlConfigurator implements ConfiguratorInterface
             template!.appMountId = 'app';
         }
         
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_HTML_PLUGIN_TEMPLATE, {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_HTML_PLUGIN_TEMPLATE, {
             template, context
         });
         

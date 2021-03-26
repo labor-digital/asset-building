@@ -20,9 +20,9 @@ import type {PlainObject} from '@labor-digital/helferlein';
 import {forEach, isArray, isFunction, isNull, isPlainObject, isUndefined} from '@labor-digital/helferlein';
 import fs from 'fs';
 import path from 'path';
-import {AssetBuilderEventList} from '../AssetBuilderEventList';
 import type {CoreContext} from '../Core/CoreContext';
 import type {WorkerContext} from '../Core/WorkerContext';
+import {EventList} from '../EventList';
 
 export class ExtensionLoader
 {
@@ -60,7 +60,7 @@ export class ExtensionLoader
         extensionPaths: Array<string>
     ): Promise<any>
     {
-        context.eventEmitter.unbindAll(AssetBuilderEventList.EXTENSION_LOADING);
+        context.eventEmitter.unbindAll(EventList.EXTENSION_LOADING);
         const extensions: Array<Function> = [];
         forEach(extensionPaths, (extensionPath: string) => {
             const extension = this.resolveExtensionPath(context, extensionPath);
@@ -70,11 +70,11 @@ export class ExtensionLoader
                 return;
             }
             extensions.push(extension);
-            context.eventEmitter.bind(AssetBuilderEventList.EXTENSION_LOADING, () => {
+            context.eventEmitter.bind(EventList.EXTENSION_LOADING, () => {
                 return extension(context, scope);
             });
         });
-        return context.eventEmitter.emitHook(AssetBuilderEventList.EXTENSION_LOADING, {});
+        return context.eventEmitter.emitHook(EventList.EXTENSION_LOADING, {});
     }
     
     /**

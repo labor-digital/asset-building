@@ -18,9 +18,9 @@
 
 import Chalk from 'chalk';
 import type {Compiler} from 'webpack';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 // @ts-ignore
 import {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 // @ts-ignore
 import {
     AssetBuilderWebpackPluginInterface,
@@ -54,7 +54,7 @@ export const GitAddPlugin: AssetBuilderWebpackPluginStaticInterface =
                     publicPath: true
                 });
                 
-                return this._context!.eventEmitter.emitHook(AssetBuilderEventList.BEFORE_GIT_ADD, {
+                return this._context!.eventEmitter.emitHook(EventList.BEFORE_GIT_ADD, {
                     context: this._context
                 }).then(() => {
                     try {

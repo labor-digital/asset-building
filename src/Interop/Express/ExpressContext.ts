@@ -17,11 +17,10 @@
  */
 
 import {EventBus, EventEmitter} from '@labor-digital/helferlein';
-import express, {Application} from 'express';
-import type {Compiler} from 'webpack';
+import type {Application} from 'express';
+import {Factory} from '../../Core/Factory';
+import type {FactoryCoreContextOptions, FactoryWorkerContextOptions} from '../../Core/Factory.interfaces';
 import type {WorkerContext} from '../../Core/WorkerContext';
-import type {ExpressAssetBuildingPluginOptions} from './expressAssetBuildingPlugin';
-import ExpressFactory from './ExpressFactory';
 
 export default class ExpressContext
 {
@@ -31,19 +30,14 @@ export default class ExpressContext
     public type: 'express';
     
     /**
-     * The app id we should build for this context
+     * The options the express plugin was initialized with
      */
-    public appId: number;
+    public options: FactoryCoreContextOptions;
     
     /**
      * True if express runs in production mode, false if not
      */
     public isProd: boolean;
-    
-    /**
-     * The cwd which point's to the package.json directory
-     */
-    public packageJsonDirectory: string;
     
     /**
      * The instance of the event emitter
@@ -56,33 +50,18 @@ export default class ExpressContext
     public expressApp: Application;
     
     /**
-     * The factory to create the parts of the asset builder in an express context
+     * The factory to create contexts with
      */
-    public factory: ExpressFactory;
+    public factory: Factory;
     
-    /**
-     * If the server does run in development mode this will contain the worker process
-     * of the main app we should build
-     */
-    public parentContext?: WorkerContext;
-    
-    /**
-     * If the server does run in development mode this will contain the webpack compiler
-     * of the main app we should build
-     */
-    public compiler?: Compiler;
-    
-    public constructor(expressApp: Application, options?: ExpressAssetBuildingPluginOptions)
+    public constructor(expressApp: Application, options?: FactoryCoreContextOptions)
     {
-        options = options ?? {};
+        this.options = options ?? {};
         this.isProd = process.env.NODE_ENV !== 'development';
         this.type = 'express';
-        this.appId = options.appId ?? 0;
         this.expressApp = expressApp;
-        this.packageJsonDirectory = options.packageJsonDirectory ?? process.cwd();
-        options.packageJsonDirectory = this.packageJsonDirectory;
         this.eventEmitter = EventBus.getEmitter();
-        this.factory = new ExpressFactory(options);
+        this.factory = new Factory();
     }
     
     /**
@@ -92,14 +71,28 @@ export default class ExpressContext
      */
     public registerPublicAssets(directory: string, route?: string)
     {
-        const stat = express.static(directory, {
+        const stat = require('express').static(directory, {
             etag: false,
             maxAge: 15 * 60 * 1000
         });
+        
         if (typeof route === 'string') {
             this.expressApp.use(route, stat);
         } else {
             this.expressApp.use(stat);
         }
+    }
+    
+    /**
+     * Creates and returns a new worker context object, to do stuff with :D
+     */
+    public async getWorker(options?: FactoryWorkerContextOptions): Promise<WorkerContext>
+    {
+        const coreContext = await this.factory.makeCoreContext({
+            watch: true,
+            mode: this.isProd ? 'production' : 'dev',
+            ...this.options
+        });
+        return await this.factory.makeWorkerContext(coreContext, options);
     }
 }

@@ -17,8 +17,8 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import type {LoaderIdentifier, PluginIdentifier} from '../../Identifier';
 
 export interface IPluginProvider<T = any>
@@ -45,7 +45,7 @@ export class ConfigGenUtil
     ): Promise<boolean>
     {
         
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.CHECK_IDENTIFIER_STATE, {
+        let args = await context.eventEmitter.emitHook(EventList.CHECK_IDENTIFIER_STATE, {
             identifier, enabled: true, config, context
         });
         
@@ -53,11 +53,11 @@ export class ConfigGenUtil
             return false;
         }
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_TEST, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_TEST, {
             test, identifier, context
         });
         
-        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_CONFIG, {
             config: {
                 ...config,
                 test: args.test
@@ -87,7 +87,7 @@ export class ConfigGenUtil
         config: ConfT
     ): Promise<boolean>
     {
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_EXCLUDE_PATTERN, {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_JS_EXCLUDE_PATTERN, {
             pattern: /node_modules/,
             context
         });
@@ -110,7 +110,7 @@ export class ConfigGenUtil
         config: ConfT
     ): Promise<ConfT>
     {
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_PLUGIN_CONFIG, {
             config, identifier, context
         });
         return args.config;
@@ -133,7 +133,7 @@ export class ConfigGenUtil
         provider: IPluginProvider<ConfT>
     ): Promise<boolean>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.CHECK_IDENTIFIER_STATE, {
+        let args = await context.eventEmitter.emitHook(EventList.CHECK_IDENTIFIER_STATE, {
             identifier, enabled: true, config, context
         });
         

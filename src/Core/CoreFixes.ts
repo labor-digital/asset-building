@@ -15,7 +15,7 @@
  *
  * Last modified: 2019.10.04 at 20:40
  */
-import {isNull, isPlainObject, PlainObject} from '@labor-digital/helferlein';
+import {isArray, isNull, isPlainObject, PlainObject} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 import Module from 'module';
 import * as path from 'path';
@@ -59,6 +59,9 @@ export class CoreFixes
         }
     };
     
+    static resolveFilenameFix(paths: Array<string>): void
+    static resolveFilenameFix(coreContext: CoreContext): void
+    
     /**
      * We need this fix, because we are a special kind of noodle...
      * My plan was to encapsulate as much node dependencies into the asset-building package as possible,
@@ -71,9 +74,9 @@ export class CoreFixes
      * To fix the resulting problems we supply this fix which helps Module._resolveFilename to look in other
      * directories when it resolves files.
      *
-     * @param coreContext
+     * @param arg
      */
-    static resolveFilenameFix(coreContext: CoreContext)
+    static resolveFilenameFix(arg: CoreContext | Array<string>): void
     {
         // Make sure we can supply modules from our build context
         const resolveFilenameOrig = (Module as any)._resolveFilename;
@@ -106,8 +109,8 @@ export class CoreFixes
             // Try harder
             if (isNull(result)) {
                 // Create local paths
-                let additionalResolverPaths = Array.from(coreContext.additionalResolverPaths).map(
-                    (s: string) => s.replace(/[\\\/]*$/, ''));
+                const paths = isArray(arg) ? arg : Array.from(arg.additionalResolverPaths);
+                let additionalResolverPaths = paths.map((s: string) => s.replace(/[\\\/]*$/, ''));
                 
                 // Try additional path's to resolve the request filename
                 if (!isPlainObject(options)) {

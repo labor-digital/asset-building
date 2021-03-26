@@ -16,8 +16,8 @@
  * Last modified: 2019.10.05 at 20:50
  */
 
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import {LoaderIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
@@ -26,7 +26,7 @@ export class JsPreloadConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_PRE_LOADERS, {
+        let args = await context.eventEmitter.emitHook(EventList.FILTER_JS_PRE_LOADERS, {
             loaders: [], context
         });
         

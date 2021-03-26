@@ -19,8 +19,8 @@
 import {isArray, isString, map} from '@labor-digital/helferlein';
 // @ts-ignore
 import WebpackFilterWarningsPlugin from 'webpack-filter-warnings-plugin';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {EventList} from '../../../EventList';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
@@ -43,7 +43,7 @@ export class FilterWarningsConfigurator implements ConfiguratorInterface
             return v;
         });
         
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
             patterns: warningsToIgnore,
             context
         });

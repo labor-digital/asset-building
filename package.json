@@ -28,7 +28,7 @@
 		"modern"
 	],
 	"bin": {
-		"labor-asset-building": "./dist/Index.js"
+		"labor-asset-building": "./dist/Main.js"
 	},
 	"scripts": {
 		"clean": "rimraf ./dist",
