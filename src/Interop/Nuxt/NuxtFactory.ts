@@ -28,12 +28,11 @@ import {
 import path from 'path';
 import type {Configuration} from 'webpack';
 import {isPlainObject} from 'webpack-merge/dist/utils';
-import {AssetBuilderConfiguratorIdentifiers as Ids} from '../../AssetBuilderConfiguratorIdentifiers';
 import {AssetBuilderEventList} from '../../AssetBuilderEventList';
-import {AssetBuilderPluginIdentifiers} from '../../AssetBuilderPluginIdentifiers';
 import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
 import type {AppDefinitionInterface} from '../../Interfaces/AppDefinitionInterface';
 import type {MakeEnhancedConfigActionOptions} from '../../Webpack/Actions/MakeEnhancedConfigAction.interfaces';
 
@@ -133,18 +132,15 @@ export class NuxtFactory
     protected getEnhancerOptions(): MakeEnhancedConfigActionOptions
     {
         return {
-            disableConfigurators: [
-                Ids.APP_PATHS,
-                Ids.PROGRESS_BAR_PLUGIN,
-                Ids.CLEAN_OUTPUT_DIR_PLUGIN,
-                Ids.MIN_CHUNK_SIZE_PLUGIN,
-                Ids.BUNDLE_ANALYZER_PLUGIN,
-                Ids.HTML_PLUGIN,
-                Ids.JS_UGLIFY_PLUGIN,
-                Ids.DEV_ONLY
-            ],
-            disablePlugins: [
-                AssetBuilderPluginIdentifiers.FANCY_STATS
+            disable: [
+                ConfiguratorIdentifier.APP_PATHS,
+                ConfiguratorIdentifier.PROGRESS_BAR,
+                ConfiguratorIdentifier.CLEAN_OUTPUT_DIR,
+                ConfiguratorIdentifier.MIN_CHUNK_SIZE,
+                ConfiguratorIdentifier.BUNDLE_ANALYZER,
+                PluginIdentifier.HTML_TEMPLATE,
+                ConfiguratorIdentifier.DEV_ONLY,
+                PluginIdentifier.FANCY_STATS
             ],
             ruleFilter: test => {
                 // The list of allowed patterns that should pass
@@ -162,8 +158,8 @@ export class NuxtFactory
                 },
                 [AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
                     switch (e.args.identifier) {
-                        case Ids.SASS_LOADER:
-                        case Ids.LESS_LOADER:
+                        case LoaderIdentifier.SASS:
+                        case LoaderIdentifier.LESS:
                             return this.modifyStyleLoader(e);
                     }
                 },

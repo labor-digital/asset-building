@@ -21,33 +21,32 @@ import {isFunction, isPlainObject, isString, isUndefined} from '@labor-digital/h
 import isDocker from 'is-docker';
 import path from 'path';
 import {merge} from 'webpack-merge';
-import {AssetBuilderConfiguratorIdentifiers as Ids} from '../../AssetBuilderConfiguratorIdentifiers';
 import {AssetBuilderEventList} from '../../AssetBuilderEventList';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {ConfiguratorIdentifier as Id} from '../../Identifier';
 import {AppPathConfigurator} from './Configurators/AppPathConfigurator';
 import {BaseConfigurator} from './Configurators/BaseConfigurator';
 import {BuiltInPluginConfigurator} from './Configurators/BuiltInPluginConfigurator';
-import {BundleAnalyzerPluginConfigurator} from './Configurators/BundleAnalyzerPluginConfigurator';
-import {CleanOutputDirPluginConfigurator} from './Configurators/CleanOutputDirPluginConfigurator';
+import {BundleAnalyzerConfigurator} from './Configurators/BundleAnalyzerConfigurator';
+import {CleanOutputDirConfigurator} from './Configurators/CleanOutputDirConfigurator';
 import type {ConfiguratorInterface} from './Configurators/ConfiguratorInterface';
-import {CopyPluginConfigurator} from './Configurators/CopyPluginConfigurator';
-import {CssExtractPluginConfigurator} from './Configurators/CssExtractPluginConfigurator';
+import {CopyConfigurator} from './Configurators/CopyConfigurator';
+import {CssExtractConfigurator} from './Configurators/CssExtractConfigurator';
 import {DevOnlyConfigurator} from './Configurators/DevOnlyConfigurator';
-import {FilterWarningsPluginConfigurator} from './Configurators/FilterWarningsPluginConfigurator';
-import {FontLoaderConfigurator} from './Configurators/FontLoaderConfigurator';
-import {HtmlLoaderConfigurator} from './Configurators/HtmlLoaderConfigurator';
-import {HtmlPluginConfigurator} from './Configurators/HtmlPluginConfigurator';
-import {ImageLoaderConfigurator} from './Configurators/ImageLoaderConfigurator';
+import {FilterWarningsConfigurator} from './Configurators/FilterWarningsConfigurator';
+import {FontConfigurator} from './Configurators/FontConfigurator';
+import {HtmlConfigurator} from './Configurators/HtmlConfigurator';
+import {ImageConfigurator} from './Configurators/ImageConfigurator';
 import {JsCompatConfigurator} from './Configurators/JsCompatConfigurator';
 import {JsPreloadConfigurator} from './Configurators/JsPreloadConfigurator';
-import {LessLoaderConfigurator} from './Configurators/LessLoaderConfigurator';
-import {MinChunkSizePluginConfigurator} from './Configurators/MinChunkSizePluginConfigurator';
+import {LessConfigurator} from './Configurators/LessConfigurator';
+import {MinChunkSizeConfigurator} from './Configurators/MinChunkSizeConfigurator';
 import {PolyfillConfigurator} from './Configurators/PolyfillConfigurator';
 import {ProdOnlyConfigurator} from './Configurators/ProdOnlyConfigurator';
-import {ProgressBarPluginConfigurator} from './Configurators/ProgressBarPluginConfigurator';
-import {ProvidePluginConfigurator} from './Configurators/ProvidePluginConfigurator';
-import {SassLoaderConfigurator} from './Configurators/SassLoaderConfigurator';
-import {TypescriptLoaderConfigurator} from './Configurators/TypescriptLoaderConfigurator';
+import {ProgressBarConfigurator} from './Configurators/ProgressBarConfigurator';
+import {ProvideConfigurator} from './Configurators/ProvideConfigurator';
+import {SassConfigurator} from './Configurators/SassConfigurator';
+import {TypescriptConfigurator} from './Configurators/TypescriptConfigurator';
 
 export class WebpackConfigGenerator
 {
@@ -61,29 +60,28 @@ export class WebpackConfigGenerator
         const w = this.configuratorWrapper;
         
         // Apply the configurators on the context object
-        await w(Ids.BASE, context, new BaseConfigurator());
-        await w(Ids.APP_PATHS, context, new AppPathConfigurator());
-        await w(Ids.POLYFILL, context, new PolyfillConfigurator());
-        await w(Ids.PROGRESS_BAR_PLUGIN, context, new ProgressBarPluginConfigurator());
-        await w(Ids.HTML_LOADER, context, new HtmlLoaderConfigurator());
-        await w(Ids.IMAGE_LOADER, context, new ImageLoaderConfigurator());
-        await w(Ids.FONT_LOADER, context, new FontLoaderConfigurator());
-        await w(Ids.JS_PRE_LOADER, context, new JsPreloadConfigurator());
-        await w(Ids.TYPESCRIPT_LOADER, context, new TypescriptLoaderConfigurator());
-        await w(Ids.JS_COMPAT_LOADER, context, new JsCompatConfigurator());
-        await w(Ids.LESS_LOADER, context, new LessLoaderConfigurator());
-        await w(Ids.SASS_LOADER, context, new SassLoaderConfigurator());
-        await w(Ids.CSS_EXTRACT_PLUGIN, context, new CssExtractPluginConfigurator());
-        await w(Ids.PROVIDE_PLUGIN, context, new ProvidePluginConfigurator());
-        await w(Ids.COPY_PLUGIN, context, new CopyPluginConfigurator());
-        await w(Ids.CLEAN_OUTPUT_DIR_PLUGIN, context, new CleanOutputDirPluginConfigurator());
-        await w(Ids.MIN_CHUNK_SIZE_PLUGIN, context, new MinChunkSizePluginConfigurator());
-        await w(Ids.FILTER_WARNINGS_PLUGIN, context, new FilterWarningsPluginConfigurator());
-        await w(Ids.DEV_ONLY, context, new DevOnlyConfigurator());
-        await w(Ids.PROD_ONLY, context, new ProdOnlyConfigurator());
-        await w(Ids.BUNDLE_ANALYZER_PLUGIN, context, new BundleAnalyzerPluginConfigurator());
-        await w(Ids.HTML_PLUGIN, context, new HtmlPluginConfigurator());
-        await w(Ids.BUILT_IN_PLUGIN, context, new BuiltInPluginConfigurator());
+        await w(Id.BASE, context, new BaseConfigurator());
+        await w(Id.APP_PATHS, context, new AppPathConfigurator());
+        await w(Id.POLYFILL, context, new PolyfillConfigurator());
+        await w(Id.PROGRESS_BAR, context, new ProgressBarConfigurator());
+        await w(Id.HTML, context, new HtmlConfigurator());
+        await w(Id.IMAGES, context, new ImageConfigurator());
+        await w(Id.FONTS, context, new FontConfigurator());
+        await w(Id.JS_PRE, context, new JsPreloadConfigurator());
+        await w(Id.TS, context, new TypescriptConfigurator());
+        await w(Id.JS_COMPAT, context, new JsCompatConfigurator());
+        await w(Id.LESS, context, new LessConfigurator());
+        await w(Id.SASS, context, new SassConfigurator());
+        await w(Id.CSS_EXTRACT, context, new CssExtractConfigurator());
+        await w(Id.PROVIDE, context, new ProvideConfigurator());
+        await w(Id.COPY, context, new CopyConfigurator());
+        await w(Id.CLEAN_OUTPUT_DIR, context, new CleanOutputDirConfigurator());
+        await w(Id.MIN_CHUNK_SIZE, context, new MinChunkSizeConfigurator());
+        await w(Id.FILTER_WARNINGS, context, new FilterWarningsConfigurator());
+        await w(Id.DEV_ONLY, context, new DevOnlyConfigurator());
+        await w(Id.PROD_ONLY, context, new ProdOnlyConfigurator());
+        await w(Id.BUNDLE_ANALYZER, context, new BundleAnalyzerConfigurator());
+        await w(Id.BUILT_IN_PLUGIN, context, new BuiltInPluginConfigurator());
         
         // Allow filtering
         await context.eventEmitter.emitHook(AssetBuilderEventList.APPLY_EXTENSION_WEBPACK_CONFIG, {context});
@@ -98,6 +96,8 @@ export class WebpackConfigGenerator
             }
             context.webpackConfig.watchOptions.poll = 600;
         }
+        
+        await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WEBPACK_CONFIG, {context});
         
         return context;
     }
@@ -115,12 +115,11 @@ export class WebpackConfigGenerator
         configurator: ConfiguratorInterface
     ): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_CONFIGURATOR, {
-            identifier, configurator, useConfigurator: true, context
+        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.CHECK_IDENTIFIER_STATE, {
+            identifier, configurator, enabled: true, context
         });
         
-        // Skip the configurator
-        if (args.useConfigurator !== true) {
+        if (!args.enabled) {
             return;
         }
         
@@ -128,7 +127,7 @@ export class WebpackConfigGenerator
             identifier, configurator: args.configurator, context
         });
         
-        await args.configurator.apply(identifier, args.context);
+        await args.configurator.apply(args.context);
         
         await context.eventEmitter.emitHook(AssetBuilderEventList.AFTER_CONFIGURATOR, {identifier, context});
     }
@@ -185,5 +184,7 @@ export class WebpackConfigGenerator
                     'The following error occured: ' + e);
             }
         }
+        
+        throw new Error('Could not load the configured custom webpack config!');
     }
 }

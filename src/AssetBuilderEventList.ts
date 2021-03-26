@@ -29,12 +29,10 @@ export enum AssetBuilderEventList
     // Events for global and app-based extensions
     FILTER_APP_DEFINITION_SCHEMA = 'assetBuilder__filterAppDefinition',
     AFTER_WORKER_INIT_DONE = 'assetBuilder__afterWorkerInitDone',
-    FILTER_CONFIGURATOR = 'assetBuilder__filterConfigurator',
     BEFORE_CONFIGURATOR = 'assetBuilder__beforeConfigurator',
     AFTER_CONFIGURATOR = 'assetBuilder__afterConfigurator',
     FILTER_LOADER_CONFIG = 'assetBuilder__filterLoaderConfig',
     FILTER_LOADER_TEST = 'assetBuilder__filterLoaderTest',
-    FILTER_BUILT_IN_PLUGIN = 'assetBuilder__filterBuildInPlugin',
     FILTER_PLUGIN_CONFIG = 'assetBuilder__filterPluginConfig',
     FILTER_POLYFILLS = 'assetBuilder__filterJsPolyfills',
     GET_JS_PROVIDES = 'assetBuilder__getJsProvides',
@@ -53,6 +51,7 @@ export enum AssetBuilderEventList
     BEFORE_GIT_ADD = 'assetBuilder__beforeGitAdd',
     CALLBACK_DONE = 'assetBuilder__callbackDone',
     PROCESS_CREATED = 'assetBuilder__processManager--processCreated',
+    CHECK_IDENTIFIER_STATE = 'assetBuilder__checkIdentifierState',
     
     // Special Interop events
     /**

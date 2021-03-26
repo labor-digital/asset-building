@@ -4,6 +4,8 @@ import {Bootstrap} from './Core/Bootstrap';
 import {ProcessManager} from './Core/ProcessManager';
 import {GeneralHelper} from './Helpers/GeneralHelper';
 
+// We should export our interfaces to the outside world through the main file
+
 const pJson = require('../package.json');
 
 const program = new Command();

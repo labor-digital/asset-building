@@ -18,19 +18,17 @@
 
 import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import path from 'path';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {PluginIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface
+export class CleanOutputDirConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
-        if (!context.isProd) {
-            return Promise.resolve(context);
-        }
-        if (context.app.keepOutputDirectory) {
-            return Promise.resolve(context);
+        if (!context.isProd || context.app.keepOutputDirectory) {
+            return;
         }
         
         const inputDirectory = path.dirname(context.app.entry);
@@ -39,28 +37,17 @@ export class CleanOutputDirPluginConfigurator implements ConfiguratorInterface
         // Add plugin to clean the output directory when the app is compiled
         // But make sure to keep all sources which have been defined in there
         const sourceToExclude = path.relative(outputDirectory, inputDirectory)
-                                    .split(/\\\//)!
-            .shift()!
-            .replace(/^[.\\\/]+/g, '');
+                                    .split(/\\\//)!.shift()!.replace(/^[.\\\/]+/g, '');
         const cleanOnceBeforeBuildPatterns = ['**/*'];
         if (sourceToExclude.length > 0) {
             cleanOnceBeforeBuildPatterns.push('!' + sourceToExclude);
             cleanOnceBeforeBuildPatterns.push('!' + sourceToExclude + '/**/*');
         }
         
-        // Allow filtering
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                          config: {
-                              verbose: true,
-                              cleanStaleWebpackAssets: false,
-                              cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
-                          },
-                          identifier,
-                          context
-                      })
-                      .then(args => {
-                          context.webpackConfig.plugins.push(new CleanWebpackPlugin(args.config));
-                          return context;
-                      });
+        await ConfigGenUtil.addPlugin(PluginIdentifier.CLEAN_OUTPUT_DIR, context, {
+            verbose: true,
+            cleanStaleWebpackAssets: false,
+            cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
+        }, config => new CleanWebpackPlugin(config));
     }
 }

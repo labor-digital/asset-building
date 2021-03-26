@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.06 at 16:37
+ * Last modified: 2019.10.05 at 20:26
  */
 
 import {isNull} from '@labor-digital/helferlein';
@@ -21,21 +21,43 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
 import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {LoaderIdentifier, PluginIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class HtmlPluginConfigurator implements ConfiguratorInterface
+export class HtmlConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
-        if (isNull(context.app.htmlTemplate)) {
-            return Promise.resolve(context);
-        }
+        // HTML LOADER
+        await ConfigGenUtil.addLoader(LoaderIdentifier.HTML, context, /\.html$/, {
+            use: [
+                {
+                    loader: 'html-loader'
+                }
+            ]
+        });
         
+        // HTML PLUGIN
+        if (!isNull(context.app.htmlTemplate)) {
+            await this.configureHtmlPlugin(context);
+        }
+    }
+    
+    /**
+     * Configures the html template provider plugin if activated in the app config
+     * @param context
+     * @protected
+     */
+    protected async configureHtmlPlugin(context: WorkerContext): Promise<void>
+    {
         // Apply a basic configuration
         let template = context.app.htmlTemplate;
+        
         if (template === true) {
             template = {};
         }
+        
         if (typeof template!.template === 'undefined') {
             template!.template = path.resolve(
                 path.join(__dirname, '../../../../static/HtmlDefaultTemplate.ejs')
@@ -55,27 +77,16 @@ export class HtmlPluginConfigurator implements ConfiguratorInterface
                 ];
             }
         }
+        
         if (typeof template!.appMountId === 'undefined') {
             template!.appMountId = 'app';
         }
         
-        // Allow filtering
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_HTML_PLUGIN_TEMPLATE, {
-                          template,
-                          identifier,
-                          context
-                      })
-                      .then(args => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                              config: args.template,
-                              identifier,
-                              context
-                          });
-                      })
-                      .then(args => {
-                          context.webpackConfig.plugins.push(new HtmlWebpackPlugin(args.config));
-                          return context;
-                      });
+        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_HTML_PLUGIN_TEMPLATE, {
+            template, context
+        });
+        
+        await ConfigGenUtil.addPlugin(PluginIdentifier.HTML_TEMPLATE, context, args.template,
+            config => new HtmlWebpackPlugin(config));
     }
-    
 }

@@ -29,6 +29,11 @@ async function init(message: PlainObject)
         const bootstrap = new Bootstrap();
         const context = await bootstrap.initWorkerProcess(message);
         const res = await context.do.runCompiler();
+        
+        res.promise.catch(() => {
+            console.error('FAIL!!!!!');
+        });
+        console.log('resolve promise', await res.promise);
         process.exit(await res.promise);
     } catch (e) {
         GeneralHelper.renderError(e, 'ERROR IN WORKER PROCESS:');

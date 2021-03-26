@@ -19,5 +19,5 @@ import type {WorkerContext} from '../../../Core/WorkerContext';
 
 export interface ConfiguratorInterface
 {
-    apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    apply(context: WorkerContext): Promise<void>
 }

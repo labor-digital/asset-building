@@ -19,11 +19,10 @@
 import type {PlainObject} from '@labor-digital/helferlein';
 import {forEach, isPlainObject, isString, isUndefined} from '@labor-digital/helferlein';
 import type {Configuration} from 'webpack';
-import {AssetBuilderConfiguratorIdentifiers as Ids} from '../../AssetBuilderConfiguratorIdentifiers';
 import {AssetBuilderEventList} from '../../AssetBuilderEventList';
-import {AssetBuilderPluginIdentifiers} from '../../AssetBuilderPluginIdentifiers';
 import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
+import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
 import type {MakeEnhancedConfigActionOptions} from '../../Webpack/Actions/MakeEnhancedConfigAction.interfaces';
 
 export class StorybookFactory
@@ -99,18 +98,16 @@ export class StorybookFactory
     protected getEnhancerOptions(): MakeEnhancedConfigActionOptions
     {
         return {
-            disableConfigurators: [
-                Ids.APP_PATHS,
-                Ids.CSS_EXTRACT_PLUGIN,
-                Ids.CLEAN_OUTPUT_DIR_PLUGIN,
-                Ids.COPY_PLUGIN,
-                Ids.MIN_CHUNK_SIZE_PLUGIN,
-                Ids.BUNDLE_ANALYZER_PLUGIN,
-                Ids.HTML_PLUGIN,
-                Ids.JS_PRE_LOADER
-            ],
-            disablePlugins: [
-                AssetBuilderPluginIdentifiers.GIT_ADD
+            disable: [
+                ConfiguratorIdentifier.APP_PATHS,
+                ConfiguratorIdentifier.CSS_EXTRACT,
+                ConfiguratorIdentifier.CLEAN_OUTPUT_DIR,
+                ConfiguratorIdentifier.COPY,
+                ConfiguratorIdentifier.MIN_CHUNK_SIZE,
+                ConfiguratorIdentifier.BUNDLE_ANALYZER,
+                PluginIdentifier.HTML_TEMPLATE,
+                ConfiguratorIdentifier.JS_PRE,
+                PluginIdentifier.GIT_ADD
             ],
             ruleFilter: test => {
                 // The list of FORBIDDEN patterns that should NOT pass
@@ -127,8 +124,8 @@ export class StorybookFactory
             events: {
                 [AssetBuilderEventList.FILTER_LOADER_CONFIG]: (e) => {
                     const cssExtractorPluginRegex = new RegExp('mini-css-extract-plugin');
-                    if (e.args.identifier === Ids.SASS_LOADER ||
-                        e.args.identifier === Ids.LESS_LOADER) {
+                    if (e.args.identifier === LoaderIdentifier.SASS ||
+                        e.args.identifier === LoaderIdentifier.LESS) {
                         forEach(e.args.config.use, (v, k) => {
                             if (!isString(v.loader)) {
                                 return;

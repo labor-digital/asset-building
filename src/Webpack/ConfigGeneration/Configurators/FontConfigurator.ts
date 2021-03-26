@@ -13,31 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.05 at 20:50
+ * Last modified: 2019.10.05 at 20:41
  */
 
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import {md5} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {LoaderIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class JsPreloadConfigurator implements ConfiguratorInterface
+export class FontConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_PRE_LOADERS, {
-            loaders: [], context
-        });
-        
-        const loaders: Array<any> = args.loaders;
-        if (loaders.length === 0) {
-            return;
-        }
-        
-        await ConfigGenUtil.addJsLoader(LoaderIdentifier.JS_PRE, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
-            enforce: 'pre',
-            use: loaders
+        await ConfigGenUtil.addLoader(LoaderIdentifier.FONT, context, /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/, {
+            use: [
+                {
+                    loader: 'file-loader',
+                    options: {
+                        name: (file: string) => {
+                            if (context.isProd) {
+                                return '[name]-[fullhash].[ext]';
+                            }
+                            // Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
+                            return '[name]-' + md5(file) + '.[ext]';
+                        },
+                        outputPath: 'assets/'
+                    }
+                }
+            ]
         });
     }
 }

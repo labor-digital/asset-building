@@ -21,17 +21,18 @@ import {forEach, isArray, PlainObject} from '@labor-digital/helferlein';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import fs from 'fs';
 import path from 'path';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {PluginIdentifier} from '../../../Identifier';
 import type {AppCopyDefinition} from '../../../Interfaces/AppDefinitionInterface';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class CopyPluginConfigurator implements ConfiguratorInterface
+export class CopyConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
         if (!isArray(context.app.copy)) {
-            return Promise.resolve(context);
+            return;
         }
         
         // Build the list of configurations we should copy for this app
@@ -46,7 +47,7 @@ export class CopyPluginConfigurator implements ConfiguratorInterface
         
         // Ignore if there are no copy configurations for this app
         if (copyToAdd.length === 0) {
-            return Promise.resolve(context);
+            return;
         }
         
         // Fix legacy "ignore" by convertig it to "globOptions"
@@ -109,17 +110,7 @@ export class CopyPluginConfigurator implements ConfiguratorInterface
         });
         
         // Allow filtering
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-            config: copyToAdd,
-            options: {},
-            identifier,
-            context
-        }).then(args => {
-            context.webpackConfig.plugins.push(new CopyWebpackPlugin({
-                patterns: args.config,
-                options: args.options
-            }));
-            return context;
-        });
+        await ConfigGenUtil.addPlugin(PluginIdentifier.COPY, context, {patterns: copyToAdd},
+            config => new CopyWebpackPlugin(config));
     }
 }

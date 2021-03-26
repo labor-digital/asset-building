@@ -17,25 +17,18 @@
  */
 
 import {isArray, PlainObject} from '@labor-digital/helferlein';
-import type {AssetBuilderConfiguratorIdentifiers as Ids} from '../../AssetBuilderConfiguratorIdentifiers';
 import {AssetBuilderEventList} from '../../AssetBuilderEventList';
-import type {AssetBuilderPluginIdentifiers as PluginIds} from '../../AssetBuilderPluginIdentifiers';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import type {Identifier} from '../../Identifier';
 import {WebpackConfigGenerator} from '../ConfigGeneration/WebpackConfigGenerator';
 import type {WorkerActionInterface} from './WorkerActionInterface';
 
 export interface MakeConfigurationActionOptions
 {
     /**
-     * An optional list of configurator ids that should be disabled when the config is generated
+     * A list of asset builder configurator/plugin ids that should be disabled when the config is generated
      */
-    disableConfigurators?: Array<Ids>
-    
-    /**
-     * A list of all asset builder plugin ids that should be disabled when the configuration is being build
-     */
-    disablePlugins?: Array<PluginIds>
-    
+    disable?: Array<Identifier>
 }
 
 export class MakeConfigurationAction implements WorkerActionInterface
@@ -74,20 +67,12 @@ export class MakeConfigurationAction implements WorkerActionInterface
             return;
         }
         
-        if (isArray(options.disableConfigurators)) {
-            context.eventEmitter.bind(AssetBuilderEventList.FILTER_CONFIGURATOR, (e: PlainObject) => {
-                if (options.disableConfigurators!.indexOf(e.args.identifier) === -1) {
+        if (isArray(options.disable)) {
+            context.eventEmitter.bind(AssetBuilderEventList.CHECK_IDENTIFIER_STATE, (e: PlainObject) => {
+                if (options.disable!.indexOf(e.args.identifier) === -1) {
                     return;
                 }
-                e.args.useConfigurator = false;
-            });
-        }
-        if (isArray(options.disablePlugins)) {
-            context.eventEmitter.bind(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, (e: PlainObject) => {
-                if (options.disablePlugins!.indexOf(e.args.identifier) === -1) {
-                    return;
-                }
-                e.args.usePlugin = false;
+                e.args.enabled = false;
             });
         }
     }

@@ -28,12 +28,13 @@ import type {WorkerActionInterface} from './WorkerActionInterface';
 export class RunCompilerAction implements WorkerActionInterface
 {
     
-    public do(context: WorkerContext, options?: RunCompilerOptions): any
+    public async do(context: WorkerContext, options?: RunCompilerOptions): Promise<RunCompilerResult>
     {
         options = options ?? {};
         
-        return this.prepareConfig(context, options)
-                   .then(config => this.runCompiler(config, context, options));
+        return this.runCompiler(
+            await this.prepareConfig(context, options), context, options
+        );
         
     }
     
@@ -82,7 +83,6 @@ export class RunCompilerAction implements WorkerActionInterface
                         const callback: WebpackCompilerCallbackInterface = args.callback;
                     
                         compilerInstance = compiler(config, (err: any, stats: any) => {
-                        
                             if (err !== null) {
                                 return rejectCallback(err);
                             }
@@ -93,6 +93,13 @@ export class RunCompilerAction implements WorkerActionInterface
                         
                             callback(context, stats, resolveCallback, rejectCallback);
                         });
+                    
+                        if (compilerInstance === null) {
+                            setTimeout(() => {
+                                rejectCompiler(new Error('Failed to instantiate webpack'));
+                            }, 2000);
+                            return;
+                        }
                     
                         context.eventEmitter.emit(AssetBuilderEventList.WEBPACK_COMPILER, {
                             compilerDefinition: compiler,
@@ -111,7 +118,11 @@ export class RunCompilerAction implements WorkerActionInterface
                         });
                     })
                     .catch(rejectCompiler);
-            }));
+            }))
+                .catch(e => {
+                    rejectCompiler(e);
+                    return 1;
+                });
         });
     }
     

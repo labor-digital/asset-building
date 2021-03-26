@@ -24,7 +24,6 @@
 		"strict": true,
 		"suppressImplicitAnyIndexErrors": true,
 		// Type-checking settings.
-		"lib": [],
 		"skipDefaultLibCheck": true,
 		"skipLibCheck": true,
 		// Type declaration settings.

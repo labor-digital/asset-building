@@ -18,29 +18,23 @@
 
 // @ts-ignore
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {FileHelpers} from '../../../Helpers/FileHelpers';
+import {PluginIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class CssExtractPluginConfigurator implements ConfiguratorInterface
+export class CssExtractConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
         const outputFileWithoutExtension = FileHelpers.getFileWithoutExtension(context.webpackConfig.output.filename);
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                          config: {
-                              filename: 'css/' + outputFileWithoutExtension + '.css',
-                              chunkFilename: 'css/' + outputFileWithoutExtension +
-                                             (context.isProd ? '-[id]-[fullhash].css' : '-[id].css'),
-                              ignoreOrder: true
-                          },
-                          identifier,
-                          context
-                      })
-                      .then(args => {
-                          context.webpackConfig.plugins.push(new MiniCssExtractPlugin(args.config));
-                          return context;
-                      });
+        
+        await ConfigGenUtil.addPlugin(PluginIdentifier.CSS_EXTRACT, context, {
+            filename: 'css/' + outputFileWithoutExtension + '.css',
+            chunkFilename: 'css/' + outputFileWithoutExtension +
+                           (context.isProd ? '-[id]-[fullhash].css' : '-[id].css'),
+            ignoreOrder: true
+        }, config => new MiniCssExtractPlugin(config));
     }
 }

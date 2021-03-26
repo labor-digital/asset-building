@@ -13,31 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.05 at 20:50
+ * Last modified: 2019.10.06 at 15:23
  */
 
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+// @ts-ignore
+import WebpackBar from 'webpackbar';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {LoaderIdentifier} from '../../../Identifier';
+import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class JsPreloadConfigurator implements ConfiguratorInterface
+export class ProgressBarConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_PRE_LOADERS, {
-            loaders: [], context
-        });
-        
-        const loaders: Array<any> = args.loaders;
-        if (loaders.length === 0) {
-            return;
-        }
-        
-        await ConfigGenUtil.addJsLoader(LoaderIdentifier.JS_PRE, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
-            enforce: 'pre',
-            use: loaders
-        });
+        await ConfigGenUtil.addPlugin(PluginIdentifier.PROGRESS_BAR, context, {}, config => new WebpackBar(config));
     }
 }

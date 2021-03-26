@@ -24,7 +24,7 @@ export const resolveFileExtensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
 
 export class BaseConfigurator implements ConfiguratorInterface
 {
-    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    public apply(context: WorkerContext): Promise<void>
     {
         // Build the json-p function name
         const jsonPName = 'labor_webpack_' + md5(
@@ -61,6 +61,6 @@ export class BaseConfigurator implements ConfiguratorInterface
         };
         
         // Done
-        return Promise.resolve(context);
+        return Promise.resolve();
     }
 }

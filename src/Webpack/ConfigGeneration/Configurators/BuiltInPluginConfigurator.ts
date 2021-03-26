@@ -17,34 +17,29 @@
  */
 
 import {isFunction} from '@labor-digital/helferlein';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
-import {AssetBuilderPluginIdentifiers as Ids} from '../../../AssetBuilderPluginIdentifiers';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {PluginIdentifier} from '../../../Identifier';
 import type {
     AssetBuilderWebpackPluginInterface,
     AssetBuilderWebpackPluginStaticInterface
 } from '../../Plugins/AssetBuilderWebpackPluginInterface';
-import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from '../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin';
 import {FancyStatsPlugin} from '../../Plugins/FancyStatsPlugin';
 import {GitAddPlugin} from '../../Plugins/GitAddPlugin';
 import {WebpackFixBrokenChunkPlugin} from '../../Plugins/WebpackFixBrokenChunkPlugin';
 import {WebpackPromiseShimPlugin} from '../../Plugins/WebpackPromiseShimPlugin';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class BuiltInPluginConfigurator implements ConfiguratorInterface
 {
     
-    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
-        
-        return Promise.resolve(context)
-                      .then(c => this.registerPluginWrapper(Ids.GIT_ADD, c, GitAddPlugin))
-                      .then(c => this.registerPluginWrapper(Ids.FANCY_STATS, c, FancyStatsPlugin))
-                      .then(c => this.registerPluginWrapper(Ids.FIX_BROKEN_CHUNKS, c, WebpackFixBrokenChunkPlugin))
-                      .then(c => this.registerPluginWrapper(Ids.PROMISE_SHIM, c, WebpackPromiseShimPlugin))
-                      .then(c => this.registerPluginWrapper(Ids.CUSTOM_SASS_LOADER_CACHE_INVALIDATOR, c,
-                          CustomSassLoaderPreCompilerCacheInvalidatePlugin));
-        
+        const w = this.registerPluginWrapper;
+        await w(PluginIdentifier.GIT_ADD, context, GitAddPlugin);
+        await w(PluginIdentifier.FANCY_STATS, context, FancyStatsPlugin);
+        await w(PluginIdentifier.FIX_BROKEN_CHUNKS, context, WebpackFixBrokenChunkPlugin);
+        await w(PluginIdentifier.PROMISE_SHIM, context, WebpackPromiseShimPlugin);
     }
     
     /**
@@ -54,42 +49,22 @@ export class BuiltInPluginConfigurator implements ConfiguratorInterface
      * @param plugin
      * @protected
      */
-    protected registerPluginWrapper(
-        identifier: string,
+    protected async registerPluginWrapper(
+        identifier: PluginIdentifier,
         context: WorkerContext,
         plugin: AssetBuilderWebpackPluginStaticInterface
-    ): Promise<WorkerContext>
+    ): Promise<void>
     {
         const config = isFunction(plugin.getDefaultConfig) ? plugin.getDefaultConfig() ?? {} : {};
         
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BUILT_IN_PLUGIN, {
-            identifier,
-            usePlugin: true,
-            config,
-            plugin,
-            context
-        }).then(args => {
+        await ConfigGenUtil.addPlugin(identifier, context, config, (config) => {
+            const i: AssetBuilderWebpackPluginInterface = new (plugin as any)(config);
             
-            if (args.usePlugin !== true) {
-                return Promise.resolve(context);
+            if (isFunction(i.setContext)) {
+                i.setContext(context);
             }
             
-            return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                config: args.config,
-                identifier: args.identifier,
-                context: args.context
-            }).then(_args => {
-                const i: AssetBuilderWebpackPluginInterface = new args.plugin(_args.config);
-                
-                if (isFunction(i.setContext)) {
-                    i.setContext(_args.context);
-                }
-                
-                _args.context.webpackConfig.plugins.push(i);
-                
-                return _args.context;
-            });
-            
+            return i;
         });
     }
 }

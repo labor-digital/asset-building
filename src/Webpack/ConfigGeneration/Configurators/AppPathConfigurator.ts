@@ -24,7 +24,7 @@ import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class AppPathConfigurator implements ConfiguratorInterface
 {
-    apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    apply(context: WorkerContext): Promise<void>
     {
         // Add the relative entry point
         context.webpackConfig.entry = '.' + path.sep + path.relative(
@@ -70,7 +70,6 @@ export class AppPathConfigurator implements ConfiguratorInterface
             context.webpackConfig.output.publicPath = context.app.publicPathDev;
         }
         
-        // Done
-        return Promise.resolve(context);
+        return Promise.resolve();
     }
 }

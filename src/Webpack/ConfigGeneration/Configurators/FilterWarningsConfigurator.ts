@@ -21,11 +21,13 @@ import {isArray, isString, map} from '@labor-digital/helferlein';
 import WebpackFilterWarningsPlugin from 'webpack-filter-warnings-plugin';
 import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {PluginIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class FilterWarningsPluginConfigurator implements ConfiguratorInterface
+export class FilterWarningsConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
         // Get the warnings to ignore
         let warningsToIgnore: Array<string | RegExp> = (isArray(context.app.warningsIgnorePattern)
@@ -41,24 +43,11 @@ export class FilterWarningsPluginConfigurator implements ConfiguratorInterface
             return v;
         });
         
-        // Allow filtering
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
-                          patterns: warningsToIgnore,
-                          identifier,
-                          context
-                      })
-                      .then(args => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                              config: {
-                                  exclude: args.patterns
-                              },
-                              identifier,
-                              context
-                          });
-                      })
-                      .then(args => {
-                          context.webpackConfig.plugins.push(new WebpackFilterWarningsPlugin(args.config));
-                          return context;
-                      });
+        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_WARNING_TO_IGNORE_PATTERNS, {
+            patterns: warningsToIgnore,
+            context
+        });
+        await ConfigGenUtil.addPlugin(PluginIdentifier.FILTER_WARNINGS, context, {exclude: args.patterns},
+            config => new WebpackFilterWarningsPlugin(config));
     }
 }

@@ -22,11 +22,12 @@ import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class DevOnlyConfigurator implements ConfiguratorInterface
 {
-    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    public apply(context: WorkerContext): Promise<void>
     {
         if (context.isProd) {
-            return Promise.resolve(context);
+            return Promise.resolve();
         }
+        
         context.webpackConfig = merge(context.webpackConfig, {
             output: {
                 pathinfo: false
@@ -37,6 +38,7 @@ export class DevOnlyConfigurator implements ConfiguratorInterface
                 splitChunks: false
             }
         });
-        return Promise.resolve(context);
+        
+        return Promise.resolve();
     }
 }

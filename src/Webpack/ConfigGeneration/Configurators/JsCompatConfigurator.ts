@@ -22,11 +22,12 @@ import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class JsCompatConfigurator implements ConfiguratorInterface
 {
-    public apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    public apply(context: WorkerContext): Promise<void>
     {
         if (!isArray(context.app.jsCompat) || context.app.jsCompat.length === 0) {
-            return Promise.resolve(context);
+            return Promise.resolve();
         }
+        
         forEach(context.app.jsCompat, (config, k) => {
             // Validate
             if (typeof config !== 'object') {
@@ -63,6 +64,7 @@ export class JsCompatConfigurator implements ConfiguratorInterface
                 'loader': config.fix
             });
         });
-        return Promise.resolve(context);
+        
+        return Promise.resolve();
     }
 }

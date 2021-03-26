@@ -17,62 +17,62 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
-import {AssetBuilderConfiguratorIdentifiers} from '../../../AssetBuilderConfiguratorIdentifiers';
 import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
 
 export abstract class AbstractStyleLoaderConfigurator
 {
     /**
      * Defines the post css configuration for sass and less loaders
      */
-    protected makePostcssConfig(identifier: string, context: WorkerContext): Promise<PlainObject>
+    protected async makePostcssConfig(identifier: ConfiguratorIdentifier, context: WorkerContext): Promise<PlainObject>
     {
         let resolveReference: any = undefined;
-        return Promise.resolve()
-                      .then(() => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BROWSER_LIST, {
-                              browserList: '> 1%, last 10 versions',
-                              identifier: AssetBuilderConfiguratorIdentifiers.POST_CSS_LOADER,
-                              parent: identifier,
-                              isPostcssLoader: true,
-                              context
-                          });
-                      })
-                      .then((args) => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POSTCSS_PLUGINS, {
-                              plugins: [
-                                  require('autoprefixer')({
-                                      overrideBrowserslist: args.browserList
-                                  }),
-                                  require('iconfont-webpack-plugin')({
-                                      resolve: function () {
-                                          return resolveReference(...arguments);
-                                      },
-                                      modules: false
-                                  })
-                              ],
-                              identifier: AssetBuilderConfiguratorIdentifiers.POST_CSS_LOADER,
-                              parent: identifier,
-                              context
-                          });
-                      })
-                      .then(args => {
-                          return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
-                              config: {
-                                  loader: 'postcss-loader',
-                                  options: {
-                                      postcssOptions: {
-                                          plugins: args.plugins
-                                      }
-                                  }
-                              },
-                              identifier: AssetBuilderConfiguratorIdentifiers.POST_CSS_LOADER,
-                              parent: identifier,
-                              isPostcssLoader: true,
-                              context
-                          });
-                      })
-                      .then(args => args.config);
+        
+        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_BROWSER_LIST, {
+            browserList: '> 1%, last 10 versions',
+            parent: identifier,
+            isPostcssLoader: true,
+            context
+        });
+        
+        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POSTCSS_PLUGINS, {
+            plugins: [
+                require('autoprefixer')({
+                    overrideBrowserslist: args.browserList
+                }),
+                require('iconfont-webpack-plugin')({
+                    resolve: function () {
+                        return resolveReference(...arguments);
+                    },
+                    modules: false
+                })
+            ],
+            parent: identifier,
+            context
+        });
+        
+        const plugins: Array<any> = args.plugins;
+        
+        args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_LOADER_CONFIG, {
+            config: {
+                loader: 'postcss-loader',
+                options: {
+                    postcssOptions: (loader: any) => {
+                        resolveReference = loader.resolve;
+                        return {
+                            plugins: plugins
+                        };
+                    }
+                }
+            },
+            identifier: LoaderIdentifier.POST_CSS,
+            parent: identifier,
+            isPostcssLoader: true,
+            context
+        });
+        
+        return args.config;
     }
 }

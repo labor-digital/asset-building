@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.05 at 20:50
+ * Last modified: 2019.10.06 at 15:29
  */
 
+import webpack from 'webpack';
 import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {LoaderIdentifier} from '../../../Identifier';
+import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class JsPreloadConfigurator implements ConfiguratorInterface
+export class ProvideConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        let args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_JS_PRE_LOADERS, {
-            loaders: [], context
-        });
+        const args = await context.eventEmitter.emitHook(
+            AssetBuilderEventList.GET_JS_PROVIDES, {provides: {}, context});
         
-        const loaders: Array<any> = args.loaders;
-        if (loaders.length === 0) {
-            return;
-        }
-        
-        await ConfigGenUtil.addJsLoader(LoaderIdentifier.JS_PRE, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
-            enforce: 'pre',
-            use: loaders
-        });
+        await ConfigGenUtil.addPlugin(PluginIdentifier.PROVIDE, context, args.provides,
+            config => new webpack.ProvidePlugin(config));
     }
+    
 }

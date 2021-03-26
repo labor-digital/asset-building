@@ -16,18 +16,18 @@
  * Last modified: 2021.03.25 at 16:30
  */
 
-import {isArray, PlainObject} from '@labor-digital/helferlein';
+import {isArray} from '@labor-digital/helferlein';
 import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
 export class PolyfillConfigurator implements ConfiguratorInterface
 {
-    public async apply(_: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
         
         if (context.app.polyfills === false) {
-            return Promise.resolve(context);
+            return Promise.resolve();
         }
         
         // Prepare the list of poly fills
@@ -41,21 +41,13 @@ export class PolyfillConfigurator implements ConfiguratorInterface
         polyfills.push('core-js/features/array/from.js');
         polyfills.push('core-js/features/symbol/index.js');
         
-        const args = await this.emitFilterEvent(polyfills, context);
+        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POLYFILLS, {polyfills, context});
         
         let entry = context.webpackConfig.entry;
         if (!isArray(entry)) {
             entry = [entry];
         }
-        context.webpackConfig.entry = [...args.polyfills, ...entry];
         
-        return Promise.resolve(context);
-    }
-    
-    protected async emitFilterEvent(polyfills: Array<any>, context: WorkerContext): Promise<PlainObject>
-    {
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_POLYFILLS, {
-            polyfills, context
-        });
+        context.webpackConfig.entry = [...args.polyfills, ...entry];
     }
 }

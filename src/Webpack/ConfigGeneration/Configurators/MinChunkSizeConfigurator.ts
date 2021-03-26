@@ -17,24 +17,17 @@
  */
 
 import webpack from 'webpack';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {PluginIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class MinChunkSizePluginConfigurator implements ConfiguratorInterface
+export class MinChunkSizeConfigurator implements ConfiguratorInterface
 {
-    public apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
-        return context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-                          config: {
-                              minChunkSize: context.app.minChunkSize
-                          },
-                          identifier,
-                          context
-                      })
-                      .then(args => {
-                          context.webpackConfig.plugins.push(new webpack.optimize.MinChunkSizePlugin(args.config));
-                          return context;
-                      });
+        await ConfigGenUtil.addPlugin(PluginIdentifier.MIN_CHUNK_SIZE, context, {
+            minChunkSize: context.app.minChunkSize
+        }, config => new webpack.optimize.MinChunkSizePlugin(config as any));
     }
 }

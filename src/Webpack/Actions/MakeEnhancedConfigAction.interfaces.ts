@@ -18,8 +18,8 @@
 
 import type {EventEmitterEventListener, PlainObject} from '@labor-digital/helferlein';
 import type {Configuration, RuleSetRule} from 'webpack';
-import type {AssetBuilderConfiguratorIdentifiers as Ids} from '../../AssetBuilderConfiguratorIdentifiers';
 import type {AssetBuilderPluginIdentifiers as PluginIds} from '../../AssetBuilderPluginIdentifiers';
+import type {Identifier} from '../../Identifier';
 
 export interface ModuleRuleFilter
 {
@@ -58,9 +58,14 @@ export interface MakeEnhancedConfigActionOptions
     pluginFilter?: PluginFilter
     
     /**
+     * A list of asset builder configurator/plugin ids that should be disabled when the configuration is being build
+     */
+    disable?: Array<Identifier>
+    
+    /**
      * A list of asset builder configurator ids that should be disabled when the configuration is being build
      */
-    disableConfigurators?: Array<Ids>
+    disableConfigurators?: Array<Identifier>
     
     /**
      * A list of all asset builder plugin ids that should be disabled when the configuration is being build

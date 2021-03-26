@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.06 at 15:23
+ * Last modified: 2019.10.06 at 16:18
  */
 
 // @ts-ignore
-import WebpackBar from 'webpackbar';
-import {AssetBuilderEventList} from '../../../AssetBuilderEventList';
+import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer';
 import type {WorkerContext} from '../../../Core/WorkerContext';
+import {PluginIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class ProgressBarPluginConfigurator implements ConfiguratorInterface
+export class BundleAnalyzerConfigurator implements ConfiguratorInterface
 {
-    public async apply(identifier: string, context: WorkerContext): Promise<WorkerContext>
+    public async apply(context: WorkerContext): Promise<void>
     {
-        const args = await context.eventEmitter.emitHook(AssetBuilderEventList.FILTER_PLUGIN_CONFIG, {
-            config: {},
-            identifier,
-            context
-        });
+        if (context.mode !== 'analyze') {
+            return;
+        }
         
-        context.webpackConfig.plugins.push(new WebpackBar(args.config));
+        await ConfigGenUtil.addPlugin(PluginIdentifier.BUNDLE_ANALYZER, context, {},
+            config => new BundleAnalyzerPlugin(config));
         
-        return context;
+        context.webpackConfig.profile = true;
+        
     }
 }
