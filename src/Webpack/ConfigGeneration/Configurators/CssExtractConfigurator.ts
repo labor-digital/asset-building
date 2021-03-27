@@ -28,6 +28,10 @@ export class CssExtractConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
+        if (context.parentContext.options.devServer) {
+            return;
+        }
+        
         const outputFileWithoutExtension = FileHelpers.getFileWithoutExtension(context.webpackConfig.output.filename);
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.CSS_EXTRACT, context, {

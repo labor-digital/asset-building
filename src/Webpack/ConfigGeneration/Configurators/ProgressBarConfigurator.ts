@@ -27,6 +27,8 @@ export class ProgressBarConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        await ConfigGenUtil.addPlugin(PluginIdentifier.PROGRESS_BAR, context, {}, config => new WebpackBar(config));
+        await ConfigGenUtil.addPlugin(PluginIdentifier.PROGRESS_BAR, context, {
+            name: context.app.appName
+        }, config => new WebpackBar(config));
     }
 }

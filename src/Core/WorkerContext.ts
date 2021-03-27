@@ -19,10 +19,9 @@ import type {EventEmitter, PlainObject} from '@labor-digital/helferlein';
 
 import type {Configuration} from 'webpack';
 import type {ExtensionLoader} from '../Extension/ExtensionLoader';
-import type {AppDefinitionInterface} from '../Interfaces/AppDefinitionInterface';
 import {WebpackWorkerActions} from '../Webpack/WebpackWorkerActions';
 import type {CoreContext} from './CoreContext';
-import type {TBuilderMode} from './Factory.interfaces';
+import type {IAppDefinition, TBuilderMode} from './types';
 
 export class WorkerContext
 {
@@ -40,7 +39,7 @@ export class WorkerContext
     /**
      * Holds the current app definition
      */
-    public app: AppDefinitionInterface;
+    public app: IAppDefinition;
     
     /**
      * Contains the webpack configuration we are currently working on
@@ -57,7 +56,7 @@ export class WorkerContext
      * @param parentContext
      * @param app
      */
-    constructor(parentContext: CoreContext, app: AppDefinitionInterface)
+    constructor(parentContext: CoreContext, app: IAppDefinition)
     {
         this.type = 'worker';
         this.parentContext = parentContext;

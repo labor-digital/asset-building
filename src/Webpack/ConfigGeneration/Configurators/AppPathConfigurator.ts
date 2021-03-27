@@ -27,12 +27,13 @@ export class AppPathConfigurator implements ConfiguratorInterface
     apply(context: WorkerContext): Promise<void>
     {
         // Add the relative entry point
+        const paths = context.parentContext.paths;
         context.webpackConfig.entry = '.' + path.sep + path.relative(
-            context.parentContext.sourcePath, path.resolve(context.parentContext.sourcePath, context.app.entry));
+            paths.source, path.resolve(paths.source, context.app.entry));
         const inputDirectory = path.dirname(context.app.entry);
         
         // Add output definition
-        let outputDirectory = path.resolve(context.parentContext.sourcePath, context.app.output);
+        let outputDirectory = path.resolve(paths.source, context.app.output);
         let outputFile = path.basename(outputDirectory);
         let outputFileWithoutExtension = FileHelpers.getFileWithoutExtension(outputFile);
         outputDirectory = path.dirname(outputDirectory);

@@ -16,29 +16,33 @@
  * Last modified: 2019.10.05 at 17:26
  */
 
-import {asArray, EventBus, EventEmitter, forEach} from '@labor-digital/helferlein';
+import {asArray, EventBus, EventEmitter, forEach, PlainObject} from '@labor-digital/helferlein';
 import * as path from 'path';
 import {ExtensionLoader} from '../Extension/ExtensionLoader';
-import type {LaborConfigInterface} from '../Interfaces/LaborConfigInterface';
-import type {TBuilderMode} from './Factory.interfaces';
+import {Logger} from './Logger';
+import type {IBuilderOptions, IPathList, TBuilderEnvironment, TBuilderMode} from './types';
 
 export class CoreContext
 {
-    
     /**
      * Contains the version number of the asset builder package
      */
-    public version: string = '1.0.0';
+    public version!: string;
     
     /**
      * Defines if the current process is the main process or a worker
      */
-    public process: 'main' | 'worker' = 'main';
+    public process!: 'main' | 'worker';
+    
+    /**
+     * The list of options that have been given when the builder was created
+     */
+    public options!: IBuilderOptions;
     
     /**
      * Defines the inter-op environment the asset builder runs in
      */
-    public environment: TBuilderMode = 'standalone';
+    public environment!: TBuilderEnvironment;
     
     /**
      * Defines the type of this context
@@ -46,109 +50,82 @@ export class CoreContext
     public type: 'core' = 'core';
     
     /**
-     * If this is true the workers will be spawn in sequential order instead of being called as parallel processes
-     */
-    public runWorkersSequential: boolean = false;
-    
-    /**
      * The mode key which was given as cli parameter
      */
-    public mode: TBuilderMode = 'production';
+    public mode!: TBuilderMode;
     
     /**
-     * True if this app should be executed as webpack's "production" mode
+     * True if this app should be executed as webpack' "production" mode
      * By default this is set to true if "mode" is "production"
      */
-    public isProd: boolean = true;
+    public isProd: boolean = false;
     
     /**
-     * If set to true, webpack will run in watch mode
+     * The list of relevant paths for this context
      */
-    public watch: boolean = false;
-    
-    /**
-     * The path to the source directory
-     */
-    public sourcePath: string = '';
-    
-    /**
-     * The directory of the asset builder
-     */
-    public assetBuilderPath: string = '';
-    
-    /**
-     * The absolute path to the node modules inside the working directory path
-     */
-    public nodeModulesPath: string = '';
-    
-    /**
-     * The absolute path to the asset-building's node modules
-     */
-    public buildingNodeModulesPath: string = '';
-    
-    /**
-     * The absolute path to the base package's package.json
-     */
-    public packageJsonPath: string = '';
-    
-    /**
-     * Is used to store additional paths that should be used for node and webpack file resolution
-     * in addition to the default node_modules directory
-     */
-    public additionalResolverPaths: Set<string> = new Set();
-    
-    /**
-     * The directory where we will put dynamically generated files
-     */
-    public workDirectoryPath: string = '';
-    
-    /**
-     * The file which is used to ship this context from one process to another
-     */
-    public coreContextFilePath: string = '';
+    public paths!: IPathList;
     
     /**
      * The event bus instance we use in this context
      */
-    public eventEmitter: EventEmitter = EventBus.getEmitter();
+    public eventEmitter: EventEmitter;
     
     /**
      * The extension loader instance
      */
-    public extensionLoader: ExtensionLoader = new ExtensionLoader();
+    public extensionLoader: ExtensionLoader;
     
     /**
-     * The raw labor configuration object
+     * A simple logger to dump verbose output;
      */
-    public laborConfig: LaborConfigInterface = {};
+    public logger: Logger;
     
-    constructor(cwd: string, assetBuilderPath: string, environment: string, version: string, watch: boolean)
+    constructor(options: IBuilderOptions | PlainObject)
     {
-        if (cwd === '' && assetBuilderPath === '' && environment === '') {
+        this.logger = new Logger(options.verbose);
+        this.eventEmitter = EventBus.getEmitter();
+        this.extensionLoader = new ExtensionLoader();
+        
+        // Rehydrate from json options
+        if ((options as PlainObject).loadFromJson) {
+            forEach(options as PlainObject, (v, k) => {
+                if (k === 'loadFromJson') {
+                    return;
+                }
+                
+                if (k === 'paths') {
+                    const paths: IPathList = v;
+                    paths.additionalResolverPaths = new Set(paths.additionalResolverPaths);
+                }
+                
+                this[k] = v;
+            });
             return;
         }
         
-        this.version = version;
-        this.type = 'core';
-        this.process = 'main';
-        this.watch = watch;
-        this.environment = environment;
-        this.runWorkersSequential = false;
-        this.sourcePath = cwd.replace(/\\\/$/g, '') + path.sep;
-        this.assetBuilderPath = assetBuilderPath.replace(/\\\/$/g, '') + path.sep;
-        this.nodeModulesPath = this.sourcePath + 'node_modules' + path.sep;
-        this.buildingNodeModulesPath = path.resolve(this.assetBuilderPath, '../node_modules/') + path.sep;
-        this.packageJsonPath = this.sourcePath + 'package.json';
-        this.workDirectoryPath = this.nodeModulesPath + '.cache' + path.sep + 'labor-asset-builder-tmp' + path.sep;
-        this.coreContextFilePath = this.workDirectoryPath + 'coreContext.json';
+        const sourcePath = path.normalize(options.cwd);
+        const assetBuilderPath = path.dirname(__dirname);
+        const additionalResolverPaths = new Set<string>();
         
-        // Build additional paths
-        this.additionalResolverPaths = new Set();
-        this.additionalResolverPaths.add(this.nodeModulesPath);
-        this.additionalResolverPaths.add(this.buildingNodeModulesPath);
-        this.additionalResolverPaths.add('node_modules' + path.sep);
-        this.additionalResolverPaths.add(path.sep);
-        this.additionalResolverPaths.add('.' + path.sep);
+        this.paths = {
+            source: sourcePath,
+            assetBuilder: assetBuilderPath,
+            nodeModules: path.resolve(sourcePath, 'node_modules'),
+            buildingNodeModules: path.resolve(assetBuilderPath, '..', 'node_modules'),
+            additionalResolverPaths
+        };
+        
+        additionalResolverPaths.add(this.paths.nodeModules);
+        additionalResolverPaths.add(this.paths.buildingNodeModules);
+        additionalResolverPaths.add('node_modules' + path.sep);
+        additionalResolverPaths.add(path.sep);
+        additionalResolverPaths.add('.' + path.sep);
+        
+        this.options = options;
+        this.process = 'main';
+        this.mode = options.mode ?? 'production';
+        this.environment = options.environment ?? 'standalone';
+        this.version = require(path.resolve(this.paths.assetBuilder, '..', 'package.json')).version;
     }
     
     /**
@@ -156,24 +133,17 @@ export class CoreContext
      */
     public toJson(): string
     {
+        const paths = {...this.paths, additionalResolverPaths: asArray(this.paths.additionalResolverPaths)};
+        
         return JSON.stringify({
+            options: this.options,
             type: this.type,
             process: this.process,
             version: this.version,
             isProd: this.isProd,
             environment: this.environment,
             mode: this.mode,
-            watch: this.watch,
-            sourcePath: this.sourcePath,
-            assetBuilderPath: this.assetBuilderPath,
-            nodeModulesPath: this.nodeModulesPath,
-            buildingNodeModulesPath: this.buildingNodeModulesPath,
-            packageJsonPath: this.packageJsonPath,
-            workDirectoryPath: this.workDirectoryPath,
-            coreContextFilePath: this.coreContextFilePath,
-            additionalResolverPaths: asArray(this.additionalResolverPaths),
-            laborConfig: this.laborConfig,
-            runWorkersSequential: this.runWorkersSequential
+            paths: paths
         });
     }
     
@@ -183,14 +153,9 @@ export class CoreContext
      */
     public static fromJson(json: string): CoreContext
     {
-        const self = new CoreContext('', '', '', '', false);
         const data = JSON.parse(json);
-        forEach(data, (v, k) => {
-            if (k === 'additionalResolverPaths') {
-                v = new Set(v);
-            }
-            self[k] = v;
-        });
-        return self;
+        data.loadFromJson = true;
+        
+        return new CoreContext(data);
     }
 }

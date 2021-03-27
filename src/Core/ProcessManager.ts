@@ -16,11 +16,12 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {EventEmitter, filter, isPlainObject} from '@labor-digital/helferlein';
-import Chalk from 'chalk';
+import {EventEmitter, filter, forEach} from '@labor-digital/helferlein';
 import childProcess from 'child_process';
+import path from 'path';
 import {EventList} from '../EventList';
 import type {CoreContext} from './CoreContext';
+import type {IAppDefinition} from './types';
 
 export class ProcessManager
 {
@@ -47,50 +48,31 @@ export class ProcessManager
      */
     public startWorkers(coreContext: CoreContext): Promise<any | void>
     {
-        console.log('Beginning to spawn worker processes...');
+        coreContext.logger.log('Beginning to spawn worker processes...');
         const processes: Array<Promise<any | void>> = [];
         
-        // Starting the workers in async mode
-        const apps = coreContext.laborConfig.apps ?? [];
-        for (let i = 0; i < apps.length; i++) {
-            processes.push(this.startSingleWorker(coreContext, i));
-        }
+        forEach(coreContext.options.apps ?? [], app => {
+            processes.push(this.startSingleWorker(coreContext, app));
+        });
         
-        // Return the combined promise
         return Promise.all(processes);
     }
     
     /**
      * Creates a new worker process for a given app definition
      * @param coreContext
-     * @param appIndex
+     * @param app
      */
-    public startSingleWorker(coreContext: CoreContext, appIndex: number): Promise<void>
+    public startSingleWorker(coreContext: CoreContext, app: IAppDefinition): Promise<void>
     {
-        const apps = coreContext.laborConfig.apps ?? [];
-        const app = apps[appIndex] ?? null;
-        
-        if (!isPlainObject(app)) {
-            throw new Error('Failed to spawn worker for app with index: ' + appIndex +
-                            ' because it does not exist in the "apps" definition!');
-        }
-        
-        if (!app.id) {
-            app.id = appIndex;
-        }
-        
         // Start the process
         return new Promise<void>((resolve, reject) => {
             
-            // Check if the app is disabled
-            if (app.disabled) {
-                console.log(Chalk.yellowBright('Ignoring app: ' + app.appName + ' because it was disabled!'));
-                return resolve();
-            }
-            
             // Create a new fork
-            const worker = childProcess.fork(coreContext.assetBuilderPath + 'Worker.js');
-            console.log('Spawned worker process: ' + app.id + ' (' + worker.pid + ')');
+            const worker = childProcess.fork(
+                path.join(coreContext.paths.assetBuilder, 'Worker.js')
+            );
+            coreContext.logger.log('Spawned worker process: ' + app.id + ' (' + worker.pid + ')');
             let stopped = false;
             
             // Allow custom actions on the worker
@@ -106,12 +88,13 @@ export class ProcessManager
                     if (stopped) {
                         return resolve1();
                     }
-                    console.log('Shutting down worker process: ' + app.id + ' (' + worker.pid + ')');
+                    coreContext.logger.log('Shutting down worker process: ' + app.id + ' (' + worker.pid + ')');
                     // Stop the work process
                     worker.send({SHUTDOWN: true});
                     const forceTimeout = setTimeout(() => {
                         if (!stopped) {
-                            console.log('Forcefully killing worker process: ' + app.id + ' (' + worker.pid + ')');
+                            coreContext.logger.log(
+                                'Forcefully killing worker process: ' + app.id + ' (' + worker.pid + ')');
                             worker.kill('SIGTERM');
                         }
                     }, 5000);
@@ -146,7 +129,7 @@ export class ProcessManager
                     return;
                 }
                 
-                console.log('Worker process no. ' + app.id + ' finished');
+                coreContext.logger.log('Worker process no. ' + app.id + ' finished');
                 resolve();
             });
         });

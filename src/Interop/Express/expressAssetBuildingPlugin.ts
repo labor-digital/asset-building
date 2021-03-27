@@ -19,7 +19,7 @@
 import type {Application} from 'express';
 import path from 'path';
 import {CoreFixes} from '../../Core/CoreFixes';
-import type {FactoryCoreContextOptions} from '../../Core/Factory.interfaces';
+import type {IBuilderOptions} from '../../Core/types';
 import {GeneralHelper} from '../../Helpers/GeneralHelper';
 import ExpressContext from './ExpressContext';
 
@@ -30,16 +30,22 @@ import ExpressContext from './ExpressContext';
  * @param expressApp
  * @param options
  */
-export function expressAssetBuildingPlugin(
+export async function expressAssetBuildingPlugin(
     expressApp: Application,
-    options?: FactoryCoreContextOptions
+    options?: IBuilderOptions
 ): Promise<ExpressContext>
 {
     GeneralHelper.renderFancyIntro();
     CoreFixes.resolveFilenameFix([process.cwd(), path.resolve(__dirname, '../../')]);
     
     try {
-        return Promise.resolve(new ExpressContext(expressApp, options));
+        const context = new ExpressContext(expressApp, options);
+        
+        if (options && options.devServer) {
+            await context.registerDevServerMiddleware();
+        }
+        
+        return context;
     } catch (err) {
         GeneralHelper.renderError(err);
         process.exit(1);

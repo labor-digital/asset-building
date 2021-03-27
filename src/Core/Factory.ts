@@ -17,9 +17,9 @@
  */
 
 import type {CoreContext} from './CoreContext';
-import type {FactoryCoreContextOptions, FactoryWorkerContextOptions} from './Factory.interfaces';
 import {CoreContextFactory} from './Factory/CoreContextFactory';
 import {WorkerContextFactory} from './Factory/WorkerContextFactory';
+import type {IAppDefinition, IBuilderOptions} from './types';
 import type {WorkerContext} from './WorkerContext';
 
 export class Factory
@@ -39,7 +39,7 @@ export class Factory
      * You need this context to create a worker/app context with
      * @param options
      */
-    public makeCoreContext(options?: FactoryCoreContextOptions): Promise<CoreContext>
+    public makeCoreContext(options?: IBuilderOptions): Promise<CoreContext>
     {
         return this._coreContextFactory.make(options);
     }
@@ -47,10 +47,10 @@ export class Factory
     /**
      * Creates a new worker context instance based on the core context and given options
      * @param coreContext
-     * @param options
+     * @param app
      */
-    public makeWorkerContext(coreContext: CoreContext, options?: FactoryWorkerContextOptions): Promise<WorkerContext>
+    public makeWorkerContext(coreContext: CoreContext, app: IAppDefinition): Promise<WorkerContext>
     {
-        return this._workerContextFactory.make(coreContext, options);
+        return this._workerContextFactory.make(coreContext, app);
     }
 }

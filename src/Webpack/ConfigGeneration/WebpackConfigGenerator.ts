@@ -158,7 +158,7 @@ export class WebpackConfigGenerator
         // Check if we got a reference
         if (isString(context.app.webpackConfig)) {
             const customWebpackConfigPath =
-                path.resolve(context.parentContext.sourcePath, (context.app.webpackConfig as string));
+                path.resolve(context.parentContext.paths.source, (context.app.webpackConfig as string));
             
             try {
                 const customWebpackConfig = require(customWebpackConfigPath);

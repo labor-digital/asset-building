@@ -3,9 +3,10 @@
 	"version": "1.0.0",
 	"description": "A demoproject to show how the buildprocess works",
 	"scripts": {
-		"build": "labor-asset-building",
-		"watch": "labor-asset-building dev --watch",
-		"analyze": "labor-asset-building analyze"
+		"build": "assets",
+		"watch": "assets dev --watch --verbose",
+		"dev": "assets dev --devServer --verbose",
+		"analyze": "assets analyze"
 	},
 	"keywords": [],
 	"author": "LABOR GmbH",

@@ -16,8 +16,6 @@
  * Last modified: 2019.10.06 at 11:34
  */
 
-// @ts-ignore
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
@@ -35,12 +33,7 @@ export class SassConfigurator extends AbstractStyleLoaderConfigurator implements
         
         await ConfigGenUtil.addLoader(LoaderIdentifier.SASS, context, /\.(sa|sc|c)ss$/, {
             use: [
-                {
-                    loader: MiniCssExtractPlugin.loader,
-                    options: {
-                        publicPath: '../'
-                    }
-                },
+                await this.makeLastLoader(context),
                 {
                     loader: 'css-loader',
                     options: {
@@ -50,7 +43,7 @@ export class SassConfigurator extends AbstractStyleLoaderConfigurator implements
                 },
                 await this.makePostcssConfig(ConfiguratorIdentifier.SASS, context),
                 {
-                    loader: path.resolve(context.parentContext.assetBuilderPath,
+                    loader: path.resolve(context.parentContext.paths.assetBuilder,
                         './Webpack/Loaders/CustomSassLoader/CustomSassLoader.js'),
                     options: {
                         app: context.app,
@@ -58,10 +51,10 @@ export class SassConfigurator extends AbstractStyleLoaderConfigurator implements
                     }
                 },
                 {
-                    loader: path.resolve(context.parentContext.assetBuilderPath,
+                    loader: path.resolve(context.parentContext.paths.assetBuilder,
                         './Webpack/Loaders/ResourceLoader/ResourceLoader.js'),
                     options: {
-                        currentDir: context.parentContext.sourcePath,
+                        currentDir: context.parentContext.paths.source,
                         entry: context.app.entry,
                         ext: ['sass', 'scss', 'css']
                     }

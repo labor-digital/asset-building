@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2018.09.20 at 19:27
+ * Last modified: 2021.03.27 at 00:07
  */
-import './Components/Components.js';
-import './Globals/Globals.sass';
 
-console.log('hallo 2');
+let el = document.createElement('div');
+
+if (module.hot) {
+    module.hot.accept();
+    
+    module.hot.dispose((data) => {
+        data.el = el;
+    });
+    
+    if (module.hot.data && module.hot.data.el) {
+        el = module.hot.data.el;
+    }
+}
+
+if (!el.parentElement) {
+    setTimeout(() => document.body.appendChild(el), 5);
+}
+
+// Change this, wile running a dev server, to see it hot-reload
+el.innerText = 'Sub-Text!';

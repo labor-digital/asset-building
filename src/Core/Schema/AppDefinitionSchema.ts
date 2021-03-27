@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.04 at 23:53
+ * Last modified: 2021.03.25 at 21:25
  */
 
 import {isString, PlainObject} from '@labor-digital/helferlein';
@@ -23,10 +23,6 @@ const chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
 export default {
     disabled: {
-        type: 'bool',
-        default: false
-    },
-    verboseResult: {
         type: 'bool',
         default: false
     },
@@ -99,6 +95,24 @@ export default {
     tsConfig: {
         type: ['undefined', 'string', 'true'],
         default: undefined
+    },
+    extensions: {
+        type: 'array',
+        default: () => []
+    },
+    devServer: {
+        type: 'plainObject',
+        default: {},
+        children: {
+            port: {
+                type: ['number', 'undefined'],
+                default: undefined
+            },
+            host: {
+                type: 'string',
+                default: 'localhost'
+            }
+        }
     },
     additionalResolverPaths: {
         type: ['undefined', 'array', 'string'],

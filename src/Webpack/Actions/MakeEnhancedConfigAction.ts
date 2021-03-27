@@ -33,7 +33,7 @@ import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier} from '../../Identifier';
 import {resolveFileExtensions} from '../ConfigGeneration/Configurators/BaseConfigurator';
-import type {MakeEnhancedConfigActionOptions} from './MakeEnhancedConfigAction.interfaces';
+import type {IMakeEnhancedConfigActionOptions} from './types';
 import type {WorkerActionInterface} from './WorkerActionInterface';
 
 export class MakeEnhancedConfigAction implements WorkerActionInterface
@@ -45,7 +45,7 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface
     public async do(
         context: WorkerContext,
         baseConfig?: Configuration,
-        options?: MakeEnhancedConfigActionOptions
+        options?: IMakeEnhancedConfigActionOptions
     ): Promise<Configuration>
     {
         baseConfig = baseConfig ?? {};
@@ -70,7 +70,7 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface
             }
         });
         
-        let config = await context.do.makeConfiguration({
+        let config = await context.do.makeConfig({
             disable: options.disable
         });
         
@@ -95,8 +95,8 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface
         if (!isArray(config.resolveLoader.modules)) {
             config.resolveLoader.modules = [];
         }
-        config.resolveLoader.modules.unshift(context.parentContext.buildingNodeModulesPath);
-        forEach(context.parentContext.additionalResolverPaths, (path: string) => {
+        config.resolveLoader.modules.unshift(context.parentContext.paths.buildingNodeModules);
+        forEach(context.parentContext.paths.additionalResolverPaths, (path: string) => {
             if (config.resolve!.modules!.indexOf(path) === -1) {
                 config.resolve!.modules!.push(path);
             }
@@ -104,7 +104,7 @@ export class MakeEnhancedConfigAction implements WorkerActionInterface
                 config.resolveLoader!.modules!.push(path);
             }
         });
-        config.resolve.modules.push(context.parentContext.sourcePath);
+        config.resolve.modules.push(context.parentContext.paths.source);
         
         // Merge the resolve extensions
         if (!isArray(config.resolve.extensions)) {

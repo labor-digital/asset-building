@@ -28,7 +28,7 @@ export class BaseConfigurator implements ConfiguratorInterface
     {
         // Build the json-p function name
         const jsonPName = 'labor_webpack_' + md5(
-                          context.parentContext.packageJsonPath +
+                          context.parentContext.paths.source +
                           (context.isProd ? Math.random() : '') +
                           context.appId +
                           JSON.stringify(context.app)) + '_' + inflectToUnderscore(context.app.appName!);
@@ -38,7 +38,7 @@ export class BaseConfigurator implements ConfiguratorInterface
             name: context.app.appName + '',
             mode: context.isProd ? 'production' : 'development',
             target: ['web', 'es5'],
-            watch: context.parentContext.watch,
+            watch: context.parentContext.options.watch ?? false,
             devtool: context.isProd ? 'source-map' : 'eval',
             entry: {},
             plugins: [],
@@ -49,11 +49,11 @@ export class BaseConfigurator implements ConfiguratorInterface
                 hints: false
             },
             resolve: {
-                modules: asArray(context.parentContext.additionalResolverPaths),
+                modules: asArray(context.parentContext.paths.additionalResolverPaths),
                 extensions: resolveFileExtensions
             },
             resolveLoader: {
-                modules: asArray(context.parentContext.additionalResolverPaths)
+                modules: asArray(context.parentContext.paths.additionalResolverPaths)
             },
             output: {
                 chunkLoadingGlobal: jsonPName

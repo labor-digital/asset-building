@@ -28,8 +28,13 @@ async function init(message: PlainObject)
     try {
         const bootstrap = new Bootstrap();
         const context = await bootstrap.initWorkerProcess(message);
-        const res = await context.do.runCompiler();
-        process.exit(await res.promise);
+        
+        if (context.parentContext.options.devServer) {
+            await context.do.runDevServer();
+        } else {
+            const res = await context.do.runCompiler();
+            process.exit(await res.promise);
+        }
     } catch (e) {
         GeneralHelper.renderError(e, 'ERROR IN WORKER PROCESS:');
     }
@@ -37,7 +42,6 @@ async function init(message: PlainObject)
 
 process.on('message', (message: PlainObject) => {
     if (message.SHUTDOWN === true) {
-        console.log('Starting worker process (' + process.pid + ') shutdown...');
         EventBus.emitHook(EventList.SHUTDOWN, {}).then(() => process.exit(0));
     } else if (!isRunning) {
         init(message);
@@ -45,6 +49,5 @@ process.on('message', (message: PlainObject) => {
 });
 
 process.on('SIGTERM', function () {
-    console.log('Stopping worker process!');
     process.exit(0);
 });

@@ -17,9 +17,7 @@
  */
 export * from './Identifier';
 export * from './EventList';
-export * from './Interfaces/AppDefinitionInterface';
-export * from './Interfaces/LaborConfigInterface';
-export * from './Core/Factory.interfaces';
+export * from './Core/types';
 export * from './Core/Factory';
 export * from './Core/Factory/CoreContextFactory';
 export * from './Core/Factory/WorkerContextFactory';

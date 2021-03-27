@@ -16,33 +16,27 @@
  * Last modified: 2020.10.21 at 20:19
  */
 
-import {cloneList, forEach, isArray, isNumber, isUndefined, makeOptions} from '@labor-digital/helferlein';
+import {cloneList, forEach, isArray, makeOptions} from '@labor-digital/helferlein';
 import {EventList} from '../../EventList';
-import type {AppDefinitionInterface} from '../../Interfaces/AppDefinitionInterface';
-import AppDefinitionSchema from '../AppDefinitionSchema';
 import {CoreContext} from '../CoreContext';
-import type {FactoryWorkerContextOptions} from '../Factory.interfaces';
+import {Logger} from '../Logger';
+import AppDefinitionSchema from '../Schema/AppDefinitionSchema';
+import type {IAppDefinition} from '../types';
 import {WorkerContext} from '../WorkerContext';
 
 export class WorkerContextFactory
 {
     /**
-     * The options used to create the context with
-     * @protected
-     */
-    protected _options: FactoryWorkerContextOptions = {};
-    
-    /**
      * Creates a new worker context instance based on the core context and given options
      * @param coreContext
-     * @param options
+     * @param app
      */
-    public async make(coreContext: CoreContext, options?: FactoryWorkerContextOptions): Promise<WorkerContext>
+    public async make(coreContext: CoreContext, app: IAppDefinition): Promise<WorkerContext>
     {
-        this._options = options ?? {};
-        
         const localCoreContext = this.cloneCoreContextIfRequired(coreContext);
-        const context = await this.makeNewContextInstance(localCoreContext);
+        localCoreContext.logger.setName(app.appName!);
+        const context = new WorkerContext(localCoreContext, app);
+        
         await this.loadExtensions(context);
         await this.applyAppSchema(context);
         this.applyAppConfig(context);
@@ -58,58 +52,16 @@ export class WorkerContextFactory
      */
     protected cloneCoreContextIfRequired(coreContext: CoreContext): CoreContext
     {
-        if (this._options.cloneCoreContext === false) {
+        if (!coreContext.options.cloneCoreContext) {
             return coreContext;
         }
         
         const clone = CoreContext.fromJson(coreContext.toJson());
         clone.eventEmitter = coreContext.eventEmitter;
         clone.extensionLoader = coreContext.extensionLoader;
+        clone.logger = new Logger(coreContext.options.verbose ?? false);
         
         return clone;
-    }
-    
-    /**
-     * Tries to find the correct app configration object either on the supplied options or on the
-     * core context labor config object
-     *
-     * @param coreContext
-     * @protected
-     */
-    protected resolveApp(coreContext: CoreContext): AppDefinitionInterface
-    {
-        let app = this._options.app;
-        
-        if (isUndefined(app)) {
-            app = 0;
-        }
-        
-        if (isNumber(app)) {
-            const appId = app as number;
-            app = coreContext.laborConfig!.apps![appId];
-            app.id = appId;
-            
-            if (isUndefined(app)) {
-                new Error('Could not find an app with id/index: ' + appId);
-            }
-            
-        } else {
-            app = app as AppDefinitionInterface;
-            if (isUndefined(app.id)) {
-                new Error('The given app definition has to have an "id" defined!');
-            }
-        }
-        
-        return app;
-    }
-    
-    /**
-     * Creates a new, empty context instance with only the most basic settings applied
-     * @protected
-     */
-    protected makeNewContextInstance(coreContext: CoreContext): WorkerContext
-    {
-        return new WorkerContext(coreContext, this.resolveApp(coreContext));
     }
     
     /**
@@ -126,7 +78,7 @@ export class WorkerContextFactory
         if (coreContext.process === 'worker') {
             await context.extensionLoader
                          .loadExtensionsFromDefinition(
-                             'global', coreContext, coreContext.laborConfig);
+                             'global', coreContext, coreContext.options);
         }
         
         await coreContext.extensionLoader
@@ -146,7 +98,7 @@ export class WorkerContextFactory
         });
         
         // Don't validate the entry and output options
-        if (this._options.noEntryOutputValidation) {
+        if (context.parentContext.options.noEntryOutputValidation) {
             delete args.schema.entry;
             delete args.schema.output;
         }
@@ -163,7 +115,7 @@ export class WorkerContextFactory
     {
         if (isArray(context.app.additionalResolverPaths)) {
             forEach(context.app.additionalResolverPaths, path => {
-                context.parentContext.additionalResolverPaths.add(path);
+                context.parentContext.paths.additionalResolverPaths.add(path);
             });
         }
     }

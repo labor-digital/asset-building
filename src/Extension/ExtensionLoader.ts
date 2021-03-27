@@ -60,13 +60,14 @@ export class ExtensionLoader
         extensionPaths: Array<string>
     ): Promise<any>
     {
+        const coreContext: CoreContext = (context as any).parentContext ?? context;
         context.eventEmitter.unbindAll(EventList.EXTENSION_LOADING);
         const extensions: Array<Function> = [];
         forEach(extensionPaths, (extensionPath: string) => {
             const extension = this.resolveExtensionPath(context, extensionPath);
             // Ignore if this extension is already known
             if (extensions.indexOf(extension) !== -1) {
-                console.log('Skipped to load already known extension: ' + extension);
+                coreContext.logger.log('Skipped to load already known extension: ' + extension);
                 return;
             }
             extensions.push(extension);
@@ -97,7 +98,7 @@ export class ExtensionLoader
             // Add configured resolver paths to the context
             if (isArray(definition.additionalResolverPaths)) {
                 forEach(definition.additionalResolverPaths, path => {
-                    context.additionalResolverPaths.add(path);
+                    context.paths.additionalResolverPaths.add(path);
                 });
             }
             
@@ -109,7 +110,6 @@ export class ExtensionLoader
                     }
                 });
             }
-            
         }
     }
     
@@ -124,7 +124,8 @@ export class ExtensionLoader
         let extensionBaseName = path.basename(extensionPath);
         const coreContext: CoreContext = (!isUndefined((context as WorkerContext).parentContext) ?
             (context as WorkerContext).parentContext : context as WorkerContext) as CoreContext;
-        forEach([coreContext.sourcePath, coreContext.buildingNodeModulesPath, coreContext.nodeModulesPath],
+        const paths = coreContext.paths;
+        forEach([paths.source, paths.buildingNodeModules, paths.nodeModules],
             (basePath: string) => {
                 try {
                     extension = require(path.resolve(basePath, extensionPath));
@@ -134,7 +135,7 @@ export class ExtensionLoader
                     while (parts.length > 0) {
                         const pl = parts.join(path.sep) + path.sep + 'node_modules' + path.sep;
                         if (fs.existsSync(pl)) {
-                            coreContext.additionalResolverPaths.add(pl);
+                            paths.additionalResolverPaths.add(pl);
                             break;
                         }
                         parts.pop();

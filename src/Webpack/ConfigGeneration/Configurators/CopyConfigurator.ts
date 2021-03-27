@@ -21,9 +21,9 @@ import {forEach, isArray, PlainObject} from '@labor-digital/helferlein';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import fs from 'fs';
 import path from 'path';
+import type {IAppCopyDefinition} from '../../../Core/types';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
-import type {AppCopyDefinition} from '../../../Interfaces/AppDefinitionInterface';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
@@ -37,8 +37,8 @@ export class CopyConfigurator implements ConfiguratorInterface
         
         // Build the list of configurations we should copy for this app
         const isWatch = context.webpackConfig.watch;
-        const copyToAdd: Array<AppCopyDefinition> = [];
-        context.app.copy.forEach((config: AppCopyDefinition) => {
+        const copyToAdd: Array<IAppCopyDefinition> = [];
+        context.app.copy.forEach((config: IAppCopyDefinition) => {
             if (config.inBuildOnly === true && isWatch) {
                 return;
             }
@@ -72,7 +72,7 @@ export class CopyConfigurator implements ConfiguratorInterface
             
             // Add context if required
             if (typeof config.context === 'undefined') {
-                config.context = context.parentContext.sourcePath;
+                config.context = context.parentContext.paths.source;
             }
             
             // Check if we have to rewrite the "from" -> Array to string
@@ -95,9 +95,9 @@ export class CopyConfigurator implements ConfiguratorInterface
             let fromPrefix = '';
             if (fromDirectory.length > 0 && !fs.existsSync(fromDirectory)) {
                 forEach([
-                    context.parentContext.nodeModulesPath,
-                    context.parentContext.buildingNodeModulesPath,
-                    context.parentContext.sourcePath
+                    context.parentContext.paths.nodeModules,
+                    context.parentContext.paths.buildingNodeModules,
+                    context.parentContext.paths.source
                 ], path => {
                     fromPrefix = path;
                     if (fs.existsSync(fromPrefix + fromDirectory)) {

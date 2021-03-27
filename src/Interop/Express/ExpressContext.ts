@@ -16,10 +16,11 @@
  * Last modified: 2020.02.17 at 20:29
  */
 
-import {EventBus, EventEmitter} from '@labor-digital/helferlein';
+import {EventBus, EventEmitter, isArray} from '@labor-digital/helferlein';
 import type {Application} from 'express';
+import WebpackDevServer from 'webpack-dev-server';
 import {Factory} from '../../Core/Factory';
-import type {FactoryCoreContextOptions, FactoryWorkerContextOptions} from '../../Core/Factory.interfaces';
+import type {IBuilderOptions} from '../../Core/types';
 import type {WorkerContext} from '../../Core/WorkerContext';
 
 export default class ExpressContext
@@ -32,7 +33,7 @@ export default class ExpressContext
     /**
      * The options the express plugin was initialized with
      */
-    public options: FactoryCoreContextOptions;
+    public options: IBuilderOptions;
     
     /**
      * True if express runs in production mode, false if not
@@ -54,7 +55,13 @@ export default class ExpressContext
      */
     public factory: Factory;
     
-    public constructor(expressApp: Application, options?: FactoryCoreContextOptions)
+    /**
+     * True if the dev server middleware was registered
+     * @protected
+     */
+    protected _devServerRegistered: boolean = false;
+    
+    public constructor(expressApp: Application, options?: IBuilderOptions)
     {
         this.options = options ?? {};
         this.isProd = process.env.NODE_ENV !== 'development';
@@ -69,7 +76,7 @@ export default class ExpressContext
      * @param directory The directory you want to make public, relative to the project root
      * @param route An optional route that is used to provide the static files
      */
-    public registerPublicAssets(directory: string, route?: string)
+    public registerPublicAssets(directory: string, route?: string): void
     {
         const stat = require('express').static(directory, {
             etag: false,
@@ -86,13 +93,73 @@ export default class ExpressContext
     /**
      * Creates and returns a new worker context object, to do stuff with :D
      */
-    public async getWorker(options?: FactoryWorkerContextOptions): Promise<WorkerContext>
+    public async getWorker(): Promise<WorkerContext>
     {
         const coreContext = await this.factory.makeCoreContext({
             watch: true,
             mode: this.isProd ? 'production' : 'dev',
             ...this.options
         });
-        return await this.factory.makeWorkerContext(coreContext, options);
+        
+        if (coreContext.options.apps?.length !== 1) {
+            throw new Error(
+                'The express plugin can only run a single app at a time! Your "apps" options contains currently '
+                + coreContext.options.apps?.length + ' apps, tho!');
+        }
+        
+        return await this.factory.makeWorkerContext(coreContext, coreContext.options.apps![0]);
+    }
+    
+    /**
+     * Automatically registers the webpack-dev-middleware and webpack-hot-middleware in the express app.
+     * Note: You should not need to do this yourself! if you set the "devServer" option to true in expressAssetBuildingPlugin,
+     * this is done automatically, for you!
+     */
+    public async registerDevServerMiddleware(): Promise<void>
+    {
+        console.log('registering dev middleware');
+        if (this.isProd) {
+            return;
+        }
+        
+        // Avoid double configuration
+        if (this._devServerRegistered) {
+            return;
+        }
+        this._devServerRegistered = true;
+        
+        this.options.watch = false;
+        const worker = await this.getWorker();
+        const config = await worker.do.makeConfig();
+        
+        if (!isArray(config.entry)) {
+            config.entry = [config.entry as any];
+        }
+        
+        config.entry.unshift('webpack-hot-middleware/client?path=/__webpack_hmr&reload=true');
+        config.plugins!.push(new (require('webpack')).HotModuleReplacementPlugin());
+        
+        const devServerOptions: WebpackDevServer.Configuration = {
+            noInfo: true,
+            hot: true
+        };
+        WebpackDevServer.addDevServerEntrypoints(config, devServerOptions);
+        
+        const compiler = await worker.do.makeCompiler({config});
+        
+        this.expressApp.use(require('webpack-dev-middleware')(compiler, {
+            stats: false,
+            publicPath: (compiler.options.output.publicPath! as string).replace(/^\./, ''),
+            headers: {
+                etag: null,
+                'cache-control': 'no-cache,no-store',
+                'Pragma': 'no-cache'
+            }
+        }));
+        this.expressApp.use(require('webpack-hot-middleware')(compiler, {
+            // log: false,
+            path: '/__webpack_hmr',
+            heartbeat: 10 * 1000
+        }));
     }
 }

@@ -85,7 +85,7 @@ export class TypescriptConfigurator implements ConfiguratorInterface
         let tsConfig = context.app.tsConfig;
         
         if (!tsConfig) {
-            return path.resolve(context.parentContext.assetBuilderPath, '../ts/tsconfig.json');
+            return path.resolve(context.parentContext.paths.assetBuilder, '../ts/tsconfig.json');
         }
         
         if (tsConfig === true) {
@@ -97,7 +97,7 @@ export class TypescriptConfigurator implements ConfiguratorInterface
                 return tsConfig;
             }
             
-            return path.resolve(context.parentContext.sourcePath, tsConfig);
+            return path.resolve(context.parentContext.paths.source, tsConfig);
         }
         
         throw new Error('Could not resolve the tsconfig.json path based on your configuration');

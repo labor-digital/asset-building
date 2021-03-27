@@ -109,7 +109,7 @@ export class CoreFixes
             // Try harder
             if (isNull(result)) {
                 // Create local paths
-                const paths = isArray(arg) ? arg : Array.from(arg.additionalResolverPaths);
+                const paths = isArray(arg) ? arg : Array.from(arg.paths.additionalResolverPaths);
                 let additionalResolverPaths = paths.map((s: string) => s.replace(/[\\\/]*$/, ''));
                 
                 // Try additional path's to resolve the request filename

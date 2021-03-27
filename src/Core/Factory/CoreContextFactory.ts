@@ -16,106 +16,146 @@
  * Last modified: 2020.10.21 at 19:12
  */
 
-import {isArray, isBool, isUndefined} from '@labor-digital/helferlein';
+import {
+    filter,
+    forEach,
+    isArray,
+    isEmpty,
+    isNull,
+    isNumeric,
+    isPlainObject,
+    makeOptions,
+    PlainObject
+} from '@labor-digital/helferlein';
+import Chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
-import {isPlainObject} from 'webpack-merge/dist/utils';
 import {EventList} from '../../EventList';
-import {FileHelpers} from '../../Helpers/FileHelpers';
 import {CoreContext} from '../CoreContext';
 import {CoreFixes} from '../CoreFixes';
-import type {FactoryCoreContextOptions, TBuilderMode} from '../Factory.interfaces';
+import BuilderOptionSchema from '../Schema/BuilderOptionSchema';
+import type {IBuilderOptions, TBuilderMode} from '../types';
 
 export class CoreContextFactory
 {
-    
-    /**
-     * The options used to create the context with
-     * @protected
-     */
-    protected _options: FactoryCoreContextOptions = {};
-    
     /**
      * Creates a new instance of the core context object based on the given options
      * @param options
      */
-    public async make(options?: FactoryCoreContextOptions): Promise<CoreContext>
+    public async make(options?: IBuilderOptions): Promise<CoreContext>
     {
-        this._options = options ?? {};
+        options = this.enhanceOptionsFromPackageJson(options);
+        options = this.prepareOptions(options);
         
-        const context = this.makeNewContextInstance();
-        this.loadConfig(context);
-        this.applyModuleResolverFix(context);
+        const context = new CoreContext(options);
+        CoreFixes.resolveFilenameFix(context);
         await this.loadExtensions(context);
-        await this.filterLaborConfig(context);
-        this.applyLaborConfig(context);
         await this.findMode(context);
-        this.ensureWorkDirectory(context);
-        this.applyDummyAppIfRequired(context);
-        await this.emitInitDone(context);
+        await context.eventEmitter.emitHook(EventList.AFTER_MAIN_INIT_DONE, {context});
         
         return context;
     }
     
     /**
-     * Creates a new, empty context instance with only the most basic settings applied
-     *
-     * IMPORTANT: Note to self -> This has to be synchronous so storybook does not break!
+     * Tries to enhance the options by finding a package json and extracting the "labor" node from it.
+     * @param options
      * @protected
      */
-    protected makeNewContextInstance(): CoreContext
+    protected enhanceOptionsFromPackageJson(options?: IBuilderOptions): IBuilderOptions
     {
-        return new CoreContext(
-            this._options.cwd ?? process.cwd(),
-            path.dirname(path.dirname(__dirname)),
-            this._options.environment ?? 'standalone',
-            require('../../../package.json').version,
-            this._options.watch ?? false
-        );
-    }
-    
-    /**
-     * Either loads the asset builder configuration from the source package.json or
-     * uses the given configuration from the options
-     * @param context
-     * @protected
-     */
-    protected loadConfig(context: CoreContext): void
-    {
-        if (isUndefined(this._options.laborConfig)) {
-            // Check if we are in the correct directory
-            if (!fs.existsSync(context.packageJsonPath)) {
-                throw new Error('Could not find package.json at: "' + context.packageJsonPath + '"');
-            }
-            
-            // Load the config using the package json
-            const packageJson = JSON.parse(fs.readFileSync(context.packageJsonPath).toString('utf-8'));
-            if (typeof packageJson.labor === 'undefined') {
-                throw new Error('There is no "labor" node inside your current package json!');
-            }
-            context.laborConfig = packageJson.labor;
-            return;
+        options = options ?? {};
+        
+        options.cwd = options.cwd ?? process.cwd();
+        
+        // Ignore this if the option was set to false
+        if (options.packageJsonPath === false) {
+            delete options.packageJsonPath;
+            return options;
         }
         
-        context.laborConfig = this._options.laborConfig ?? {};
+        let packageJson: null | string = null;
+        if (options.packageJsonPath) {
+            if (fs.existsSync(options.packageJsonPath)) {
+                packageJson = options.packageJsonPath;
+            } else {
+                const tmpPath = path.resolve(options.cwd, options.packageJsonPath);
+                if (!fs.existsSync(tmpPath)) {
+                    throw new Error('Invalid "packageJsonPath" option given! The file was not found at: ' + tmpPath);
+                }
+                packageJson = tmpPath;
+            }
+        }
+        
+        if (isNull(packageJson)) {
+            packageJson = path.resolve(options.cwd, 'package.json');
+            if (!fs.existsSync(packageJson)) {
+                packageJson = null;
+            }
+        }
+        
+        if (isNull(packageJson)) {
+            return options;
+        }
+        
+        options.packageJsonPath = packageJson;
+        
+        const pJson = require(packageJson);
+        if (!isPlainObject(pJson.labor)) {
+            return options;
+        }
+        
+        const lab: PlainObject = pJson.labor;
+        
+        forEach(['extensions', 'apps', 'additionalResolverPaths'], field => {
+            if (isArray(lab[field])) {
+                options![field] = [
+                    ...(options![field] ?? []),
+                    ...lab[field]
+                ];
+            }
+        });
+        
+        return options;
     }
     
     /**
-     * Applys the module resolver fix so that node_modules of the asset builder as well as all registerd
-     * apps can be found by all node modules
-     * @param context
+     * Prepares the options by applying the schema and defining the app list to load
+     * @param options
      * @protected
      */
-    protected applyModuleResolverFix(context: CoreContext): void
+    protected prepareOptions(options: IBuilderOptions): IBuilderOptions
     {
-        context.extensionLoader.resolveAdditionalResolverPaths(context,
-            this._options.laborConfig?.additionalResolverPaths ?? {});
+        options = makeOptions(options, BuilderOptionSchema);
         
-        context.extensionLoader.resolveAdditionalResolverPaths(context,
-            isPlainObject(this._options.additionalResolversForApp)
-                ? this._options.additionalResolversForApp! : {});
+        // Validates the options schema and checks if some app definitions are present
+        if (isEmpty(options.app) && isEmpty(options.apps)) {
+            throw new Error('You need to define either an array of "apps" or a single "app" option!');
+        }
         
-        CoreFixes.resolveFilenameFix(context);
+        // Make sure every ap has a unique id
+        if (isArray(options.apps)) {
+            forEach(options.apps, (app, k) => {
+                app.id = app.id ?? k;
+            });
+        }
+        
+        // Make sure only the selected app has priority
+        if (isNumeric(options.app)) {
+            if (!options.apps || !options.apps[options.app]) {
+                throw new Error('Invalid option "app" (' + options.app + '), there is no app with this index!');
+            }
+            options.apps = [options.apps[options.app]];
+        } else if (isPlainObject(options.app)) {
+            options.apps = [options.app];
+        }
+        
+        // Filter out disabled apps
+        options.apps = filter(options.apps as any, v => v.disabled);
+        if (options.apps.length === 0) {
+            throw new Error('All apps have been disabled! So there is nothing left to do!');
+        }
+        
+        return options;
     }
     
     /**
@@ -126,34 +166,7 @@ export class CoreContextFactory
     protected async loadExtensions(context: CoreContext): Promise<void>
     {
         await context.extensionLoader
-                     .loadExtensionsFromDefinition('global', context, context.laborConfig);
-    }
-    
-    /**
-     * Emits the FILTER_LABOR_CONFIG hook to allow extensions to filter the labor config
-     * @param context
-     * @protected
-     */
-    protected async filterLaborConfig(context: CoreContext): Promise<void>
-    {
-        const args = await context.eventEmitter.emitHook(EventList.FILTER_LABOR_CONFIG, {
-            laborConfig: context.laborConfig,
-            context: context
-        });
-        
-        context.laborConfig = args.laborConfig;
-    }
-    
-    /**
-     * Applys the global labor configuration to the new context instance
-     * @param context
-     * @protected
-     */
-    protected applyLaborConfig(context: CoreContext): void
-    {
-        // Check if we are running in sequential mode
-        context.runWorkersSequential = isBool(context.laborConfig.runWorkersSequential) ?
-            context.laborConfig.runWorkersSequential : false;
+                     .loadExtensionsFromDefinition('global', context, context.options);
     }
     
     /**
@@ -167,7 +180,7 @@ export class CoreContextFactory
         });
         
         const modes: Array<TBuilderMode> = args.modes;
-        let mode: TBuilderMode = this._options.mode ?? context.mode;
+        let mode: TBuilderMode = context.options.mode ?? context.mode;
         
         args = await context.eventEmitter.emitHook(EventList.GET_MODE, {
             mode, context: context, modes
@@ -184,6 +197,12 @@ export class CoreContextFactory
         
         context.mode = mode;
         
+        if (mode === 'analyze') {
+            console.log(
+                Chalk.yellowBright('Please note: "analyze" mode started, this forces webpack to "watch" for changed!'));
+            context.options.watch = true;
+        }
+        
         args = await context.eventEmitter.emitHook(EventList.IS_PROD, {
             isProd: mode === 'production' || mode === 'analyze',
             mode,
@@ -192,49 +211,5 @@ export class CoreContextFactory
         });
         
         context.isProd = args.isProd;
-    }
-    
-    /**
-     * There might be cases where there is actually no webpack config involved, but we are
-     * running other tasks, like copying files e.g. in that case we create a dummy application
-     * @param context
-     */
-    protected applyDummyAppIfRequired(context: CoreContext): void
-    {
-        if (isArray(context.laborConfig.apps) && context.laborConfig.apps.length > 0) {
-            return;
-        }
-        
-        FileHelpers.touch(context.workDirectoryPath + 'dummy.js');
-        context.laborConfig.apps = [
-            {
-                appName: 'Dummy App',
-                entry: path.relative(context.sourcePath, context.workDirectoryPath + 'dummy.js'),
-                output: path.relative(context.sourcePath, context.workDirectoryPath + 'dist' + path.sep + 'dummy.js')
-            }
-        ];
-        
-    };
-    
-    /**
-     * Makes sure the work directory exists and is keept nice and clean
-     * @param context
-     * @protected
-     */
-    protected ensureWorkDirectory(context: CoreContext): void
-    {
-        FileHelpers.mkdir(context.workDirectoryPath);
-        FileHelpers.flushDirectory(context.workDirectoryPath);
-    };
-    
-    /**
-     * Emits the late hook to filter the context after it was completely instantiated
-     * @param context
-     * @protected
-     */
-    protected emitInitDone(context: CoreContext): Promise<any>
-    {
-        return context.eventEmitter
-                      .emitHook(EventList.AFTER_MAIN_INIT_DONE, {context});
     }
 }

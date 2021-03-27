@@ -16,8 +16,6 @@
  * Last modified: 2019.10.05 at 21:39
  */
 
-// @ts-ignore
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
@@ -31,12 +29,7 @@ export class LessConfigurator extends AbstractStyleLoaderConfigurator implements
     {
         await ConfigGenUtil.addLoader(LoaderIdentifier.LESS, context, /\.less$/, {
             use: [
-                {
-                    loader: MiniCssExtractPlugin.loader,
-                    options: {
-                        publicPath: '../'
-                    }
-                },
+                await this.makeLastLoader(context),
                 {
                     loader: 'css-loader'
                 },
@@ -45,10 +38,10 @@ export class LessConfigurator extends AbstractStyleLoaderConfigurator implements
                     loader: 'less-loader'
                 },
                 {
-                    loader: path.resolve(context.parentContext.assetBuilderPath,
+                    loader: path.resolve(context.parentContext.paths.assetBuilder,
                         './Webpack/Loaders/ResourceLoader/ResourceLoader.js'),
                     options: {
-                        currentDir: context.parentContext.sourcePath,
+                        currentDir: context.parentContext.paths.source,
                         entry: context.app.entry,
                         ext: ['less', 'css']
                     }

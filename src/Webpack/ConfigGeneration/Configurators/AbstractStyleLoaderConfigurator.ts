@@ -17,6 +17,8 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
+// @ts-ignore
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
 import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
@@ -74,5 +76,32 @@ export abstract class AbstractStyleLoaderConfigurator
         });
         
         return args.config;
+    }
+    
+    /**
+     * Generates the last loader that should be executed in a style loader chain.
+     * By default this is the loader of mini-css-extract-plugin, or "style-loader" when dev-server is enabled.
+     *
+     * @param context
+     * @protected
+     */
+    protected async makeLastLoader(context: WorkerContext): Promise<any>
+    {
+        let lastLoader: any =
+            {
+                loader: MiniCssExtractPlugin.loader,
+                options: {
+                    publicPath: '../'
+                }
+            };
+        
+        if (context.parentContext.options.devServer) {
+            lastLoader = 'style-loader';
+        }
+        
+        // @todo add filter so we don't have to fiddle the css extract plugin out for vue.js environments
+        
+        console.log('setting last loader', lastLoader);
+        return lastLoader;
     }
 }

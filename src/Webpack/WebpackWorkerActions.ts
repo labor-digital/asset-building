@@ -16,13 +16,20 @@
  * Last modified: 2020.10.21 at 21:29
  */
 
-import type {Configuration} from 'webpack';
+import type {Compiler, Configuration} from 'webpack';
 import type {WorkerContext} from '../Core/WorkerContext';
-import {MakeConfigurationAction, MakeConfigurationActionOptions} from './Actions/MakeConfigurationAction';
+import {MakeCompilerAction} from './Actions/MakeCompilerAction';
+import {MakeConfigAction} from './Actions/MakeConfigAction';
 import {MakeEnhancedConfigAction} from './Actions/MakeEnhancedConfigAction';
-import type {MakeEnhancedConfigActionOptions} from './Actions/MakeEnhancedConfigAction.interfaces';
 import {RunCompilerAction} from './Actions/RunCompilerAction';
-import type {RunCompilerOptions, RunCompilerResult} from './Actions/RunCompilerAction.interfaces';
+import {RunDevServerAction} from './Actions/RunDevServerAction';
+import type {
+    ICompilerOptions,
+    ICompilerResult,
+    IMakeConfigActionOptions,
+    IMakeEnhancedConfigActionOptions,
+    IRunDevServerOptions
+} from './Actions/types';
 
 export class WebpackWorkerActions
 {
@@ -39,21 +46,35 @@ export class WebpackWorkerActions
     }
     
     /**
+     * Creates a new webpack compiler instance for the generated config to be executed
+     * @param options
+     */
+    public makeCompiler(options?: ICompilerOptions): Promise<Compiler>
+    {
+        return (new MakeCompilerAction()).do(this._context, options);
+    }
+    
+    /**
      * Allows you to run a webpack compiler based on your current worker configuration
      * @param options
      */
-    public runCompiler(options?: RunCompilerOptions): Promise<RunCompilerResult>
+    public runCompiler(options?: ICompilerOptions): Promise<ICompilerResult>
     {
         return (new RunCompilerAction()).do(this._context, options);
+    }
+    
+    public runDevServer(options?: IRunDevServerOptions): Promise<any>
+    {
+        return (new RunDevServerAction()).do(this._context, options);
     }
     
     /**
      * Creates a complete webpack configuration object and and returns it, wrapped inside a promise
      * @param options
      */
-    public makeConfiguration(options?: MakeConfigurationActionOptions): Promise<Configuration>
+    public makeConfig(options?: IMakeConfigActionOptions): Promise<Configuration>
     {
-        return (new MakeConfigurationAction()).do(this._context, options);
+        return (new MakeConfigAction()).do(this._context, options);
     }
     
     /**
@@ -64,7 +85,7 @@ export class WebpackWorkerActions
      */
     public makeEnhancedConfig(
         baseConfig: Configuration,
-        options?: MakeEnhancedConfigActionOptions
+        options?: IMakeEnhancedConfigActionOptions
     ): Promise<Configuration>
     {
         return (new MakeEnhancedConfigAction()).do(this._context, baseConfig, options);

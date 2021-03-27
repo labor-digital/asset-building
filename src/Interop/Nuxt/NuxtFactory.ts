@@ -30,11 +30,11 @@ import type {Configuration} from 'webpack';
 import {isPlainObject} from 'webpack-merge/dist/utils';
 import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
+import type {IAppDefinition} from '../../Core/types';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
-import type {AppDefinitionInterface} from '../../Interfaces/AppDefinitionInterface';
-import type {MakeEnhancedConfigActionOptions} from '../../Webpack/Actions/MakeEnhancedConfigAction.interfaces';
+import type {IMakeEnhancedConfigActionOptions} from '../../Webpack/Actions/types';
 
 export class NuxtFactory
 {
@@ -69,9 +69,11 @@ export class NuxtFactory
     public enhanceWebpackConfigs(configs: Array<Configuration>): Promise<Array<Configuration>>
     {
         return this._factory.makeCoreContext({
-            mode: configs[0].mode === 'production' ? 'build' : 'watch',
+            mode: configs[0].mode === 'production' ? 'production' : 'dev',
             environment: 'nuxt',
-            laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
+            noEntryOutputValidation: true
+            // @todo this has to be fixed!
+            // laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
         }).then(coreContext => Promise.all([
             this.makeEnhancedConfig('client', configs, coreContext),
             this.makeEnhancedConfig('server', configs, coreContext)
@@ -87,7 +89,7 @@ export class NuxtFactory
      * @param coreContext the core context instance to inherit the worker context from
      * @protected
      */
-    protected makeEnhancedConfig(
+    protected async makeEnhancedConfig(
         type: string,
         configs: Array<Configuration>,
         coreContext: CoreContext
@@ -110,26 +112,16 @@ export class NuxtFactory
         }
         
         // Build the enhanced configuration
-        return this._factory.makeWorkerContext(
-            coreContext, {
-                noEntryOutputValidation: true,
-                app: this.makeAppDefinition(type, config)
-            }
-        ).then(context =>
-                       context.do
-                              .makeEnhancedConfig(config!, this.getEnhancerOptions())
-                              .then(config => this.applyAdditionalServerConfiguration(type, config, context))
-                   )
-                   .then(config => {
-                       configs[key!] = config;
-                   });
+        const worker = await this._factory.makeWorkerContext(coreContext, this.makeAppDefinition(type, config));
+        const enhancedConfig = await worker.do.makeEnhancedConfig(config!, this.getEnhancerOptions());
+        configs[key!] = await this.applyAdditionalServerConfiguration(type, enhancedConfig, worker);
     }
     
     /**
      * Provides the options for the makeEnhancedConfig method
      * @protected
      */
-    protected getEnhancerOptions(): MakeEnhancedConfigActionOptions
+    protected getEnhancerOptions(): IMakeEnhancedConfigActionOptions
     {
         return {
             disable: [
@@ -247,9 +239,9 @@ export class NuxtFactory
      * @param config The webpack configuration to extract the entry point from
      * @protected
      */
-    protected makeAppDefinition(type: string, config: Configuration): AppDefinitionInterface
+    protected makeAppDefinition(type: string, config: Configuration): IAppDefinition
     {
-        const app: AppDefinitionInterface = (
+        const app: IAppDefinition = (
             isPlainObject(this._options.app) ? cloneList(this._options.app) : {}
         ) as any;
         
@@ -263,7 +255,6 @@ export class NuxtFactory
         
         app.keepOutputDirectory = true;
         app.disableGitAdd = true;
-        app.verboseResult = true;
         
         // Find the correct entry file
         forEach(isArray((config.entry as any).app)

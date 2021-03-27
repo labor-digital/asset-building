@@ -65,7 +65,7 @@ export const GitAddPlugin: AssetBuilderWebpackPluginStaticInterface =
                                 'The built files in ' + stats.outputPath!.substr(-50) + ' were added to git!')
                         );
                     } catch (e) {
-                        console.log(
+                        this._context?.parentContext.logger.log(
                             Chalk.yellowBright('Failed to automagically add files in ' + stats.outputPath + ' to git')
                         );
                     }

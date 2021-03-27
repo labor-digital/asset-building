@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.06 at 13:39
+ * Last modified: 2021.03.26 at 09:47
  */
+import 'app.css';
+import 'sub.js';
 
-import type {Stats} from 'webpack';
-import type {WorkerContext} from '../Core/WorkerContext';
+let el = document.createElement('div');
 
-export interface WebpackCompilerCallbackInterface
-{
-    (context: WorkerContext, stats: Stats, resolve: Function, reject: Function): void
+if (module.hot) {
+    module.hot.accept();
+    
+    module.hot.dispose((data) => {
+        data.el = el;
+    });
+    
+    if (module.hot.data && module.hot.data.el) {
+        el = module.hot.data.el;
+    }
 }
+
+if (!el.parentElement) {
+    setTimeout(() => document.body.appendChild(el));
+}
+
+// Change this, wile running a dev server, to see it hot-reload
+el.innerText = 'This is a javascript text!';

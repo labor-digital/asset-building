@@ -23,7 +23,7 @@ import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
 import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
-import type {MakeEnhancedConfigActionOptions} from '../../Webpack/Actions/MakeEnhancedConfigAction.interfaces';
+import type {IMakeEnhancedConfigActionOptions} from '../../Webpack/Actions/types';
 
 export class StorybookFactory
 {
@@ -44,8 +44,8 @@ export class StorybookFactory
     
     /**
      * Injects the factory instance and options
-     * @param factory
      * @param options
+     * @param factory
      */
     public constructor(options: PlainObject, factory?: Factory)
     {
@@ -64,8 +64,9 @@ export class StorybookFactory
         return this.coreContextPromise = this._factory.makeCoreContext({
             mode: 'watch',
             environment: 'storyBook',
-            laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {},
-            additionalResolversForApp: (isPlainObject(this._options.app) ? this._options.app : {}) as any
+            additionalResolverPaths: (isPlainObject(this._options.app) ? this._options.app : {}) as any,
+            ...(this._options.assetBuilder ?? {}),
+            ...(isPlainObject(this._options.app) ? {app: this._options.app} : {})
         });
     }
     
@@ -73,29 +74,23 @@ export class StorybookFactory
      * Enhances the given storybook configuration with the config build by our asset builder logic
      * @param config
      */
-    public enhanceWebpackConfig(config: Configuration): Promise<Configuration>
+    public async enhanceWebpackConfig(config: Configuration): Promise<Configuration>
     {
-        return this.initializeCoreContext()
-                   .then(coreContext => {
-                           // Recalculate the context properties when we have the configuration
-                           coreContext.isProd = config.mode !== 'development';
-                           coreContext.mode = coreContext.isProd ? 'build' : 'watch';
-                
-                           // Make the child context
-                           return this._factory.makeWorkerContext(coreContext, {
-                               app: this._options.app ?? {},
-                               noEntryOutputValidation: true
-                           });
-                       }
-                   )
-                   .then(workerContext => workerContext.do.makeEnhancedConfig(config, this.getEnhancerOptions()));
+        const coreContext = await this.initializeCoreContext();
+        
+        // Recalculate the context properties when we have the configuration
+        coreContext.isProd = config.mode !== 'development';
+        coreContext.mode = coreContext.isProd ? 'build' : 'watch';
+        
+        const worker = await this._factory.makeWorkerContext(coreContext, coreContext.options!.apps![0]);
+        return await worker.do.makeEnhancedConfig(config, this.getEnhancerOptions());
     }
     
     /**
      * Provides the options for the makeEnhancedConfig method
      * @protected
      */
-    protected getEnhancerOptions(): MakeEnhancedConfigActionOptions
+    protected getEnhancerOptions(): IMakeEnhancedConfigActionOptions
     {
         return {
             disable: [

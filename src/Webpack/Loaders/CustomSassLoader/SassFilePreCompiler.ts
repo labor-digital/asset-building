@@ -49,7 +49,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
 `;
             });
         
-        // Resolve url's
+        // Resolve urls
         file.content = file.content.replace(/(url(?:\s+)?\()((?:\s+)?["']?[^"']*?["']?(?:[^\S\n]+)?)(\))/gm,
             (a, before, url, after) => {
                 // Ignore data urls
@@ -80,7 +80,7 @@ $customSassLoaderTmp: custom-sass-loader-close-file();
         // Resolve node modules
         if (output.charAt(0) === '~') {
             output = output.replace(/^[~\\\/]+/, '');
-            output = path.resolve(context.parentContext.parentContext.nodeModulesPath, output);
+            output = path.resolve(context.parentContext.parentContext.paths.nodeModules, output);
         }
         
         // Resolve relative paths

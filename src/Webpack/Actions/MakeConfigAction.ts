@@ -19,29 +19,21 @@
 import {isArray, PlainObject} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
-import type {Identifier} from '../../Identifier';
 import {WebpackConfigGenerator} from '../ConfigGeneration/WebpackConfigGenerator';
+import type {IMakeConfigActionOptions} from './types';
 import type {WorkerActionInterface} from './WorkerActionInterface';
 
-export interface MakeConfigurationActionOptions
-{
-    /**
-     * A list of asset builder configurator/plugin ids that should be disabled when the config is generated
-     */
-    disable?: Array<Identifier>
-}
-
-export class MakeConfigurationAction implements WorkerActionInterface
+export class MakeConfigAction implements WorkerActionInterface
 {
     
     /**
      * @inheritDoc
      */
-    public do(context: WorkerContext, options?: MakeConfigurationActionOptions): any
+    public do(context: WorkerContext, options?: IMakeConfigActionOptions): any
     {
         options = options ?? {};
         
-        this.bindDisalbedElementListener(context, options);
+        this.bindDisabledElementListener(context, options);
         
         return (new WebpackConfigGenerator())
             .generateConfiguration(context)
@@ -61,7 +53,7 @@ export class MakeConfigurationAction implements WorkerActionInterface
      * @param options
      * @protected
      */
-    protected bindDisalbedElementListener(context: WorkerContext, options?: MakeConfigurationActionOptions): void
+    protected bindDisabledElementListener(context: WorkerContext, options?: IMakeConfigActionOptions): void
     {
         if (!options) {
             return;

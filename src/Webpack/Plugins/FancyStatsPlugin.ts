@@ -69,6 +69,7 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
                 this.renderWarnings(output, stats);
                 this.renderErrors(output, stats);
                 this.renderFooter(output);
+                
                 console.log(output.join('\r\n'));
             });
         }
@@ -112,8 +113,8 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
                                     (asset.chunks[0] as string).indexOf('main') === 0;
                 const chunkNameIsMain = typeof asset.chunkNames[0] === 'string' &&
                                         asset.chunkNames[0].indexOf('main') === 0;
-                const useAsset = (this._context!.app.verboseResult || !isMap && !isHotUpdate &&
-                                  (chunkIsMain || chunkNameIsMain));
+                const useAsset = (!isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain)) ||
+                                 this._context?.parentContext.options.verbose;
                 
                 if (!useAsset) {
                     ignoredChunks++;
