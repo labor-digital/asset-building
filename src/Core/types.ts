@@ -106,7 +106,7 @@ export interface IBuilderOptions
      * If set to true, the app definition will not validate the entry or output configuration.
      * This can be useful if you create the builder for services that already create their own entry point
      */
-    noEntryOutputValidation?: boolean;
+    appEntryOutputValidation?: boolean;
 }
 
 export interface IPathList

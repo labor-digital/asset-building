@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2020.10.20 at 17:25
+ * Last modified: 2021.03.28 at 08:19
  */
-// Disabled until Nuxt@3 is available
 
-// import type {Configuration} from 'webpack';
-// import {GeneralHelper} from '../../Helpers/GeneralHelper';
-// import {NuxtFactory} from './NuxtFactory';
-
-// Module(this: any, options: any)
-export default function Module() {
-    return;
-    // this.nuxt.hook('webpack:config', function (configs: Configuration[]) {
-    //     GeneralHelper.renderFancyIntro();
-    //     return new NuxtFactory(options).enhanceWebpackConfigs(configs);
-    // });
-}
+export * from 'stories/Button';
+export * from 'stories/Header';
+export * from 'stories/Page';

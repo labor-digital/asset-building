@@ -41,6 +41,10 @@ export default {
         type: 'boolean',
         default: false
     },
+    appEntryOutputValidation: {
+        type: 'boolean',
+        default: true
+    },
     environment: {
         type: 'string',
         default: 'standalone'

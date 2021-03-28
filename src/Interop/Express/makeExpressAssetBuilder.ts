@@ -30,11 +30,10 @@ import ExpressContext from './ExpressContext';
  * @param expressApp
  * @param options
  */
-export async function expressAssetBuildingPlugin(
+export default async function makeExpressAssetBuilder(
     expressApp: Application,
     options?: IBuilderOptions
-): Promise<ExpressContext>
-{
+): Promise<ExpressContext> {
     GeneralHelper.renderFancyIntro();
     CoreFixes.resolveFilenameFix([process.cwd(), path.resolve(__dirname, '../../')]);
     

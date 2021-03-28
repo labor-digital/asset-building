@@ -58,6 +58,7 @@ export class NuxtFactory
      */
     public constructor(options: PlainObject, factory?: Factory)
     {
+        throw new Error('This feature is currently not usable!');
         this._options = options;
         this._factory = factory ?? new Factory();
     }
@@ -71,7 +72,7 @@ export class NuxtFactory
         return this._factory.makeCoreContext({
             mode: configs[0].mode === 'production' ? 'production' : 'dev',
             environment: 'nuxt',
-            noEntryOutputValidation: true
+            appEntryOutputValidation: false
             // @todo this has to be fixed!
             // laborConfig: isPlainObject(this._options.laborConfig) ? this._options.laborConfig : {}
         }).then(coreContext => Promise.all([

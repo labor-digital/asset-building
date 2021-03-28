@@ -15,6 +15,9 @@
  *
  * Last modified: 2021.03.26 at 12:10
  */
+import makeExpressAssetBuilder from './Interop/Express/makeExpressAssetBuilder';
+import makeStorybookAssetBuilder from './Interop/Storybook/makeStorybookAssetBuilder';
+
 export * from './Identifier';
 export * from './EventList';
 export * from './Core/types';
@@ -24,7 +27,12 @@ export * from './Core/Factory/WorkerContextFactory';
 export * from './Core/CoreContext';
 export * from './Core/WorkerContext';
 export * from './Core/Bootstrap';
-export * from './Interop/Express/expressAssetBuildingPlugin';
 export * from './Interop/Express/ExpressContext';
-export * from './Interop/Nuxt/NuxtFactory';
+// export * from './Interop/Nuxt/NuxtFactory';
 export * from './Interop/Storybook/StorybookFactory';
+
+export const interop = {
+    storybook: makeStorybookAssetBuilder,
+    express: makeExpressAssetBuilder,
+    nuxt: () => {}
+};

@@ -98,7 +98,7 @@ export class WorkerContextFactory
         });
         
         // Don't validate the entry and output options
-        if (context.parentContext.options.noEntryOutputValidation) {
+        if (!context.parentContext.options.appEntryOutputValidation) {
             delete args.schema.entry;
             delete args.schema.output;
         }

@@ -83,9 +83,10 @@ export abstract class AbstractStyleLoaderConfigurator
      * By default this is the loader of mini-css-extract-plugin, or "style-loader" when dev-server is enabled.
      *
      * @param context
+     * @param identifier
      * @protected
      */
-    protected async makeLastLoader(context: WorkerContext): Promise<any>
+    protected async makeLastLoader(context: WorkerContext, identifier: LoaderIdentifier): Promise<any>
     {
         let lastLoader: any =
             {
@@ -99,9 +100,12 @@ export abstract class AbstractStyleLoaderConfigurator
             lastLoader = 'style-loader';
         }
         
-        // @todo add filter so we don't have to fiddle the css extract plugin out for vue.js environments
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_LAST_STYLE_LOADER, {
+            identifier,
+            context,
+            loader: lastLoader
+        });
         
-        console.log('setting last loader', lastLoader);
-        return lastLoader;
+        return args.loader;
     }
 }

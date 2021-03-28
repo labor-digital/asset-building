@@ -33,7 +33,7 @@ export class SassConfigurator extends AbstractStyleLoaderConfigurator implements
         
         await ConfigGenUtil.addLoader(LoaderIdentifier.SASS, context, /\.(sa|sc|c)ss$/, {
             use: [
-                await this.makeLastLoader(context),
+                await this.makeLastLoader(context, LoaderIdentifier.SASS),
                 {
                     loader: 'css-loader',
                     options: {

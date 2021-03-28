@@ -1,0 +1,36 @@
+{
+	"name": "storybook",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"storybook": "start-storybook -p 6006",
+		"build-storybook": "build-storybook",
+		"build": "assets"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@babel/core": "^7.13.13",
+		"@storybook/addon-actions": "^6.2.0-rc.10",
+		"@storybook/addon-essentials": "^6.2.0-rc.10",
+		"@storybook/addon-links": "^6.2.0-rc.10",
+		"@storybook/builder-webpack5": "^6.2.0-rc.10",
+		"@storybook/html": "^6.2.0-rc.10",
+		"babel-loader": "^8.2.2",
+		"@labor-digital/asset-building": "file:../../..",
+		"postcss": "^8.2.8"
+	},
+	"labor": {
+		"apps": [
+			{
+				"entry": "./lib.js",
+				"output": "./dist/bundle.js"
+			}
+		]
+	},
+	"dependencies": {
+	}
+}

@@ -16,13 +16,13 @@
  * Last modified: 2020.04.23 at 20:11
  */
 
-import type {PlainObject} from '@labor-digital/helferlein';
-import {forEach, isPlainObject, isString, isUndefined} from '@labor-digital/helferlein';
+import {isUndefined} from '@labor-digital/helferlein';
 import type {Configuration} from 'webpack';
 import type {CoreContext} from '../../Core/CoreContext';
 import {Factory} from '../../Core/Factory';
+import type {IBuilderOptions} from '../../Core/types';
 import {EventList} from '../../EventList';
-import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
+import {ConfiguratorIdentifier, PluginIdentifier} from '../../Identifier';
 import type {IMakeEnhancedConfigActionOptions} from '../../Webpack/Actions/types';
 
 export class StorybookFactory
@@ -32,7 +32,7 @@ export class StorybookFactory
      * The story book module options to extract the app from
      * @protected
      */
-    protected _options: PlainObject;
+    protected _options: IBuilderOptions;
     
     /**
      * The concrete factory to create the asset builder with
@@ -40,14 +40,14 @@ export class StorybookFactory
      */
     protected _factory: Factory;
     
-    protected coreContextPromise?: Promise<CoreContext>;
+    protected _coreContextPromise?: Promise<CoreContext>;
     
     /**
      * Injects the factory instance and options
      * @param options
      * @param factory
      */
-    public constructor(options: PlainObject, factory?: Factory)
+    public constructor(options: IBuilderOptions, factory?: Factory)
     {
         this._options = options;
         this._factory = factory ?? new Factory();
@@ -58,15 +58,14 @@ export class StorybookFactory
      */
     public initializeCoreContext(): Promise<CoreContext>
     {
-        if (!isUndefined(this.coreContextPromise)) {
-            return this.coreContextPromise;
+        if (!isUndefined(this._coreContextPromise)) {
+            return this._coreContextPromise;
         }
-        return this.coreContextPromise = this._factory.makeCoreContext({
-            mode: 'watch',
-            environment: 'storyBook',
-            additionalResolverPaths: (isPlainObject(this._options.app) ? this._options.app : {}) as any,
-            ...(this._options.assetBuilder ?? {}),
-            ...(isPlainObject(this._options.app) ? {app: this._options.app} : {})
+        return this._coreContextPromise = this._factory.makeCoreContext({
+            app: {} as any,
+            appEntryOutputValidation: false,
+            ...this._options,
+            environment: 'storyBook'
         });
     }
     
@@ -80,7 +79,7 @@ export class StorybookFactory
         
         // Recalculate the context properties when we have the configuration
         coreContext.isProd = config.mode !== 'development';
-        coreContext.mode = coreContext.isProd ? 'build' : 'watch';
+        coreContext.mode = coreContext.isProd ? 'production' : 'dev';
         
         const worker = await this._factory.makeWorkerContext(coreContext, coreContext.options!.apps![0]);
         return await worker.do.makeEnhancedConfig(config, this.getEnhancerOptions());
@@ -107,7 +106,10 @@ export class StorybookFactory
             ruleFilter: test => {
                 // The list of FORBIDDEN patterns that should NOT pass
                 return [
-                           '/\\.vue$/'
+                           '/\\.vue$/',
+                           '/\\.css$/',
+                           '/\\.(svg|ico|jpg|jpeg|png|apng|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\\?.*)?$/'
+                
                        ].indexOf(test) === -1;
             },
             pluginFilter: test => {
@@ -117,20 +119,8 @@ export class StorybookFactory
                        ].indexOf(test) === -1;
             },
             events: {
-                [EventList.FILTER_LOADER_CONFIG]: (e) => {
-                    const cssExtractorPluginRegex = new RegExp('mini-css-extract-plugin');
-                    if (e.args.identifier === LoaderIdentifier.SASS ||
-                        e.args.identifier === LoaderIdentifier.LESS) {
-                        forEach(e.args.config.use, (v, k) => {
-                            if (!isString(v.loader)) {
-                                return;
-                            }
-                            if (v.loader.match(cssExtractorPluginRegex)) {
-                                e.args.config.use[k] = 'style-loader';
-                                return false;
-                            }
-                        });
-                    }
+                [EventList.FILTER_LAST_STYLE_LOADER]: e => {
+                    e.args.loader = 'style-loader';
                 }
             }
         };

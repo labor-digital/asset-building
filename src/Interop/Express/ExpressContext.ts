@@ -117,7 +117,6 @@ export default class ExpressContext
      */
     public async registerDevServerMiddleware(): Promise<void>
     {
-        console.log('registering dev middleware');
         if (this.isProd) {
             return;
         }

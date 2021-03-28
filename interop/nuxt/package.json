@@ -1,5 +1,0 @@
-{
-	"name": "@labor-digital/asset-building-for-nuxt",
-	"license": "Apache-2.0",
-	"main": "../../dist/Interop/Nuxt/Module.js"
-}

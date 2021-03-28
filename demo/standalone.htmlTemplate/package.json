@@ -1,0 +1,30 @@
+{
+	"name": "demo",
+	"version": "1.0.0",
+	"description": "A demoproject to show how the buildprocess works",
+	"scripts": {
+		"build": "assets",
+		"watch": "assets dev --watch --verbose",
+		"dev": "assets dev --devServer --verbose",
+		"analyze": "assets analyze"
+	},
+	"keywords": [],
+	"author": "LABOR GmbH",
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"@labor-digital/asset-building": "file:../.."
+	},
+	"labor": {
+		"apps": [
+			{
+				"entry": "./frontend/src/app.js",
+				"output": "./frontend/dist/bundle.js",
+				"publicPath": "./",
+				"htmlTemplate": {
+					"title": "Demo Page"
+				}
+			}
+		]
+	},
+	"dependencies": {}
+}

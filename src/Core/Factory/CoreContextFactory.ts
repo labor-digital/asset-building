@@ -128,7 +128,7 @@ export class CoreContextFactory
         options = makeOptions(options, BuilderOptionSchema);
         
         // Validates the options schema and checks if some app definitions are present
-        if (isEmpty(options.app) && isEmpty(options.apps)) {
+        if (!isPlainObject(options.app) && isEmpty(options.apps)) {
             throw new Error('You need to define either an array of "apps" or a single "app" option!');
         }
         

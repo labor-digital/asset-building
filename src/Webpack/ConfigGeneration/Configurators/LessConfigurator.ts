@@ -29,7 +29,7 @@ export class LessConfigurator extends AbstractStyleLoaderConfigurator implements
     {
         await ConfigGenUtil.addLoader(LoaderIdentifier.LESS, context, /\.less$/, {
             use: [
-                await this.makeLastLoader(context),
+                await this.makeLastLoader(context, LoaderIdentifier.LESS),
                 {
                     loader: 'css-loader'
                 },
