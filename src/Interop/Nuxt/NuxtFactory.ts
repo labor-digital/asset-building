@@ -188,9 +188,14 @@ export class NuxtFactory
     {
         const cssExtractorPluginRegex = new RegExp('mini-css-extract-plugin');
         
+        const worker: WorkerContext = e.args.context;
+        
         // Register additional loader to strip out all /deep/ selectors we need for component nesting,
         // but that are not wanted in a browser environment
-        const deepRemoverPath = path.resolve(__dirname, 'DeepRemoverLoader.js');
+        const deepRemoverPath = path.resolve(
+            worker.parentContext.paths.assetBuilder,
+            '/dist/Webpack/Loaders/DeepRemover/DeepRemoverLoader.js'
+        );
         e.args.config.use.forEach((v: any, k: any) => {
             if (typeof v === 'string') {
                 v = {loader: v};
