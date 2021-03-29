@@ -20,7 +20,6 @@ export enum EventList
 {
     // Events for global extensions
     SHUTDOWN = 'assetBuilder__shutdown',
-    FILTER_LABOR_CONFIG = 'assetBuilder__filterLaborConfig',
     GET_MODES = 'assetBuilder__getModes',
     GET_MODE = 'assetBuilder__getMode',
     IS_PROD = 'assetBuilder__isProd',
@@ -47,7 +46,6 @@ export enum EventList
     APPLY_EXTENSION_WEBPACK_CONFIG = 'assetBuilder__applyExtensionWebpackConfig',
     FILTER_WEBPACK_CONFIG = 'assetBuilder__filterWebpackConfig',
     FILTER_WEBPACK_COMPILER = 'assetBuilder__filterWebpackCompiler',
-    WEBPACK_COMPILER = 'assetBuilder__webpackCompiler',
     COMPILING_DONE = 'assetBuilder__compilingDone',
     BEFORE_GIT_ADD = 'assetBuilder__beforeGitAdd',
     CALLBACK_DONE = 'assetBuilder__callbackDone',
@@ -77,6 +75,5 @@ export enum EventList
     
     // INTERNAL EVENTS
     EXTENSION_LOADING = 'assetBuilder__internal--extensionLoading',
-    SEQUENTIAL_WORKER_QUEUE = 'assetBuilder__internal--sequentialWorkerQueue',
     CUSTOM_WEBPACK_CONFIG_LOADING = 'assetBuilder__internal--customWebpackConfigLoading'
 }
