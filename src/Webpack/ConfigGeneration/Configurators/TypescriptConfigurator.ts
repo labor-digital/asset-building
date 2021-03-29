@@ -85,7 +85,7 @@ export class TypescriptConfigurator implements ConfiguratorInterface
         let tsConfig = context.app.tsConfig;
         
         if (!tsConfig) {
-            return path.resolve(context.parentContext.paths.assetBuilder, '../ts/tsconfig.json');
+            return path.resolve(context.parentContext.paths.assetBuilder, '../static/ts/tsconfig.json');
         }
         
         if (tsConfig === true) {
