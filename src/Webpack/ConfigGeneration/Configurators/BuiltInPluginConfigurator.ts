@@ -25,7 +25,6 @@ import type {
 } from '../../Plugins/AssetBuilderWebpackPluginInterface';
 import {FancyStatsPlugin} from '../../Plugins/FancyStatsPlugin';
 import {GitAddPlugin} from '../../Plugins/GitAddPlugin';
-import {WebpackFixBrokenChunkPlugin} from '../../Plugins/WebpackFixBrokenChunkPlugin';
 import {WebpackPromiseShimPlugin} from '../../Plugins/WebpackPromiseShimPlugin';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {ConfiguratorInterface} from './ConfiguratorInterface';
@@ -38,7 +37,6 @@ export class BuiltInPluginConfigurator implements ConfiguratorInterface
         const w = this.registerPluginWrapper;
         await w(PluginIdentifier.GIT_ADD, context, GitAddPlugin);
         await w(PluginIdentifier.FANCY_STATS, context, FancyStatsPlugin);
-        await w(PluginIdentifier.FIX_BROKEN_CHUNKS, context, WebpackFixBrokenChunkPlugin);
         await w(PluginIdentifier.PROMISE_SHIM, context, WebpackPromiseShimPlugin);
     }
     

@@ -70,7 +70,6 @@ export enum PluginIdentifier
     HTML_TEMPLATE = 'plugin:html:template',
     BUNDLE_ANALYZER = 'plugin:bundleAnalyzer',
     FANCY_STATS = 'plugin:fancyStats',
-    FIX_BROKEN_CHUNKS = 'plugin:fixBrokenChunks',
     PROMISE_SHIM = 'plugin:promiseShim',
     GIT_ADD = 'plugin:gitAdd'
 }
