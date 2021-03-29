@@ -16,7 +16,7 @@
  * Last modified: 2021.03.26 at 15:03
  */
 
-import {isArray} from '@labor-digital/helferlein';
+import {isArray, isString} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 import portfinder from 'portfinder';
 import WebpackDevServer from 'webpack-dev-server';
@@ -48,9 +48,15 @@ export class RunDevServerAction implements WorkerActionInterface
         
         config.entry.unshift('webpack-dev-server/client?http://' + host + ':' + port);
         
+        let publicPath = context.webpackConfig.output.publicPath ?? undefined;
+        if (isString(publicPath) && publicPath.charAt(0) !== '/') {
+            publicPath = '/' + publicPath;
+        }
+        
         const devServerOptions: WebpackDevServer.Configuration = {
             noInfo: true,
             hot: true,
+            publicPath: publicPath,
             ...options?.devServer
         };
         

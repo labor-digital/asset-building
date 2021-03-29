@@ -16,7 +16,7 @@
  * Last modified: 2020.10.21 at 17:31
  */
 
-import {isString, PlainObject} from '@labor-digital/helferlein';
+import {forEach, isString, PlainObject} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 // @ts-ignore
 import webpack, {Compiler} from 'webpack';
@@ -122,8 +122,28 @@ export const FancyStatsPlugin: AssetBuilderWebpackPluginStaticInterface =
                     return;
                 }
                 let realAssetName = (stats.outputPath + '/' + asset.name).replace(/[\\\/]/g, '/');
+                
+                const lines = [];
+                const parts = realAssetName.split('/').reverse();
+                let line: Array<string> = [];
+                let first = true;
+                let lineLength = 1; // 1 for the trailing slash
+                forEach(parts, part => {
+                    let newLineLength = lineLength + (part.length + 1);
+                    if (newLineLength > assetColLength) {
+                        lines.push((line.reverse().join('/') + (!first ? '/...' : '')).padStart(assetColLength));
+                        first = false;
+                        line = [];
+                        lineLength = 1;
+                    }
+                    lineLength += part.length + 1;
+                    line.push(part);
+                });
+                lines.push((line.reverse().join('/') + (!first ? '/...' : '')).padStart(assetColLength));
+                const outputAssetName = lines.reverse().join('\n');
+                
                 output.push(
-                    Chalk.greenBright(realAssetName.substr(-(assetColLength - 5)).padStart(assetColLength)) + '  '
+                    Chalk.greenBright(outputAssetName) + '  '
                     + FileHelpers.humanFileSize(asset.size).padStart(sizeColLength));
             });
             

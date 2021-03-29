@@ -17,17 +17,17 @@
 	"labor": {
 		"apps": [
 			{
-				"entry": "./webroot/frontend/src/app.js",
-				"output": "./webroot/frontend/dist/bundle.js",
+				"entry": "./frontend/src/app.js",
+				"output": "./frontend/dist/bundle.js",
 				"minChunkSize": 0,
 				"webpackConfig": true,
 				"extensions": [
-					"./webroot/frontend/extensions"
+					"./frontend/extensions"
 				]
 			}
 		],
 		"extensions": [
-			"./webroot/frontend/extensions"
+			"./frontend/extensions"
 		]
 	},
 	"dependencies": {}

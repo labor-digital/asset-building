@@ -53,14 +53,12 @@ export class AppPathConfigurator implements ConfiguratorInterface
             publicPathRoot = path.dirname(publicPathRoot);
             publicPath = path.relative(publicPathRoot, outputDirectory);
             publicPath = publicPath.replace('\\', '/');
-            if (!publicPath.match(/^\.\//)) {
-                publicPath = '/' + publicPath;
-            }
-            if (!publicPath.match(/\/$/)) {
-                publicPath += '/';
-            }
         } else {
             publicPath = context.app.publicPath;
+        }
+        
+        if (!publicPath.match(/\/$/)) {
+            publicPath += '/';
         }
         
         context.webpackConfig.output.publicPath = publicPath;

@@ -27,7 +27,7 @@ export class CleanOutputDirConfigurator implements ConfiguratorInterface
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        if (!context.isProd || context.app.keepOutputDirectory) {
+        if (!context.isProd && !context.parentContext.options.devServer || context.app.keepOutputDirectory) {
             return;
         }
         
@@ -45,7 +45,7 @@ export class CleanOutputDirConfigurator implements ConfiguratorInterface
         }
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.CLEAN_OUTPUT_DIR, context, {
-            verbose: true,
+            verbose: context.parentContext.options.verbose,
             cleanStaleWebpackAssets: false,
             cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
         }, config => new CleanWebpackPlugin(config));
