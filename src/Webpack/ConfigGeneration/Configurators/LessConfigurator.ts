@@ -18,26 +18,25 @@
 
 import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
+import {ConfiguratorIdentifier, LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
+import type {IConfigurator} from '../types';
 import {AbstractStyleLoaderConfigurator} from './AbstractStyleLoaderConfigurator';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class LessConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface
+export class LessConfigurator extends AbstractStyleLoaderConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        await ConfigGenUtil.addLoader(LoaderIdentifier.LESS, context, /\.less$/, {
-            use: [
-                await this.makeLastLoader(context, LoaderIdentifier.LESS),
-                {
-                    loader: 'css-loader'
-                },
-                await this.makePostcssConfig(ConfiguratorIdentifier.LESS, context),
-                {
-                    loader: 'less-loader'
-                },
-                {
+        await ConfigGenUtil.addRule(RuleIdentifier.LESS, context, /\.less$/, {
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.LESS, context)
+                .addLoader(LoaderIdentifier.STYLE_LAST, await this.makeLastLoader(context, RuleIdentifier.LESS))
+                .addRaw(await this.makeLastMinuteLoaders(context, RuleIdentifier.LESS))
+                .addLoader(LoaderIdentifier.CSS, {loader: 'css-loader'})
+                .addLoader(LoaderIdentifier.POST_CSS,
+                    await this.makePostcssConfig(ConfiguratorIdentifier.LESS, context))
+                .addLoader(LoaderIdentifier.LESS, {loader: 'less-loader'})
+                .addLoader(LoaderIdentifier.STYLE_RESOURCE, {
                     loader: path.resolve(context.parentContext.paths.assetBuilder,
                         './Webpack/Loaders/ResourceLoader/ResourceLoader.js'),
                     options: {
@@ -45,8 +44,8 @@ export class LessConfigurator extends AbstractStyleLoaderConfigurator implements
                         entry: context.app.entry,
                         ext: ['less', 'css']
                     }
-                }
-            ]
+                })
+                .finish()
         });
     }
 }

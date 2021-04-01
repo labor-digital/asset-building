@@ -21,9 +21,9 @@ import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class BundleAnalyzerConfigurator implements ConfiguratorInterface
+export class BundleAnalyzerConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

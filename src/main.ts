@@ -19,7 +19,6 @@
 
 import {Command} from 'commander';
 import {Bootstrap} from './Core/Bootstrap';
-import {ProcessManager} from './Core/ProcessManager';
 import {GeneralHelper} from './Helpers/GeneralHelper';
 
 const program = new Command();
@@ -44,8 +43,7 @@ program.action(async function (mode, args) {
             mode
         });
         
-        const manager = new ProcessManager(context.eventEmitter);
-        await manager.startWorkers(context);
+        await context.processManager.startWorkers();
         
         process.exit(0);
     } catch (e) {

@@ -1,0 +1,36 @@
+{
+	"name": "demo",
+	"version": "1.0.0",
+	"description": "A demoproject to show how the buildprocess works",
+	"scripts": {
+		"build": "assets",
+		"prod": "node ./index.js",
+		"dev": "cross-env NODE_ENV=development node ./server.js",
+		"analyze": "assets analyze",
+		"install-dev:compile": "cd ../../../extensions/vue && npm run install-dev",
+		"install-dev": "npm run install-dev:compile && npm run install"
+	},
+	"devDependencies": {
+		"@labor-digital/asset-building": "file:../../../",
+		"@labor-digital/asset-building-env-vuejs": "file:../../../extensions/vue"
+	},
+	"labor": {
+		"builderVersion": 2,
+		"apps": [
+			{
+				"entry": "./frontend/src/Index.ts",
+				"output": "./frontend/dist/bundle.js",
+				"publicPath": "/dist",
+				"htmlTemplate": true,
+				"useSsr": true,
+				"extensions": [
+					"@labor-digital/asset-building-env-vuejs"
+				]
+			}
+		]
+	},
+	"dependencies": {
+		"cross-env": "^7.0.3",
+		"express": "^4.17.1"
+	}
+}

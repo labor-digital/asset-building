@@ -18,8 +18,7 @@
 
 import {cloneList, forEach, isArray, makeOptions} from '@labor-digital/helferlein';
 import {EventList} from '../../EventList';
-import {CoreContext} from '../CoreContext';
-import {Logger} from '../Logger';
+import type {CoreContext} from '../CoreContext';
 import AppDefinitionSchema from '../Schema/AppDefinitionSchema';
 import type {IAppDefinition} from '../types';
 import {WorkerContext} from '../WorkerContext';
@@ -34,11 +33,12 @@ export class WorkerContextFactory
     public async make(coreContext: CoreContext, app: IAppDefinition): Promise<WorkerContext>
     {
         const localCoreContext = this.cloneCoreContextIfRequired(coreContext);
-        localCoreContext.logger.setName(app.appName!);
         const context = new WorkerContext(localCoreContext, app);
         
         await this.loadExtensions(context);
         await this.applyAppSchema(context);
+        localCoreContext.io.setAppName(context.app.appName!);
+        context.progressReporter = localCoreContext.progressManager.getReporter(context.app.appName!);
         this.applyAppConfig(context);
         await context.eventEmitter.emitHook(EventList.AFTER_WORKER_INIT_DONE, {context});
         
@@ -56,12 +56,7 @@ export class WorkerContextFactory
             return coreContext;
         }
         
-        const clone = CoreContext.fromJson(coreContext.toJson());
-        clone.eventEmitter = coreContext.eventEmitter;
-        clone.extensionLoader = coreContext.extensionLoader;
-        clone.logger = new Logger(coreContext.options.verbose ?? false);
-        
-        return clone;
+        return coreContext.makeClone();
     }
     
     /**

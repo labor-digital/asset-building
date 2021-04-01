@@ -21,7 +21,7 @@ import path from 'path';
 import {CoreFixes} from '../../Core/CoreFixes';
 import type {IBuilderOptions} from '../../Core/types';
 import {GeneralHelper} from '../../Helpers/GeneralHelper';
-import ExpressContext from './ExpressContext';
+import {ExpressContext} from './ExpressContext';
 
 /**
  * Use this function to create an express context object that can be used by asset-builder extensions to run

@@ -19,10 +19,15 @@
 import type {Stats} from 'webpack';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
-import type {ICompilerCallback, ICompilerOptions, ICompilerResult, IWebpackCompilerCallback} from './types';
-import type {WorkerActionInterface} from './WorkerActionInterface';
+import type {
+    ICompilerCallback,
+    ICompilerOptions,
+    ICompilerResult,
+    IWebpackCompilerCallback,
+    IWorkerAction
+} from './types';
 
-export class RunCompilerAction implements WorkerActionInterface
+export class RunCompilerAction implements IWorkerAction
 {
     
     public async do(context: WorkerContext, options?: ICompilerOptions): Promise<ICompilerResult>
@@ -68,94 +73,6 @@ export class RunCompilerAction implements WorkerActionInterface
         
     }
     
-    //
-    // /**
-    //  * Runs the actual compiler and wraps the webpack execution into a promise that returns the exit
-    //  * code after webpack finished to compile
-    //  *
-    //  * @param config
-    //  * @param context
-    //  * @protected
-    //  */
-    // protected async runCompiler(config: Configuration, context: WorkerContext): Promise<any>
-    // {
-    //     const compiler = context.do.makeCompiler();
-    //
-    //     let compilerInstance: any | null = null;
-    //
-    //     return new Promise((resolveCompiler, rejectCompiler) => {
-    //         const callbackPromise = (new Promise<number>((resolveCallback, rejectCallback) => {
-    //             this.emitFilterEvent(context, options)
-    //                 .then(args => {
-    //                     const compiler: Function = args.compiler;
-    //                     const context: WorkerContext = args.context;
-    //                     const callback: WebpackCompilerCallbackInterface = args.callback;
-    //
-    //                     compilerInstance = compiler(config, (err: any, stats: any) => {
-    //                         if (err !== null) {
-    //                             return rejectCallback(err);
-    //                         }
-    //
-    //                         if (context.parentContext.process === 'worker') {
-    //                             process!.send!({WEBPACK_DONE: true});
-    //                         }
-    //
-    //                         callback(context, stats, resolveCallback, rejectCallback);
-    //                     });
-    //
-    //                     if (compilerInstance === null) {
-    //                         setTimeout(() => {
-    //                             rejectCompiler(new Error('Failed to instantiate webpack'));
-    //                         }, 2000);
-    //                         return;
-    //                     }
-    //
-    //                     context.eventEmitter.emit(EventList.WEBPACK_COMPILER, {
-    //                         compilerDefinition: compiler,
-    //                         context,
-    //                         webpackCompiler: compilerInstance
-    //                     });
-    //
-    //                     if (!isUndefined(compilerInstance!.compiler)) {
-    //                         compilerInstance = compilerInstance!.compiler;
-    //                     }
-    //
-    //                     resolveCompiler({
-    //                         context,
-    //                         compiler: compilerInstance,
-    //                         promise: callbackPromise
-    //                     });
-    //                 })
-    //                 .catch(rejectCompiler);
-    //         }))
-    //             .catch(e => {
-    //                 rejectCompiler(e);
-    //                 return 1;
-    //             });
-    //     });
-    // }
-    //
-    // /**
-    //  * Allows the outside world to filter our settings for the webpack compiler and callback
-    //  * @param context
-    //  * @param options
-    //  * @protected
-    //  */
-    // protected emitFilterEvent(
-    //     context: WorkerContext,
-    //     options?: RunCompilerOptions
-    // ): Promise<PlainObject>
-    // {
-    //     return context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_COMPILER, {
-    //         compiler: webpack,
-    //         callback: (context: any, stats: any, resolve: any, reject: any): void => {
-    //             this.webpackCallback(context, stats, resolve, reject);
-    //         },
-    //         options,
-    //         context
-    //     });
-    // }
-    //
     /**
      * The default webpack callback which checks if there are errors or warnings and calculates
      * the exit code based on that information
@@ -196,7 +113,7 @@ export class RunCompilerAction implements WorkerActionInterface
             exitCode = args.exitCode > 0 || args.exitWorker ? args.exitCode : -1;
             
             if (exitCode === -1) {
-                context.parentContext.logger.log('Webpack finished, but I should keep the script running...');
+                context.parentContext.logger.debug('Webpack finished, but I should keep the script running...');
                 return;
             }
             

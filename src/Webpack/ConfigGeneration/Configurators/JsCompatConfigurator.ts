@@ -16,19 +16,22 @@
  * Last modified: 2019.10.05 at 21:31
  */
 
-import {forEach, isArray, isString} from '@labor-digital/helferlein';
+import {isArray, isString} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import {GeneralHelper} from '../../../Helpers/GeneralHelper';
+import {LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
+import {ConfigGenUtil} from '../ConfigGenUtil';
+import type {IConfigurator} from '../types';
 
-export class JsCompatConfigurator implements ConfiguratorInterface
+export class JsCompatConfigurator implements IConfigurator
 {
-    public apply(context: WorkerContext): Promise<void>
+    public async apply(context: WorkerContext): Promise<void>
     {
         if (!isArray(context.app.jsCompat) || context.app.jsCompat.length === 0) {
             return Promise.resolve();
         }
         
-        forEach(context.app.jsCompat, (config, k) => {
+        await GeneralHelper.awaitingForEach(context.app.jsCompat, async (config, k) => {
             // Validate
             if (typeof config !== 'object') {
                 throw new Error('Invalid js compat configuration at key: ' + k);
@@ -39,14 +42,15 @@ export class JsCompatConfigurator implements ConfiguratorInterface
             }
             
             if (typeof config!.options !== 'undefined') {
-                context.webpackConfig.module.rules.push({
-                    test: new RegExp(config.rule),
-                    use: {
-                        loader: 'imports-loader',
-                        options: config.options
-                    }
+                return ConfigGenUtil.addRule(RuleIdentifier.JS_COMPAT, context, new RegExp(config.rule), {
+                    use: await ConfigGenUtil
+                        .makeRuleUseChain(RuleIdentifier.JS_COMPAT, context)
+                        .addLoader(LoaderIdentifier.IMPORTS, {
+                            loader: 'imports-loader',
+                            options: config.options
+                        })
+                        .finish()
                 });
-                return;
             }
             
             if (typeof config.fix !== 'string' || config.fix.trim().length === 0) {
@@ -59,9 +63,8 @@ export class JsCompatConfigurator implements ConfiguratorInterface
             }
             
             // Add new module
-            context.webpackConfig.module.rules.push({
-                'test': new RegExp(config.rule),
-                'loader': config.fix
+            return ConfigGenUtil.addRule(RuleIdentifier.JS_COMPAT, context, new RegExp(config.rule), {
+                loader: config.fix
             });
         });
         

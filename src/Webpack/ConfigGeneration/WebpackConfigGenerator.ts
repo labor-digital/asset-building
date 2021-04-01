@@ -29,7 +29,6 @@ import {BaseConfigurator} from './Configurators/BaseConfigurator';
 import {BuiltInPluginConfigurator} from './Configurators/BuiltInPluginConfigurator';
 import {BundleAnalyzerConfigurator} from './Configurators/BundleAnalyzerConfigurator';
 import {CleanOutputDirConfigurator} from './Configurators/CleanOutputDirConfigurator';
-import type {ConfiguratorInterface} from './Configurators/ConfiguratorInterface';
 import {CopyConfigurator} from './Configurators/CopyConfigurator';
 import {CssExtractConfigurator} from './Configurators/CssExtractConfigurator';
 import {DevOnlyConfigurator} from './Configurators/DevOnlyConfigurator';
@@ -47,6 +46,7 @@ import {ProgressBarConfigurator} from './Configurators/ProgressBarConfigurator';
 import {ProvideConfigurator} from './Configurators/ProvideConfigurator';
 import {SassConfigurator} from './Configurators/SassConfigurator';
 import {TypescriptConfigurator} from './Configurators/TypescriptConfigurator';
+import type {IConfigurator} from './types';
 
 export class WebpackConfigGenerator
 {
@@ -112,7 +112,7 @@ export class WebpackConfigGenerator
     protected async configuratorWrapper(
         identifier: string,
         context: WorkerContext,
-        configurator: ConfiguratorInterface
+        configurator: IConfigurator
     ): Promise<void>
     {
         let args = await context.eventEmitter.emitHook(EventList.CHECK_IDENTIFIER_STATE, {

@@ -46,7 +46,7 @@ const customSassLoader = function (this: Loader, source: string) {
     };
     try {
         // Prepare the compiler context
-        const context = new SassFileResolverContext(this.query.context, this);
+        const context = new SassFileResolverContext(this.query.context(), this);
         
         // Ignore if we don't have to do anything
         if (context.baseExt === 'css') {

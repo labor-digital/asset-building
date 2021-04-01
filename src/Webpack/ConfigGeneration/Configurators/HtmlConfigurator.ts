@@ -21,21 +21,22 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
-import {LoaderIdentifier, PluginIdentifier} from '../../../Identifier';
+import {LoaderIdentifier, PluginIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class HtmlConfigurator implements ConfiguratorInterface
+export class HtmlConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
         // HTML LOADER
-        await ConfigGenUtil.addLoader(LoaderIdentifier.HTML, context, /\.html$/, {
-            use: [
-                {
+        await ConfigGenUtil.addRule(RuleIdentifier.HTML, context, /\.html$/, {
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.HTML, context)
+                .addLoader(LoaderIdentifier.HTML, {
                     loader: 'html-loader'
-                }
-            ]
+                })
+                .finish()
         });
         
         // HTML PLUGIN

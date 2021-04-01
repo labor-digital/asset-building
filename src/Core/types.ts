@@ -17,6 +17,7 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
+import type {ChildProcess} from 'child_process';
 import type {RuleSetRule} from 'webpack';
 
 export type TBuilderMode = 'production' | 'dev' | 'analyze' | string;
@@ -148,6 +149,8 @@ export interface IAppCopyDefinition
 
 export interface IAppDefinition
 {
+    [key: string]: any;
+    
     /**
      * If this is set to true, the app will not be build.
      */
@@ -284,4 +287,25 @@ export interface IAppDefinition
          */
         host?: string;
     }
+}
+
+export interface ISingleWorkerOptions
+{
+    
+    /**
+     * Allows you to add events or completely modify the created child process
+     * @param process
+     * @param app
+     */
+    onCreate?: (process: ChildProcess, app: IAppDefinition) => Promise<ChildProcess>
+}
+
+export interface IProcessMessageListener
+{
+    (data: any, namespace: string, worker: ChildProcess): void
+}
+
+export interface IIOLogWriter
+{
+    (...args: Array<string>): void
 }

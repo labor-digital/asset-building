@@ -1,5 +1,5 @@
-/*
- * Copyright 2020 LABOR.digital
+/*!
+ * Copyright 2019 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2020.10.21 at 21:30
+ * Last modified: 2018.09.10 at 14:47
  */
 
-import type {WorkerContext} from '../../Core/WorkerContext';
-
-export interface WorkerActionInterface
-{
-    
-    /**
-     * Receives the worker context and must perform the required steps for the action
-     * @param context
-     */
-    do(context: WorkerContext): any;
-    
-}
+$globalColor: #333;
+$white: #fff;

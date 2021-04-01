@@ -16,6 +16,8 @@
  * Last modified: 2021.03.26 at 20:28
  */
 
+import type {IO} from './IO';
+
 export class Logger
 {
     /**
@@ -25,34 +27,33 @@ export class Logger
     protected _verbose: boolean;
     
     /**
-     * An app name that should be prepended for a log output
+     * The io manager to write the log with
      * @protected
      */
-    protected _name: string;
+    protected _io: IO;
     
-    constructor(verbose: boolean, name?: string)
+    constructor(io: IO, verbose: boolean)
     {
+        this._io = io;
         this._verbose = verbose;
-        this._name = name ?? 'CORE';
     }
     
     /**
-     * Updates the name to be shown
-     * @param name
+     * Logs the given message/list of arguments
      */
-    public setName(name: string): void
+    public info(...args: any): this
     {
-        this._name = name;
+        this._io.write(...args);
+        return this;
     }
     
     /**
-     * Logs the given message if "verbose" is set to true
-     * @param message
+     * Logs the given message/list of arguments, if "verbose" is set to true
      */
-    public log(message: string): this
+    public debug(...args: any): this
     {
         if (this._verbose) {
-            console.log('[' + this._name + ']: ' + message);
+            this._io.write(...args);
         }
         return this;
     }

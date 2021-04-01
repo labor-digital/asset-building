@@ -21,6 +21,9 @@ import type {Configuration} from 'webpack';
 import type {ExtensionLoader} from '../Extension/ExtensionLoader';
 import {WebpackWorkerActions} from '../Webpack/WebpackWorkerActions';
 import type {CoreContext} from './CoreContext';
+import type {IO} from './IO';
+import type {Logger} from './Logger';
+import type {IReporter} from './Progress/types';
 import type {IAppDefinition, TBuilderMode} from './types';
 
 export class WorkerContext
@@ -50,6 +53,11 @@ export class WorkerContext
      * The core context object that is used for this context object
      */
     public parentContext: CoreContext;
+    
+    /**
+     * The progress reporter instance to render nice progress bars
+     */
+    public progressReporter?: IReporter;
     
     /**
      * Injects the basic configuration
@@ -89,6 +97,21 @@ export class WorkerContext
         return this.parentContext.extensionLoader;
     }
     
+    /**
+     * Returns the logger instance to write logs with
+     */
+    public get logger(): Logger
+    {
+        return this.parentContext.logger;
+    }
+    
+    /**
+     * Returns the io instance to write to the output stream
+     */
+    public get io(): IO
+    {
+        return this.parentContext.io;
+    }
     
     /**
      * The numeric zero-based index of the app which is currently configured.
@@ -99,7 +122,7 @@ export class WorkerContext
     }
     
     /**
-     * True if this app should be executed as webpack's "production" mode
+     * True if this app should be executed as webpack "production" mode
      */
     public get isProd(): boolean
     {

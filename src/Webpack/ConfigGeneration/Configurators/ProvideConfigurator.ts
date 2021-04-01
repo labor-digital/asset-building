@@ -21,9 +21,9 @@ import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class ProvideConfigurator implements ConfiguratorInterface
+export class ProvideConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

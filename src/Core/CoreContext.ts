@@ -16,10 +16,13 @@
  * Last modified: 2019.10.05 at 17:26
  */
 
-import {asArray, EventBus, EventEmitter, forEach, PlainObject} from '@labor-digital/helferlein';
+import {asArray, EventBus, EventEmitter, forEach, isString, PlainObject} from '@labor-digital/helferlein';
 import * as path from 'path';
 import {ExtensionLoader} from '../Extension/ExtensionLoader';
+import {IO} from './IO';
 import {Logger} from './Logger';
+import {ProcessManager} from './ProcessManager';
+import {ProgressManager} from './Progress/ProgressManager';
 import type {IBuilderOptions, IPathList, TBuilderEnvironment, TBuilderMode} from './types';
 
 export class CoreContext
@@ -68,42 +71,61 @@ export class CoreContext
     /**
      * The event bus instance we use in this context
      */
-    public eventEmitter: EventEmitter;
+    public eventEmitter!: EventEmitter;
     
     /**
      * The extension loader instance
      */
-    public extensionLoader: ExtensionLoader;
+    public extensionLoader!: ExtensionLoader;
+    
+    /**
+     * The process manager to create child processes with
+     */
+    public processManager!: ProcessManager;
     
     /**
      * A simple logger to dump verbose output;
      */
-    public logger: Logger;
+    public logger!: Logger;
     
-    constructor(options: IBuilderOptions | PlainObject)
+    /**
+     * IO manager to orchestrate the output of the different processes in a unified matter
+     */
+    public io!: IO;
+    
+    /**
+     * Manager to handle the rendering of progress bars for the different processes
+     */
+    public progressManager!: ProgressManager;
+    
+    protected constructor() {}
+    
+    /**
+     * Create a clone of the current context object
+     */
+    public makeClone(): CoreContext
     {
-        this.logger = new Logger(options.verbose);
-        this.eventEmitter = EventBus.getEmitter();
-        this.extensionLoader = new ExtensionLoader();
-        
-        // Rehydrate from json options
-        if ((options as PlainObject).loadFromJson) {
-            forEach(options as PlainObject, (v, k) => {
-                if (k === 'loadFromJson') {
-                    return;
-                }
-                
-                if (k === 'paths') {
-                    const paths: IPathList = v;
-                    paths.additionalResolverPaths = new Set(paths.additionalResolverPaths);
-                }
-                
-                this[k] = v;
-            });
-            return;
-        }
-        
-        const sourcePath = path.normalize(options.cwd);
+        const i = new CoreContext();
+        i.hydrateFromJson(JSON.parse(this.toJson()));
+        i.instantiateChildren(this);
+        return i;
+    }
+    
+    protected hydrateFromJson(jsonData?: PlainObject): void
+    {
+        forEach(jsonData as PlainObject, (v, k) => {
+            if (k === 'paths') {
+                const paths: IPathList = v;
+                paths.additionalResolverPaths = new Set(paths.additionalResolverPaths);
+            }
+            
+            this[k] = v;
+        });
+    }
+    
+    protected hydrateFromOptions(options: IBuilderOptions): void
+    {
+        const sourcePath = path.normalize(options.cwd ?? process.cwd());
         const assetBuilderPath = path.dirname(__dirname);
         const additionalResolverPaths = new Set<string>();
         
@@ -128,6 +150,23 @@ export class CoreContext
         this.version = require(path.resolve(this.paths.assetBuilder, '..', 'package.json')).version;
     }
     
+    protected instantiateChildren(cloneBase?: CoreContext): void
+    {
+        if (cloneBase) {
+            // Just inherit the services from the original core context, instead of creating new instances
+            forEach(['logger', 'eventEmitter', 'extensionLoader', 'io', 'progressManager'], el => {
+                this[el] = cloneBase[el];
+            });
+        } else {
+            this.eventEmitter = EventBus.getEmitter();
+            this.extensionLoader = new ExtensionLoader();
+            this.processManager = new ProcessManager(this);
+            this.io = new IO(this);
+            this.logger = new Logger(this.io, this.options?.verbose ?? false);
+            this.progressManager = new ProgressManager(this);
+        }
+    }
+    
     /**
      * Dumps the current context object as a json string
      */
@@ -148,14 +187,30 @@ export class CoreContext
     }
     
     /**
+     * Creates a new instance of the context object
+     * @param options
+     */
+    public static new(options: IBuilderOptions): CoreContext
+    {
+        const i = new CoreContext();
+        i.hydrateFromOptions(options);
+        i.instantiateChildren();
+        return i;
+    }
+    
+    /**
      * Factory method to create a new instance of this class based on a given json representation of itself.
      * @param json
+     * @param process
      */
-    public static fromJson(json: string): CoreContext
+    public static fromJson(json: string, process?: 'main' | 'worker'): CoreContext
     {
-        const data = JSON.parse(json);
-        data.loadFromJson = true;
-        
-        return new CoreContext(data);
+        const i = new CoreContext();
+        i.hydrateFromJson(JSON.parse(json));
+        if (isString(process)) {
+            i.process = process;
+        }
+        i.instantiateChildren();
+        return i;
     }
 }

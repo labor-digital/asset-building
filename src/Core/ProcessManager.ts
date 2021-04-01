@@ -16,12 +16,12 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {EventEmitter, filter, forEach} from '@labor-digital/helferlein';
+import {filter, forEach, isFunction} from '@labor-digital/helferlein';
 import childProcess from 'child_process';
 import path from 'path';
 import {EventList} from '../EventList';
 import type {CoreContext} from './CoreContext';
-import type {IAppDefinition} from './types';
+import type {IAppDefinition, IProcessMessageListener, ISingleWorkerOptions} from './types';
 
 export class ProcessManager
 {
@@ -31,28 +31,44 @@ export class ProcessManager
      */
     protected shutdownList: Array<Function>;
     
-    public constructor(eventEmitter: EventEmitter)
+    /**
+     * The core context instance
+     * @protected
+     */
+    protected context: CoreContext;
+    
+    /**
+     * A list of registered listeners
+     * @protected
+     */
+    protected listeners: Array<{
+        namespace: string,
+        listener: IProcessMessageListener
+    }>;
+    
+    public constructor(context: CoreContext)
     {
         this.shutdownList = [];
+        this.listeners = [];
+        
+        this.context = context;
         
         // Allow synchronous shutdown of all worker processes
-        eventEmitter.bind(EventList.SHUTDOWN, () => {
+        context.eventEmitter.bind(EventList.SHUTDOWN, () => {
             return Promise.all(filter(this.shutdownList, (v) => v()));
         });
     }
     
     /**
      * Forks a new worker process for each app that is defined in the core context
-     *
-     * @param coreContext
      */
-    public startWorkers(coreContext: CoreContext): Promise<any | void>
+    public startWorkers(): Promise<any | void>
     {
-        coreContext.logger.log('Beginning to spawn worker processes...');
+        this.context.logger.debug('Beginning to spawn worker processes...');
         const processes: Array<Promise<any | void>> = [];
         
-        forEach(coreContext.options.apps ?? [], app => {
-            processes.push(this.startSingleWorker(coreContext, app));
+        forEach(this.context.options.apps ?? [], app => {
+            processes.push(this.startSingleWorker(app));
         });
         
         return Promise.all(processes);
@@ -60,26 +76,36 @@ export class ProcessManager
     
     /**
      * Creates a new worker process for a given app definition
-     * @param coreContext
      * @param app
+     * @param options
      */
-    public startSingleWorker(coreContext: CoreContext, app: IAppDefinition): Promise<void>
+    public startSingleWorker(app: IAppDefinition, options?: ISingleWorkerOptions): Promise<void>
     {
+        options = options ?? {};
+        
         // Start the process
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>(async (resolve, reject) => {
             
             // Create a new fork
-            const worker = childProcess.fork(
-                path.join(coreContext.paths.assetBuilder, 'Worker.js')
+            let worker = childProcess.fork(
+                path.join(this.context.paths.assetBuilder, 'worker.js')
             );
-            coreContext.logger.log('Spawned worker process: ' + app.id + ' (' + worker.pid + ')');
+            
+            if (isFunction(options!.onCreate ?? false)) {
+                worker = await options!.onCreate!(worker, app);
+                if (!worker) {
+                    throw new Error('"onCreate" failed, no child process object was returned!');
+                }
+            }
+            
+            this.context.logger.debug('Spawned worker process: ' + app.id + ' (' + worker.pid + ')');
             let stopped = false;
             
             // Allow custom actions on the worker
-            coreContext.eventEmitter.emit(EventList.PROCESS_CREATED, {
+            this.context.eventEmitter.emit(EventList.PROCESS_CREATED, {
                 process: worker,
                 app: app,
-                context: coreContext
+                context: this.context
             });
             
             // Register shutdown handler for this worker
@@ -88,16 +114,19 @@ export class ProcessManager
                     if (stopped) {
                         return resolve1();
                     }
-                    coreContext.logger.log('Shutting down worker process: ' + app.id + ' (' + worker.pid + ')');
+                    this.context.logger.debug('Shutting down worker process: ' + app.id + ' (' + worker.pid + ')');
+                    
                     // Stop the work process
                     worker.send({SHUTDOWN: true});
+                    
                     const forceTimeout = setTimeout(() => {
                         if (!stopped) {
-                            coreContext.logger.log(
+                            this.context.logger.debug(
                                 'Forcefully killing worker process: ' + app.id + ' (' + worker.pid + ')');
                             worker.kill('SIGTERM');
                         }
                     }, 5000);
+                    
                     worker.on('close', () => {
                         clearTimeout(forceTimeout);
                         stopped = true;
@@ -106,32 +135,79 @@ export class ProcessManager
                 });
             });
             
+            // Register message listeners
+            worker.on('message', (msg: string) => {
+                msg = msg + '';
+                
+                if (msg.indexOf('ASSET_MSG::') !== 0) {
+                    return;
+                }
+                
+                msg = msg.substr(11);
+                const nsEndPos = msg.indexOf('::');
+                const ns = msg.substr(0, nsEndPos);
+                const data = JSON.parse(msg.substr(nsEndPos + 2));
+                forEach(this.listeners, listener => {
+                    if (listener.namespace !== ns) {
+                        return;
+                    }
+                    
+                    listener.listener(data, ns, worker);
+                });
+            });
+            
             // Start the work process
             worker.send({
-                context: coreContext.toJson(),
+                context: this.context.toJson(),
                 app: JSON.stringify(app)
             });
             
             // Resolve the promise if the child was closed
             worker.on('exit', (code) => {
                 if (stopped) {
+                    resolve();
                     return;
                 }
                 stopped = true;
                 
                 // Check if we got an error
                 if (code !== 0 && code !== null) {
-                    coreContext.eventEmitter.emitHook(EventList.SHUTDOWN, {})
-                               .then(() => {
-                                   reject(new Error(
-                                       'The worker process no. ' + app.id + ' was closed with a non-zero exit code!'));
-                               });
+                    this.context.eventEmitter.emitHook(EventList.SHUTDOWN, {})
+                        .then(() => {
+                            reject(new Error(
+                                'The worker process no. ' + app.id + ' was closed with a non-zero exit code!'));
+                        });
                     return;
                 }
                 
-                coreContext.logger.log('Worker process no. ' + app.id + ' finished');
+                this.context.logger.debug('Worker process no. ' + app.id + ' finished');
                 resolve();
             });
+        });
+    }
+    
+    /**
+     * Allows a worker process to send any kind of data to the core process
+     * @param namespace
+     * @param data
+     */
+    public sendMessageToParent(namespace: string, data: any): void
+    {
+        if (!process.send) {
+            throw new Error('Can\'t send a message to the parent process, because we are already in the core process!');
+        }
+        process.send('ASSET_MSG::' + namespace + '::' + JSON.stringify(data));
+    }
+    
+    /**
+     * Adds a new message listener, which listeners for messages send by a worker process
+     * @param namespace
+     * @param listener
+     */
+    public addMessageListener(namespace: string, listener: IProcessMessageListener): void
+    {
+        this.listeners.push({
+            namespace, listener
         });
     }
 }

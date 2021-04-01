@@ -77,14 +77,18 @@ export class Bootstrap
         }
         
         // Warm up the core context
-        const coreContext = CoreContext.fromJson(message.context);
+        const coreContext = CoreContext.fromJson(message.context, 'worker');
         const app: IAppDefinition = JSON.parse(message.app);
-        coreContext.process = 'worker';
+        coreContext.io.setAppName(app.appName ?? 'LIMBO:App - ' + app.id);
         this.applyEnvironmentFixes();
         
         // Create the worker context using the factory
         this.bindWorkerProcessEventHandlers(coreContext);
-        return await this._factory.makeWorkerContext(coreContext, app);
+        const worker = await this._factory.makeWorkerContext(coreContext, app);
+        coreContext.io.setAppName(worker.app.appName!);
+        
+        
+        return worker;
     }
     
     /**
@@ -107,12 +111,20 @@ export class Bootstrap
      */
     protected bindMainProcessEventHandlers(context: CoreContext): void
     {
+        let isShuttingDown = false;
         const shutdownHandler = async function () {
-            context.logger.log('Starting main process shutdown...');
+            if (isShuttingDown) {
+                return;
+            }
+            isShuttingDown = true;
+            
+            context.logger.debug('Starting main process shutdown...');
             await context.eventEmitter!.emitHook(EventList.SHUTDOWN, {});
-            context.logger.log('Good bye!');
+            context.logger.debug('Good bye!');
             process.exit(0);
         };
+        
+        process.on('exit', shutdownHandler);
         process.on('SIGTERM', shutdownHandler);
         process.on('SIGINT', shutdownHandler);
         
@@ -138,7 +150,7 @@ export class Bootstrap
     protected bindWorkerProcessEventHandlers(context: CoreContext): void
     {
         const shutdownHandler = async function () {
-            context.logger.log('Starting worker process shutdown...');
+            context.logger.debug('Starting worker process shutdown...');
             await context.eventEmitter!.emitHook(EventList.SHUTDOWN, {});
             process.exit(0);
         };

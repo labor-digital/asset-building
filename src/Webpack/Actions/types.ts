@@ -32,6 +32,13 @@ export interface ICompilerOptions
     config?: Configuration;
     
     /**
+     * Allows you to inject a pre-configured webpack compiler instance
+     * The script will just wrap and execute it, like any other compiler,
+     * NOTE: this will disable all other options!
+     */
+    compiler?: Compiler;
+    
+    /**
      * Allows you to supply your own options when the configuration is generated.
      * Note that this option does nothing if "config" was supplied!
      */
@@ -144,4 +151,15 @@ export interface ICompilerResult
 export interface ICompilerCallback<T = Stats>
 {
     (err?: Error, result?: T): any;
+}
+
+export interface IWorkerAction
+{
+    
+    /**
+     * Receives the worker context and must perform the required steps for the action
+     * @param context
+     */
+    do(context: WorkerContext): any;
+    
 }

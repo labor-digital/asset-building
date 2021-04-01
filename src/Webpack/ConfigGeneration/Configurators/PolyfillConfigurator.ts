@@ -19,9 +19,9 @@
 import {isArray} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class PolyfillConfigurator implements ConfiguratorInterface
+export class PolyfillConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

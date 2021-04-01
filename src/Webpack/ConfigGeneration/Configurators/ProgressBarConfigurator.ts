@@ -21,14 +21,16 @@ import WebpackBar from 'webpackbar';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class ProgressBarConfigurator implements ConfiguratorInterface
+export class ProgressBarConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
+        return;
         await ConfigGenUtil.addPlugin(PluginIdentifier.PROGRESS_BAR, context, {
-            name: context.app.appName
+            name: context.app.appName,
+            basic: true
         }, config => new WebpackBar(config));
     }
 }

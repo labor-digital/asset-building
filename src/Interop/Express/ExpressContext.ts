@@ -23,7 +23,7 @@ import {Factory} from '../../Core/Factory';
 import type {IBuilderOptions} from '../../Core/types';
 import type {WorkerContext} from '../../Core/WorkerContext';
 
-export default class ExpressContext
+export class ExpressContext
 {
     /**
      * Defines the type of this context
@@ -64,6 +64,7 @@ export default class ExpressContext
     public constructor(expressApp: Application, options?: IBuilderOptions)
     {
         this.options = options ?? {};
+        this.options.environment = 'express';
         this.isProd = process.env.NODE_ENV !== 'development';
         this.type = 'express';
         this.expressApp = expressApp;
@@ -142,7 +143,7 @@ export default class ExpressContext
             noInfo: true,
             hot: true
         };
-        WebpackDevServer.addDevServerEntrypoints(config, devServerOptions);
+        WebpackDevServer.addDevServerEntrypoints(config as any, devServerOptions);
         
         const compiler = await worker.do.makeCompiler({config});
         
@@ -155,6 +156,7 @@ export default class ExpressContext
                 'Pragma': 'no-cache'
             }
         }));
+        
         this.expressApp.use(require('webpack-hot-middleware')(compiler, {
             // log: false,
             path: '/__webpack_hmr',

@@ -18,14 +18,14 @@
 
 import {isArray, isString} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
+import {createServer, Server} from 'http';
 import portfinder from 'portfinder';
 import WebpackDevServer from 'webpack-dev-server';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {PluginIdentifier} from '../../Identifier';
-import type {IRunDevServerOptions} from './types';
-import type {WorkerActionInterface} from './WorkerActionInterface';
+import type {IRunDevServerOptions, IWorkerAction} from './types';
 
-export class RunDevServerAction implements WorkerActionInterface
+export class RunDevServerAction implements IWorkerAction
 {
     public async do(context: WorkerContext, options?: IRunDevServerOptions): Promise<WebpackDevServer>
     {
@@ -36,11 +36,7 @@ export class RunDevServerAction implements WorkerActionInterface
             ]
         });
         
-        const port = context.app.devServer?.port ?? await portfinder.getPortPromise({
-            port: 8888,
-            stopPort: 9000
-        });
-        const host = context.app.devServer?.host ?? 'localhost';
+        const {port, host, tempServer} = await this.resolvePort(context);
         
         if (!isArray(config.entry)) {
             config.entry = [config.entry as any];
@@ -60,10 +56,10 @@ export class RunDevServerAction implements WorkerActionInterface
             ...options?.devServer
         };
         
-        WebpackDevServer.addDevServerEntrypoints(config, devServerOptions);
+        WebpackDevServer.addDevServerEntrypoints(config as any, devServerOptions);
         
         const compiler = await context.do.makeCompiler({config});
-        const server = new WebpackDevServer(compiler, devServerOptions);
+        const server = new WebpackDevServer(compiler as any, devServerOptions);
         
         let rendered = false;
         compiler.hooks.afterDone.tap('DevServerOutput', function () {
@@ -72,20 +68,82 @@ export class RunDevServerAction implements WorkerActionInterface
             }
             rendered = true;
             
-            console.log(`
-[DEV SERVER]: ${Chalk.greenBright('started')}
+            console.log(`[DEV SERVER]: ${Chalk.greenBright('started')}
 Running on: http://${host}:${port}
+Public path: http://${host}:${port}${publicPath}
 `);
         });
         
+        // Destroy our temporary server
+        if (tempServer) {
+            await new Promise<void>(resolve => {
+                tempServer.close(() => resolve());
+            });
+        }
+        
+        // Now, start the real server
         server.listen(port, host, function (err) {
             if (err) {
                 throw new Error('Failed to start dev server, because: ' + err);
             }
-            
-            
         });
         
         return server;
+    }
+    
+    /**
+     * Resolving the port is a bit tricky, first we use the given option
+     * Or we try to find a port using the port finder AND when doing so, we will
+     * block the selected port, so no other process will steal it, right before our very eyes o.O
+     * @param context
+     * @protected
+     */
+    protected async resolvePort(context: WorkerContext): Promise<{ port: number, host: string, tempServer?: Server }>
+    {
+        const host = context.app.devServer?.host ?? 'localhost';
+        let port = context.app.devServer?.port;
+        
+        let tempServer: Server | undefined;
+        if (!port) {
+            
+            tempServer = createServer(() => {});
+            let error = false;
+            tempServer.on('error', () => {error = true;});
+            
+            let hasPort = false;
+            port = 8888;
+            for (let i = 0; i < 10; i++) {
+                error = false;
+                port = await portfinder.getPortPromise({
+                    port: port,
+                    stopPort: 9000
+                });
+                context.logger.debug('Trying to bind to port: ' + port + ' (' + (i + 1) + '/10)');
+                try {
+                    tempServer.listen(port, host);
+                    await new Promise<void>(resolve => {
+                        setTimeout(() => resolve(), 500);
+                        tempServer!.on('listening', () => {
+                            resolve();
+                        });
+                    });
+                    
+                    if (error) {
+                        continue;
+                    }
+                    
+                    hasPort = true;
+                    break;
+                } catch (e) {
+                    context.logger.debug('Failed to bind to port: ' + port + ', retry!');
+                }
+            }
+            
+            if (!hasPort) {
+                throw new Error('Failed to find a port to run the dev-server on!');
+            }
+        }
+        
+        return {port, host, tempServer};
     }
 }

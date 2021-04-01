@@ -16,18 +16,16 @@
  * Last modified: 2019.10.05 at 21:15
  */
 
-import type {PlainObject} from '@labor-digital/helferlein';
 import {isString} from '@labor-digital/helferlein';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import * as fs from 'fs';
 import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {EventList} from '../../../EventList';
-import {LoaderIdentifier, PluginIdentifier} from '../../../Identifier';
+import {LoaderIdentifier, PluginIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class TypescriptConfigurator implements ConfiguratorInterface
+export class TypescriptConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
@@ -39,31 +37,24 @@ export class TypescriptConfigurator implements ConfiguratorInterface
                 configFilePath + '"!');
         }
         
-        let args;
-        args = await context.eventEmitter.emitHook(EventList.FILTER_TYPESCRIPT_OPTIONS, {
-            options: {
-                context: path.dirname(configFilePath),
-                configFile: configFilePath,
-                transpileOnly: true,
-                experimentalWatchApi: true,
-                onlyCompileBundledFiles: true,
-                appendTsSuffixTo: [/\.vue$/]
-            },
-            context
-        });
-        
-        const typescriptOptions: PlainObject = args.options;
-        
-        await ConfigGenUtil.addJsLoader(LoaderIdentifier.TS, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
-            use: [
-                {
+        await ConfigGenUtil.addJsRule(RuleIdentifier.TS, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.TS, context)
+                .addLoader(LoaderIdentifier.TS, {
                     loader: 'ts-loader',
-                    options: typescriptOptions
-                }
-            ]
+                    options: {
+                        context: path.dirname(configFilePath),
+                        configFile: configFilePath,
+                        transpileOnly: true,
+                        experimentalWatchApi: true,
+                        onlyCompileBundledFiles: true,
+                        appendTsSuffixTo: [/\.vue$/]
+                    }
+                })
+                .finish()
         });
         
-        // Only register the typechecker plugin if it was actually required by the app
+        // Only register the type-checker plugin if it was actually required by the app
         if (context.app.useTypeChecker) {
             await ConfigGenUtil.addPlugin(PluginIdentifier.TS_CHECK, context, {
                     typescript: {

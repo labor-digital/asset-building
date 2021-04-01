@@ -42,17 +42,34 @@ export enum ConfiguratorIdentifier
     BUILT_IN_PLUGIN = 'conf:builtIn',
 }
 
+export enum RuleIdentifier
+{
+    HTML = 'rule:html',
+    IMAGE = 'rule:image',
+    IMAGE_SVG = 'rule:image:svg',
+    FONT = 'rule:font',
+    JS_PRE = 'rule:js:pre',
+    JS_COMPAT = 'rule:js:pre',
+    TS = 'rule:ts',
+    LESS = 'rule:less',
+    SASS = 'rule:sass',
+}
+
 export enum LoaderIdentifier
 {
+    FILE = 'loader:file',
     HTML = 'loader:html',
-    IMAGE = 'loader:image',
-    IMAGE_SVG = 'loader:image:svg',
-    FONT = 'loader:font',
-    JS_PRE = 'loader:js:pre',
+    IMPORTS = 'loader:imports',
+    URL = 'loader:url',
+    URL_SVG = 'loader:url:svg',
+    IMAGE_OPTIMIZATION = 'loader:imageOptimization',
+    CSS = 'loader:css',
     TS = 'loader:ts',
-    POST_CSS = 'loader:postCss',
     LESS = 'loader:less',
     SASS = 'loader:sass',
+    STYLE_RESOURCE = 'loader:style:resource',
+    STYLE_LAST = 'loader:style:resource',
+    POST_CSS = 'loader:postCss',
 }
 
 export enum PluginIdentifier
@@ -71,7 +88,8 @@ export enum PluginIdentifier
     BUNDLE_ANALYZER = 'plugin:bundleAnalyzer',
     FANCY_STATS = 'plugin:fancyStats',
     PROMISE_SHIM = 'plugin:promiseShim',
-    GIT_ADD = 'plugin:gitAdd'
+    GIT_ADD = 'plugin:gitAdd',
+    PROGRESS_PROVIDER = 'plugin:progressProvider'
 }
 
-export type Identifier = ConfiguratorIdentifier | LoaderIdentifier | PluginIdentifier | string;
+export type Identifier = ConfiguratorIdentifier | RuleIdentifier | PluginIdentifier | string;

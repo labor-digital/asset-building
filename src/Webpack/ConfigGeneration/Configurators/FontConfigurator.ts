@@ -18,17 +18,18 @@
 
 import {md5} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {LoaderIdentifier} from '../../../Identifier';
+import {LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class FontConfigurator implements ConfiguratorInterface
+export class FontConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        await ConfigGenUtil.addLoader(LoaderIdentifier.FONT, context, /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/, {
-            use: [
-                {
+        await ConfigGenUtil.addRule(RuleIdentifier.FONT, context, /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/, {
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.FONT, context)
+                .addLoader(LoaderIdentifier.FILE, {
                     loader: 'file-loader',
                     options: {
                         name: (file: string) => {
@@ -40,8 +41,8 @@ export class FontConfigurator implements ConfiguratorInterface
                         },
                         outputPath: 'assets/'
                     }
-                }
-            ]
+                })
+                .finish()
         });
     }
 }

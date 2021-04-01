@@ -18,39 +18,42 @@
 
 import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
+import {ConfiguratorIdentifier, LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
 import {CustomSassLoaderPreCompilerCacheInvalidatePlugin} from '../../Plugins/CustomSassLoaderPreCompilerCacheInvalidatePlugin';
 import {ConfigGenUtil} from '../ConfigGenUtil';
+import type {IConfigurator} from '../types';
 import {AbstractStyleLoaderConfigurator} from './AbstractStyleLoaderConfigurator';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
 
-export class SassConfigurator extends AbstractStyleLoaderConfigurator implements ConfiguratorInterface
+export class SassConfigurator extends AbstractStyleLoaderConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
         // Register cache clear plugin for custom sass compiler
         context.webpackConfig.plugins.push(new CustomSassLoaderPreCompilerCacheInvalidatePlugin());
         
-        await ConfigGenUtil.addLoader(LoaderIdentifier.SASS, context, /\.(sa|sc|c)ss$/, {
-            use: [
-                await this.makeLastLoader(context, LoaderIdentifier.SASS),
-                {
+        await ConfigGenUtil.addRule(RuleIdentifier.SASS, context, /\.(sa|sc|c)ss$/, {
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.SASS, context)
+                .addLoader(LoaderIdentifier.STYLE_LAST, await this.makeLastLoader(context, RuleIdentifier.SASS))
+                .addRaw(await this.makeLastMinuteLoaders(context, RuleIdentifier.SASS))
+                .addLoader(LoaderIdentifier.CSS, {
                     loader: 'css-loader',
                     options: {
                         esModule: false,
                         import: true
                     }
-                },
-                await this.makePostcssConfig(ConfiguratorIdentifier.SASS, context),
-                {
+                })
+                .addLoader(LoaderIdentifier.POST_CSS,
+                    await this.makePostcssConfig(ConfiguratorIdentifier.SASS, context))
+                .addLoader(LoaderIdentifier.SASS, {
                     loader: path.resolve(context.parentContext.paths.assetBuilder,
                         './Webpack/Loaders/CustomSassLoader/CustomSassLoader.js'),
                     options: {
                         app: context.app,
-                        context
+                        context: () => context
                     }
-                },
-                {
+                })
+                .addLoader(LoaderIdentifier.STYLE_RESOURCE, {
                     loader: path.resolve(context.parentContext.paths.assetBuilder,
                         './Webpack/Loaders/ResourceLoader/ResourceLoader.js'),
                     options: {
@@ -58,8 +61,8 @@ export class SassConfigurator extends AbstractStyleLoaderConfigurator implements
                         entry: context.app.entry,
                         ext: ['sass', 'scss', 'css']
                     }
-                }
-            ]
+                })
+                .finish()
         });
     }
 }

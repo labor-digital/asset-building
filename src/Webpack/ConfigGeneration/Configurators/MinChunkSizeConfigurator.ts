@@ -20,9 +20,9 @@ import webpack from 'webpack';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class MinChunkSizeConfigurator implements ConfiguratorInterface
+export class MinChunkSizeConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

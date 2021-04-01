@@ -6,5 +6,8 @@
 		"moduleResolution": "node",
 		"module": "esnext",
 		"jsx": "react"
-	}
+	},
+	"files": [
+		"./a-file-which-is-hopefully-never-there.ts"
+	]
 }

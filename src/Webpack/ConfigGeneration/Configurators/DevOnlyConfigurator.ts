@@ -18,9 +18,9 @@
 
 import {merge} from 'webpack-merge';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class DevOnlyConfigurator implements ConfiguratorInterface
+export class DevOnlyConfigurator implements IConfigurator
 {
     public apply(context: WorkerContext): Promise<void>
     {

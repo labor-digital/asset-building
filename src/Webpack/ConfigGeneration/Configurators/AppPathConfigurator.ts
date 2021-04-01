@@ -20,9 +20,9 @@ import path from 'path';
 import {merge} from 'webpack-merge';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {FileHelpers} from '../../../Helpers/FileHelpers';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class AppPathConfigurator implements ConfiguratorInterface
+export class AppPathConfigurator implements IConfigurator
 {
     apply(context: WorkerContext): Promise<void>
     {

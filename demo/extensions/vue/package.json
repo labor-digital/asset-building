@@ -1,0 +1,29 @@
+{
+	"name": "demo",
+	"version": "1.0.0",
+	"description": "A demoproject to show how the buildprocess works",
+	"scripts": {
+		"build": "assets",
+		"watch": "assets dev --watch --verbose",
+		"dev": "assets dev --devServer --verbose",
+		"install-dev:compile": "cd ../../../extensions/vue && npm run install-dev",
+		"install-dev": "npm run install-dev:compile && npm run install"
+	},
+	"devDependencies": {
+		"@labor-digital/asset-building": "file:../../../",
+		"@labor-digital/asset-building-env-vuejs": "file:../../../extensions/vue"
+	},
+	"labor": {
+		"builderVersion": 2,
+		"apps": [
+			{
+				"entry": "./frontend/src/Index.ts",
+				"output": "./frontend/dist/bundle.js",
+				"publicPath": "/",
+				"extensions": [
+					"@labor-digital/asset-building-env-vuejs"
+				]
+			}
+		]
+	}
+}

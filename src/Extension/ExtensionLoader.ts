@@ -23,6 +23,7 @@ import path from 'path';
 import type {CoreContext} from '../Core/CoreContext';
 import type {WorkerContext} from '../Core/WorkerContext';
 import {EventList} from '../EventList';
+import type {AbstractExtension} from './AbstractExtension';
 
 export class ExtensionLoader
 {
@@ -42,9 +43,11 @@ export class ExtensionLoader
         if (!isPlainObject(definition)) {
             return Promise.resolve();
         }
+        
         if (!isArray(definition.extensions)) {
             return Promise.resolve();
         }
+        
         return this.loadExtensions(scope, context, definition.extensions);
     }
     
@@ -65,12 +68,15 @@ export class ExtensionLoader
         const extensions: Array<Function> = [];
         forEach(extensionPaths, (extensionPath: string) => {
             const extension = this.resolveExtensionPath(context, extensionPath);
+            
             // Ignore if this extension is already known
             if (extensions.indexOf(extension) !== -1) {
-                coreContext.logger.log('Skipped to load already known extension: ' + extension);
+                coreContext.logger.debug('Skipped to load already known extension: ' + extension);
                 return;
             }
+            
             extensions.push(extension);
+            
             context.eventEmitter.bind(EventList.EXTENSION_LOADING, () => {
                 return extension(context, scope);
             });
@@ -140,6 +146,7 @@ export class ExtensionLoader
                         }
                         parts.pop();
                     }
+                    
                     return false;
                 } catch (e) {
                     if (e.toString().indexOf('find module') === -1 || e.toString().indexOf(extensionBaseName) === -1) {
@@ -153,12 +160,28 @@ export class ExtensionLoader
             throw new Error(
                 'Invalid extension path given! Missing extension: "' + extensionPath + '"');
         }
+        
         if (!isFunction(extension)) {
             if (isPlainObject(extension) && isFunction((extension as any).default)) {
-                extension
-                    = (extension as any).default;
+                extension = (extension as any).default;
             } else {
                 throw new Error('The defined extension: "' + extensionPath + '" isn\'t a function!');
+            }
+        }
+        
+        if ((extension as any).assetExtension) {
+            try {
+                // We wrap the new, fancy extension classes in a legacy extension to keep backward compatible.
+                const ctor: any = extension;
+                extension = function (context: any, scope: string): Promise<void> {
+                    const i: AbstractExtension = new ctor(extensionBaseName, context, scope);
+                    return i.initialize();
+                };
+            } catch (e) {
+                if (e.message === '__SKIP__') {
+                    extension = -1;
+                }
+                throw e;
             }
         }
         

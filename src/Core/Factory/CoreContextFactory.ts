@@ -47,7 +47,7 @@ export class CoreContextFactory
         options = this.enhanceOptionsFromPackageJson(options);
         options = this.prepareOptions(options);
         
-        const context = new CoreContext(options);
+        const context = CoreContext.new(options);
         CoreFixes.resolveFilenameFix(context);
         await this.loadExtensions(context);
         await this.findMode(context);

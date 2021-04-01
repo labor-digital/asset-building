@@ -68,4 +68,22 @@ export class GeneralHelper
             process.exit(1);
         }
     }
+    
+    /**
+     * Small for-each helper that waits on promises returned by its callback
+     * @param list
+     * @param callback
+     */
+    public static async awaitingForEach<T = any>(
+        list: Array<T>,
+        callback: (el: T, k: number) => Promise<any>
+    ): Promise<void>
+    {
+        for (let i = 0; i < list.length; i++) {
+            const res = await callback(list[i], i);
+            if (res === false) {
+                break;
+            }
+        }
+    }
 }

@@ -33,7 +33,7 @@ import {Factory} from '../../Core/Factory';
 import type {IAppDefinition} from '../../Core/types';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
-import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier} from '../../Identifier';
+import {ConfiguratorIdentifier, LoaderIdentifier, PluginIdentifier, RuleIdentifier} from '../../Identifier';
 import type {IMakeEnhancedConfigActionOptions} from '../../Webpack/Actions/types';
 
 export class NuxtFactory
@@ -146,24 +146,26 @@ export class NuxtFactory
                        ].indexOf(test) !== -1;
             },
             events: {
-                [EventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
-                    e.args.options.compilerOptions.jsxFactory = 'h';
-                },
-                [EventList.FILTER_LOADER_CONFIG]: (e) => {
+                [EventList.FILTER_RULE_CONFIG]: (e) => {
                     switch (e.args.identifier) {
-                        case LoaderIdentifier.SASS:
-                        case LoaderIdentifier.LESS:
+                        case RuleIdentifier.SASS:
+                        case RuleIdentifier.LESS:
                             return this.modifyStyleLoader(e);
                     }
                 },
                 [EventList.FILTER_POSTCSS_PLUGINS]: (e) => {
                     const context = e.args.context;
                     if (!context.isProd) {
+                        e.args.plugins.push(require('cssnano'));
+                    }
+                },
+                [EventList.FILTER_LOADER_CONFIG]: (e) => {
+                    if (e.args.identifier !== LoaderIdentifier.TS) {
                         return;
                     }
-                    e.args.plugins.push(require('cssnano'));
-                },
-                [EventList.FILTER_TYPESCRIPT_OPTIONS]: (e) => {
+                    
+                    e.args.options.compilerOptions.jsxFactory = 'h';
+                    
                     // We adjust the typescript options here to match
                     // https://github.com/nuxt/typescript/blob/master/packages/typescript-build/src/index.ts#L65
                     // and
@@ -196,6 +198,7 @@ export class NuxtFactory
             worker.parentContext.paths.assetBuilder,
             '/dist/Webpack/Loaders/DeepRemover/DeepRemoverLoader.js'
         );
+        // @todo this can be done better now, look at vue-extension
         e.args.config.use.forEach((v: any, k: any) => {
             if (typeof v === 'string') {
                 v = {loader: v};

@@ -18,4 +18,4 @@
 import './Components/Components.js';
 import './Globals/Globals.sass';
 
-console.log('hallo 2');
+console.log('hallo 1212');

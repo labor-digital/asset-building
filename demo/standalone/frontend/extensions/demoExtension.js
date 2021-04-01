@@ -15,8 +15,13 @@
  *
  * Last modified: 2019.10.06 at 17:41
  */
+const AbstractExtension = require('@labor-digital/asset-building').AbstractExtension;
 
-module.exports = function demoExtension(context, scope) {
-    console.log('[EXTENSION]: Loaded demoExtension.js for scope: ' + scope + ' context type: ' + context.type +
-                ' in process: ' + context.process);
+module.exports = class DemoExtension extends AbstractExtension
+{
+    initialize()
+    {
+        console.log('[EXTENSION]: Loaded demoExtension.js for scope: ' + this.scope +
+                    ' in process: ' + this.coreContext.process);
+    }
 };

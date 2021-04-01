@@ -24,9 +24,9 @@ import {merge} from 'webpack-merge';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class ProdOnlyConfigurator implements ConfiguratorInterface
+export class ProdOnlyConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

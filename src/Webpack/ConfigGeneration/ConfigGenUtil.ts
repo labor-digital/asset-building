@@ -17,31 +17,32 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
+import {cloneList, forEach} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
-import type {LoaderIdentifier, PluginIdentifier} from '../../Identifier';
+import {GeneralHelper} from '../../Helpers/GeneralHelper';
+import type {PluginIdentifier, RuleIdentifier} from '../../Identifier';
+import type {IPluginProvider, IRuleUseChainCollector} from './types';
 
-export interface IPluginProvider<T = any>
-{
-    (config: T): any
-}
 
 export class ConfigGenUtil
 {
     
     /**
-     * Helper to add a new webpack loader configuration to the webpack config object of the provided context
+     * Helper to add a new webpack rule configuration to the webpack config object of the provided context
      *
      * @param identifier The unique identifier of the loader to register
      * @param context The context to add the plugin to
      * @param test The "test" for the loader. A regex for the matching filenames
      * @param config The loader configuration to apply
+     * @param prepend If true, the rule will be added before all other rules
      */
-    public static async addLoader<ConfT = PlainObject>(
-        identifier: LoaderIdentifier | string,
+    public static async addRule<ConfT = PlainObject>(
+        identifier: RuleIdentifier | string,
         context: WorkerContext,
         test: RegExp,
-        config: ConfT
+        config: ConfT,
+        prepend?: boolean
     ): Promise<boolean>
     {
         
@@ -53,26 +54,108 @@ export class ConfigGenUtil
             return false;
         }
         
-        args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_TEST, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_RULE_TEST, {
             test, identifier, context
         });
         
-        args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_CONFIG, {
+        args = await context.eventEmitter.emitHook(EventList.FILTER_RULE_CONFIG, {
             config: {
-                ...config,
+                ...cloneList(config),
                 test: args.test
             },
             identifier,
             context
         });
         
-        context.webpackConfig.module.rules.push(args.config);
+        const rules = context.webpackConfig.module.rules;
+        if (prepend) {
+            rules.unshift(args.config);
+        } else {
+            rules.push(args.config);
+        }
         
         return true;
     }
     
     /**
-     * Does exactly the same as addLoader() but triggers the "FILTER_JS_EXCLUDE_PATTERN" hook first
+     * Internal helper to build a rule "use" list where each of the added elements gets filtered by the outside world
+     */
+    public static makeRuleUseChain(
+        ruleIdent: RuleIdentifier | string,
+        context: WorkerContext
+    ): IRuleUseChainCollector
+    {
+        const def: Array<{ type: 'raw' | 'given', config: PlainObject, identifier?: string }> = [];
+        
+        return {
+            addLoader(identifier, config)
+            {
+                def.push({type: 'given', config: cloneList(config), identifier});
+                return this;
+            },
+            
+            addRaw(list: Array<any>)
+            {
+                forEach(list, config => {
+                    def.push({type: 'raw', config: cloneList(config)});
+                });
+                
+                return this;
+            },
+            
+            async finish(): Promise<Array<any>>
+            {
+                let use: Array<PlainObject> = [];
+                
+                await GeneralHelper.awaitingForEach(def, async (entry) => {
+                    if (entry.type === 'raw') {
+                        use.push(entry.config);
+                        return;
+                    }
+                    
+                    let args = await context.eventEmitter.emitHook(EventList.CHECK_IDENTIFIER_STATE, {
+                        identifier: entry.identifier,
+                        ruleIdent,
+                        enabled: true,
+                        config: entry.config,
+                        context
+                    });
+                    
+                    if (!args.enabled) {
+                        return this;
+                    }
+                    
+                    args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_CONFIG, {
+                        identifier: entry.identifier,
+                        ruleIdent,
+                        config: entry.config,
+                        context
+                    });
+                    
+                    use.push(args.config);
+                    
+                    args = await context.eventEmitter.emitHook(EventList.AFTER_LOADER_CONFIG_ADDED, {
+                        identifier: entry.identifier,
+                        ruleIdent,
+                        config: entry.config,
+                        use,
+                        context
+                    });
+                    use = args.use;
+                });
+                
+                let args = await context.eventEmitter.emitHook(EventList.FILTER_RULE_USE_LIST, {
+                    ruleIdent, use, context
+                });
+                
+                return args.use;
+            }
+        };
+        
+    }
+    
+    /**
+     * Does exactly the same as addRule() but triggers the "FILTER_JS_EXCLUDE_PATTERN" hook first
      * and then adds the result to the "config" object, before the other loader hooks are executed
      *
      * @param identifier
@@ -80,8 +163,8 @@ export class ConfigGenUtil
      * @param test
      * @param config
      */
-    public static async addJsLoader<ConfT = PlainObject>(
-        identifier: LoaderIdentifier | string,
+    public static async addJsRule<ConfT = PlainObject>(
+        identifier: RuleIdentifier | string,
         context: WorkerContext,
         test: RegExp,
         config: ConfT
@@ -92,7 +175,7 @@ export class ConfigGenUtil
             context
         });
         
-        return this.addLoader(identifier, context, test, {
+        return this.addRule(identifier, context, test, {
             exclude: args.pattern ?? undefined,
             ...config
         });
@@ -111,7 +194,7 @@ export class ConfigGenUtil
     ): Promise<ConfT>
     {
         const args = await context.eventEmitter.emitHook(EventList.FILTER_PLUGIN_CONFIG, {
-            config, identifier, context
+            config: cloneList(config), identifier, context
         });
         return args.config;
     }

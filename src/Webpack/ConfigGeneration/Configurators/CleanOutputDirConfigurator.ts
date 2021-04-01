@@ -21,9 +21,9 @@ import path from 'path';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class CleanOutputDirConfigurator implements ConfiguratorInterface
+export class CleanOutputDirConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

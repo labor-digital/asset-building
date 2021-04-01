@@ -33,10 +33,9 @@ import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier} from '../../Identifier';
 import {resolveFileExtensions} from '../ConfigGeneration/Configurators/BaseConfigurator';
-import type {IMakeEnhancedConfigActionOptions} from './types';
-import type {WorkerActionInterface} from './WorkerActionInterface';
+import type {IMakeEnhancedConfigActionOptions, IWorkerAction} from './types';
 
-export class MakeEnhancedConfigAction implements WorkerActionInterface
+export class MakeEnhancedConfigAction implements IWorkerAction
 {
     
     /**

@@ -18,13 +18,10 @@
 
 import type {Compiler} from 'webpack';
 import {SassFileResolver} from '../Loaders/CustomSassLoader/SassFileResolver';
-import type {
-    AssetBuilderWebpackPluginInterface,
-    AssetBuilderWebpackPluginStaticInterface
-} from './AssetBuilderWebpackPluginInterface';
+import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from './types';
 
-export const CustomSassLoaderPreCompilerCacheInvalidatePlugin: AssetBuilderWebpackPluginStaticInterface =
-    class implements AssetBuilderWebpackPluginInterface
+export const CustomSassLoaderPreCompilerCacheInvalidatePlugin: IAssetBuilderPluginStatic =
+    class implements IAssetBuilderPlugin
     {
         apply(compiler: Compiler)
         {

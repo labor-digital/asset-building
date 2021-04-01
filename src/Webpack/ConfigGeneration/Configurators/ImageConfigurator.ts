@@ -18,11 +18,11 @@
 
 import {md5} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {LoaderIdentifier} from '../../../Identifier';
+import {LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class ImageConfigurator implements ConfiguratorInterface
+export class ImageConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
@@ -59,10 +59,11 @@ export class ImageConfigurator implements ConfiguratorInterface
         };
         
         // Generic images
-        await ConfigGenUtil.addLoader(LoaderIdentifier.IMAGE, context, /\.(png|jpe?g|gif|webp|avif)$/,
+        await ConfigGenUtil.addRule(RuleIdentifier.IMAGE, context, /\.(png|jpe?g|gif|webp|avif)$/,
             {
-                use: [
-                    {
+                use: await ConfigGenUtil
+                    .makeRuleUseChain(RuleIdentifier.IMAGE, context)
+                    .addLoader(LoaderIdentifier.URL, {
                         loader: 'url-loader',
                         options: {
                             name: generateName,
@@ -76,15 +77,16 @@ export class ImageConfigurator implements ConfiguratorInterface
                                 }
                             }
                         }
-                    },
-                    imageOptimization
-                ]
+                    })
+                    .addLoader(LoaderIdentifier.IMAGE_OPTIMIZATION, imageOptimization)
+                    .finish()
             });
         
         // SVG images -> Fallback for IE 11
-        await ConfigGenUtil.addLoader(LoaderIdentifier.IMAGE_SVG, context, /\.svg$/, {
-            use: [
-                {
+        await ConfigGenUtil.addRule(RuleIdentifier.IMAGE_SVG, context, /\.svg$/, {
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.IMAGE_SVG, context)
+                .addLoader(LoaderIdentifier.URL_SVG, {
                     loader: 'svg-url-loader',
                     options: {
                         name: generateName,
@@ -94,9 +96,9 @@ export class ImageConfigurator implements ConfiguratorInterface
                         iesafe: true,
                         stripdeclarations: true
                     }
-                },
-                imageOptimization
-            ]
+                })
+                .addLoader(LoaderIdentifier.IMAGE_OPTIMIZATION, imageOptimization)
+                .finish()
         });
     }
     

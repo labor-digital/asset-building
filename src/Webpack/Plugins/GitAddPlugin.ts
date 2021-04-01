@@ -22,55 +22,51 @@ import type {Compiler} from 'webpack';
 import {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 // @ts-ignore
-import {
-    AssetBuilderWebpackPluginInterface,
-    AssetBuilderWebpackPluginStaticInterface
-} from './AssetBuilderWebpackPluginInterface';
+import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from './types';
 
-export const GitAddPlugin: AssetBuilderWebpackPluginStaticInterface =
-    class implements AssetBuilderWebpackPluginInterface
+export const GitAddPlugin: IAssetBuilderPluginStatic = class implements IAssetBuilderPlugin
+{
+    
+    protected _context?: WorkerContext;
+    
+    public setContext(context: WorkerContext): void
+    {
+        this._context = context;
+    }
+    
+    public apply(compiler: Compiler)
     {
         
-        protected _context?: WorkerContext;
-        
-        public setContext(context: WorkerContext): void
-        {
-            this._context = context;
+        // Don't add files to git if we are watching
+        // Or if git add was disabled
+        if (!this._context || this._context.webpackConfig.watch || this._context.app.disableGitAdd === true) {
+            return;
         }
         
-        public apply(compiler: Compiler)
-        {
-            
-            // Don't add files to git if we are watching
-            // Or if git add was disabled
-            if (!this._context || this._context.webpackConfig.watch || this._context.app.disableGitAdd === true) {
-                return;
-            }
-            
-            compiler.hooks.done.tap('GitAddPlugin', (statsRaw) => {
-                let stats = statsRaw.toJson({
-                    assets: true,
-                    errorDetails: false,
-                    publicPath: true
-                });
-                
-                return this._context!.eventEmitter.emitHook(EventList.BEFORE_GIT_ADD, {
-                    context: this._context
-                }).then(() => {
-                    try {
-                        const childProcess = require('child_process');
-                        childProcess.execSync('git add ' + stats.outputPath, {stdio: 'pipe'});
-                        console.log(
-                            Chalk.greenBright(
-                                'The built files in ' + stats.outputPath!.substr(-50) + ' were added to git!')
-                        );
-                    } catch (e) {
-                        this._context?.parentContext.logger.log(
-                            Chalk.yellowBright('Failed to automagically add files in ' + stats.outputPath + ' to git')
-                        );
-                    }
-                });
+        compiler.hooks.done.tap('GitAddPlugin', (statsRaw) => {
+            let stats = statsRaw.toJson({
+                assets: true,
+                errorDetails: false,
+                publicPath: true
             });
-        }
-        
-    };
+            
+            return this._context!.eventEmitter.emitHook(EventList.BEFORE_GIT_ADD, {
+                context: this._context
+            }).then(() => {
+                try {
+                    const childProcess = require('child_process');
+                    childProcess.execSync('git add ' + stats.outputPath, {stdio: 'pipe'});
+                    console.log(
+                        Chalk.greenBright(
+                            'The built files in ' + stats.outputPath!.substr(-50) + ' were added to git!')
+                    );
+                } catch (e) {
+                    this._context?.parentContext.logger.debug(
+                        Chalk.yellowBright('Failed to automagically add files in ' + stats.outputPath + ' to git')
+                    );
+                }
+            });
+        });
+    }
+    
+};

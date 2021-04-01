@@ -22,9 +22,9 @@ import type {WorkerContext} from '../../../Core/WorkerContext';
 import {FileHelpers} from '../../../Helpers/FileHelpers';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class CssExtractConfigurator implements ConfiguratorInterface
+export class CssExtractConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {

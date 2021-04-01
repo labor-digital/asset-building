@@ -25,7 +25,7 @@ export class CoreFixes
 {
     /**
      * I apply this fix, because I got errors like the one down below, if required files were deleted in
-     * webpack's "watch" mode. The error can be handled internally without a major problem but the script
+     * webpack "watch" mode. The error can be handled internally without a major problem but the script
      * got killed because events.js complained about an "unhandled error".
      *
      * To prevent that error, we simply ignore that "throw" and go our merry way... \o/
@@ -41,6 +41,7 @@ export class CoreFixes
      */
     static eventsJsUncaughtErrorFix()
     {
+        return;
         try {
             // Try to load events to apply fix
             const EventEmitter = require('events');

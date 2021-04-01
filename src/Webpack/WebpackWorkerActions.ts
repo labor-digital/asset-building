@@ -63,6 +63,10 @@ export class WebpackWorkerActions
         return (new RunCompilerAction()).do(this._context, options);
     }
     
+    /**
+     * Boots up the webpack dev server for the current worker process
+     * @param options
+     */
     public runDevServer(options?: IRunDevServerOptions): Promise<any>
     {
         return (new RunDevServerAction()).do(this._context, options);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2019.10.05 at 15:34
+ * Last modified: 2021.03.31 at 12:57
  */
-import type {WorkerContext} from '../../../Core/WorkerContext';
 
-export interface ConfiguratorInterface
+export interface IReporterUpdateOptions
 {
-    apply(context: WorkerContext): Promise<void>
+    percent: number,
+    message?: string
 }
+
+export interface IReporter
+{
+    update(options: IReporterUpdateOptions): this;
+}
+
+export interface IBarData
+{
+    percent: number,
+    message: string
+}
+
+export type TBarMap = Map<string, IBarData>;

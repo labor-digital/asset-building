@@ -18,11 +18,11 @@
 
 import {asArray, inflectToUnderscore, md5} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
 export const resolveFileExtensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
 
-export class BaseConfigurator implements ConfiguratorInterface
+export class BaseConfigurator implements IConfigurator
 {
     public apply(context: WorkerContext): Promise<void>
     {

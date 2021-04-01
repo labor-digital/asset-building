@@ -21,7 +21,7 @@ import type {PlainObject} from '@labor-digital/helferlein';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
-import {ConfiguratorIdentifier, LoaderIdentifier} from '../../../Identifier';
+import type {ConfiguratorIdentifier, RuleIdentifier} from '../../../Identifier';
 
 export abstract class AbstractStyleLoaderConfigurator
 {
@@ -55,27 +55,17 @@ export abstract class AbstractStyleLoaderConfigurator
             context
         });
         
-        const plugins: Array<any> = args.plugins;
-        
-        args = await context.eventEmitter.emitHook(EventList.FILTER_LOADER_CONFIG, {
-            config: {
-                loader: 'postcss-loader',
-                options: {
-                    postcssOptions: (loader: any) => {
-                        resolveReference = loader.resolve;
-                        return {
-                            plugins: plugins
-                        };
-                    }
+        return {
+            loader: 'postcss-loader',
+            options: {
+                postcssOptions: (loader: any) => {
+                    resolveReference = loader.resolve;
+                    return {
+                        plugins: args.plugins
+                    };
                 }
-            },
-            identifier: LoaderIdentifier.POST_CSS,
-            parent: identifier,
-            isPostcssLoader: true,
-            context
-        });
-        
-        return args.config;
+            }
+        };
     }
     
     /**
@@ -86,7 +76,7 @@ export abstract class AbstractStyleLoaderConfigurator
      * @param identifier
      * @protected
      */
-    protected async makeLastLoader(context: WorkerContext, identifier: LoaderIdentifier): Promise<any>
+    protected async makeLastLoader(context: WorkerContext, identifier: RuleIdentifier): Promise<any>
     {
         let lastLoader: any =
             {
@@ -107,5 +97,22 @@ export abstract class AbstractStyleLoaderConfigurator
         });
         
         return args.loader;
+    }
+    
+    /**
+     * Hook to add additional style loaders right before the post-processing begins.
+     * We use this for the deep removal loader, but any other last-minute loader could be handled here
+     * @param context
+     * @param identifier
+     * @protected
+     */
+    protected async makeLastMinuteLoaders(context: WorkerContext, identifier: RuleIdentifier): Promise<Array<any>>
+    {
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_LAST_MINUTE_STYLE_LOADERS, {
+            identifier,
+            context,
+            loaders: []
+        });
+        return args.loaders;
     }
 }

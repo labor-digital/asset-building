@@ -18,11 +18,11 @@
 
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
-import {LoaderIdentifier} from '../../../Identifier';
+import {RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class JsPreloadConfigurator implements ConfiguratorInterface
+export class JsPreloadConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
@@ -35,9 +35,12 @@ export class JsPreloadConfigurator implements ConfiguratorInterface
             return;
         }
         
-        await ConfigGenUtil.addJsLoader(LoaderIdentifier.JS_PRE, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
+        await ConfigGenUtil.addJsRule(RuleIdentifier.JS_PRE, context, /\.js$|\.jsx$|\.ts$|\.tsx$/, {
             enforce: 'pre',
-            use: loaders
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.JS_PRE, context)
+                .addRaw(loaders)
+                .finish()
         });
     }
 }

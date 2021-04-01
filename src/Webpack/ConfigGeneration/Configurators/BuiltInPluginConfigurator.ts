@@ -19,22 +19,21 @@
 import {isFunction} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
-import type {
-    AssetBuilderWebpackPluginInterface,
-    AssetBuilderWebpackPluginStaticInterface
-} from '../../Plugins/AssetBuilderWebpackPluginInterface';
 import {FancyStatsPlugin} from '../../Plugins/FancyStatsPlugin';
 import {GitAddPlugin} from '../../Plugins/GitAddPlugin';
+import {ProgressProviderPlugin} from '../../Plugins/ProgressProviderPlugin';
+import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from '../../Plugins/types';
 import {WebpackPromiseShimPlugin} from '../../Plugins/WebpackPromiseShimPlugin';
 import {ConfigGenUtil} from '../ConfigGenUtil';
-import type {ConfiguratorInterface} from './ConfiguratorInterface';
+import type {IConfigurator} from '../types';
 
-export class BuiltInPluginConfigurator implements ConfiguratorInterface
+export class BuiltInPluginConfigurator implements IConfigurator
 {
     
     public async apply(context: WorkerContext): Promise<void>
     {
         const w = this.registerPluginWrapper;
+        await w(PluginIdentifier.PROGRESS_PROVIDER, context, ProgressProviderPlugin);
         await w(PluginIdentifier.GIT_ADD, context, GitAddPlugin);
         await w(PluginIdentifier.FANCY_STATS, context, FancyStatsPlugin);
         await w(PluginIdentifier.PROMISE_SHIM, context, WebpackPromiseShimPlugin);
@@ -50,13 +49,13 @@ export class BuiltInPluginConfigurator implements ConfiguratorInterface
     protected async registerPluginWrapper(
         identifier: PluginIdentifier,
         context: WorkerContext,
-        plugin: AssetBuilderWebpackPluginStaticInterface
+        plugin: IAssetBuilderPluginStatic
     ): Promise<void>
     {
         const config = isFunction(plugin.getDefaultConfig) ? plugin.getDefaultConfig() ?? {} : {};
         
         await ConfigGenUtil.addPlugin(identifier, context, config, (config) => {
-            const i: AssetBuilderWebpackPluginInterface = new (plugin as any)(config);
+            const i: IAssetBuilderPlugin = new (plugin as any)(config);
             
             if (isFunction(i.setContext)) {
                 i.setContext(context);

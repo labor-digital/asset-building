@@ -21,10 +21,9 @@ import type {Compiler} from 'webpack';
 import {Configuration, webpack} from 'webpack';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
-import type {ICompilerOptions} from './types';
-import type {WorkerActionInterface} from './WorkerActionInterface';
+import type {ICompilerOptions, IWorkerAction} from './types';
 
-export class MakeCompilerAction implements WorkerActionInterface
+export class MakeCompilerAction implements IWorkerAction
 {
     public async do(context: WorkerContext, options?: ICompilerOptions): Promise<Compiler>
     {

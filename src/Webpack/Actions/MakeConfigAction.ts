@@ -20,10 +20,9 @@ import {isArray, PlainObject} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 import {WebpackConfigGenerator} from '../ConfigGeneration/WebpackConfigGenerator';
-import type {IMakeConfigActionOptions} from './types';
-import type {WorkerActionInterface} from './WorkerActionInterface';
+import type {IMakeConfigActionOptions, IWorkerAction} from './types';
 
-export class MakeConfigAction implements WorkerActionInterface
+export class MakeConfigAction implements IWorkerAction
 {
     
     /**

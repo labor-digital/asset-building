@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2020.10.22 at 10:51
+ * Last modified: 2021.03.30 at 21:01
  */
+
 
 import type {PlainObject} from '@labor-digital/helferlein';
 import type {Compiler} from 'webpack';
 import type {WorkerContext} from '../../Core/WorkerContext';
 
-export interface AssetBuilderWebpackPluginInterface
+export interface IAssetBuilderPlugin
 {
     
     /**
@@ -37,10 +38,10 @@ export interface AssetBuilderWebpackPluginInterface
     setContext?(context: WorkerContext): void;
 }
 
-export interface AssetBuilderWebpackPluginStaticInterface
+export interface IAssetBuilderPluginStatic
 {
     
-    new(): AssetBuilderWebpackPluginInterface;
+    new(): IAssetBuilderPlugin;
     
     /**
      * Can return the default configuration to apply to the plugin constructor or undefined.

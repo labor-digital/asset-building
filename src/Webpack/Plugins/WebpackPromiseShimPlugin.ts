@@ -18,34 +18,30 @@
 
 import type {Compiler} from 'webpack';
 import type {WorkerContext} from '../../Core/WorkerContext';
-import type {
-    AssetBuilderWebpackPluginInterface,
-    AssetBuilderWebpackPluginStaticInterface
-} from './AssetBuilderWebpackPluginInterface';
+import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from './types';
 
 /**
  * This module plugin makes sure that every package can use dynamic imports,
  * without an additional polyfill, as we provide a polyfill for promises.
  */
-export const WebpackPromiseShimPlugin: AssetBuilderWebpackPluginStaticInterface =
-    class implements AssetBuilderWebpackPluginInterface
+export const WebpackPromiseShimPlugin: IAssetBuilderPluginStatic = class implements IAssetBuilderPlugin
+{
+    protected _context?: WorkerContext;
+    
+    public setContext(context: WorkerContext): void
     {
-        protected _context?: WorkerContext;
-        
-        public setContext(context: WorkerContext): void
-        {
-            this._context = context;
-        }
-        
-        public apply(compiler: Compiler)
-        {
-            if (this._context!.app.polyfills !== false) {
-                compiler.hooks.compilation.tap('WebpackPromiseShimPlugin', compilation => {
-                    compilation.mainTemplate.hooks.bootstrap.tap('WebpackPromiseShimPlugin', function (_) {
-                        /*
-                         * @see https://github.com/taylorhakes/promise-polyfill
-                         */
-                        _ += `
+        this._context = context;
+    }
+    
+    public apply(compiler: Compiler)
+    {
+        if (this._context!.app.polyfills !== false) {
+            compiler.hooks.compilation.tap('WebpackPromiseShimPlugin', compilation => {
+                compilation.mainTemplate.hooks.bootstrap.tap('WebpackPromiseShimPlugin', function (_) {
+                    /*
+                     * @see https://github.com/taylorhakes/promise-polyfill
+                     */
+                    _ += `
 				// Shimming in a polyfill for Promise if it is not already defined
 				if(typeof Promise === "undefined"){
 				(function() {
@@ -53,9 +49,9 @@ export const WebpackPromiseShimPlugin: AssetBuilderWebpackPluginStaticInterface 
 				})();
 				};
 				`;
-                        return _;
-                    });
+                    return _;
                 });
-            }
+            });
         }
-    };
+    }
+};

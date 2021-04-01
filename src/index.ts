@@ -28,6 +28,12 @@ export * from './Core/CoreContext';
 export * from './Core/WorkerContext';
 export * from './Core/Bootstrap';
 export * from './Interop/Express/ExpressContext';
+export * from './Extension/AbstractExtension';
+export * from './Extension/types';
+export * from './Webpack/ConfigGeneration/ConfigGenUtil';
+export * from './Webpack/ConfigGeneration/types';
+export * from './Webpack/Actions/types';
+export * from './Webpack/Plugins/types';
 // export * from './Interop/Nuxt/NuxtFactory';
 export * from './Interop/Storybook/StorybookFactory';
 
