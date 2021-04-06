@@ -16,7 +16,7 @@
  * Last modified: 2019.10.06 at 15:49
  */
 
-import webpack from 'webpack';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
@@ -28,6 +28,6 @@ export class MinChunkSizeConfigurator implements IConfigurator
     {
         await ConfigGenUtil.addPlugin(PluginIdentifier.MIN_CHUNK_SIZE, context, {
             minChunkSize: context.app.minChunkSize
-        }, config => new webpack.optimize.MinChunkSizePlugin(config as any));
+        }, config => new Dependencies.webpack.optimize.MinChunkSizePlugin(config as any));
     }
 }

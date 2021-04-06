@@ -32,7 +32,7 @@ import fs from 'fs';
 import path from 'path';
 import {EventList} from '../../EventList';
 import {CoreContext} from '../CoreContext';
-import {CoreFixes} from '../CoreFixes';
+import {Dependencies} from '../Dependencies';
 import BuilderOptionSchema from '../Schema/BuilderOptionSchema';
 import type {IBuilderOptions, TBuilderMode} from '../types';
 
@@ -47,8 +47,10 @@ export class CoreContextFactory
         options = this.enhanceOptionsFromPackageJson(options);
         options = this.prepareOptions(options);
         
+        // This makes only sense if we run standalone, for all other cases this must be done in the factory
+        Dependencies.inheritFromOptions(options);
+        
         const context = CoreContext.new(options);
-        CoreFixes.resolveFilenameFix(context);
         await this.loadExtensions(context);
         await this.findMode(context);
         await context.eventEmitter.emitHook(EventList.AFTER_MAIN_INIT_DONE, {context});

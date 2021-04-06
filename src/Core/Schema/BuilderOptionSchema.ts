@@ -78,5 +78,15 @@ export default {
             }
             return v;
         }
+    },
+    dependencies: {
+        type: 'PlainObject',
+        default: () => { return {};},
+        children: {
+            webpack: {
+                type: 'string',
+                default: 'webpack'
+            }
+        }
     }
 };

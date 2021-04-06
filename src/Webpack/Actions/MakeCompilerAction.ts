@@ -17,8 +17,8 @@
  */
 
 import {isObject} from '@labor-digital/helferlein';
-import type {Compiler} from 'webpack';
-import {Configuration, webpack} from 'webpack';
+import type {Compiler, Configuration} from 'webpack';
+import {Dependencies} from '../../Core/Dependencies';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 import type {ICompilerOptions, IWorkerAction} from './types';
@@ -31,7 +31,7 @@ export class MakeCompilerAction implements IWorkerAction
         
         // Allows the outside world to filter our settings for the webpack compiler and callback
         const args = await context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_COMPILER, {
-            compiler: webpack, config, options, context
+            compiler: Dependencies.webpack, config, options, context
         });
         
         return args.compiler(config, options?.callback);

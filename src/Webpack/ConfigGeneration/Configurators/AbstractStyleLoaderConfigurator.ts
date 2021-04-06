@@ -17,8 +17,7 @@
  */
 
 import type {PlainObject} from '@labor-digital/helferlein';
-// @ts-ignore
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
 import type {ConfiguratorIdentifier, RuleIdentifier} from '../../../Identifier';
@@ -80,7 +79,7 @@ export abstract class AbstractStyleLoaderConfigurator
     {
         let lastLoader: any =
             {
-                loader: MiniCssExtractPlugin.loader,
+                loader: Dependencies.cssExtractPlugin.loader,
                 options: {
                     publicPath: '../'
                 }

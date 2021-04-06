@@ -15,33 +15,33 @@
  *
  * Last modified: 2021.03.26 at 09:48
  */
-const {interop} = require('@labor-digital/asset-building');
+const assets = require('@labor-digital/asset-building/interop/express');
 const express = require('express');
 
 const app = express();
 const port = 8000;
 
 // Apply the dev server plugin to the app
-interop.express(app)
-       .then((context) => {
-    
-           // Our assets are compiled in the /frontend/dist directory
-           // so we have to tell express, that this directory is a public asset root
-           context.registerPublicAssets('frontend/dist/');
-    
-           // Normally your assets are already compiled when you run in production
-           // therefore we only start webpack if we are NOT in production
-           if (!context.isProd) {
-               return context.getWorker().then(worker => worker.do.runCompiler());
-           }
-    
-       })
-       .then(() => {
-           app.get('/', (req, res) => {
-               res.send(
-                   '<html><head><title>Hello!</title><script type="text/javascript" src="/bundle.js"></script></head>Hello World!</html>');
-           });
-    
-           app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-       });
+assets(app)
+    .then((context) => {
+        
+        // Our assets are compiled in the /frontend/dist directory
+        // so we have to tell express, that this directory is a public asset root
+        context.registerPublicAssets('frontend/dist/');
+        
+        // Normally your assets are already compiled when you run in production
+        // therefore we only start webpack if we are NOT in production
+        if (!context.isProd) {
+            return context.getWorker().then(worker => worker.do.runCompiler());
+        }
+        
+    })
+    .then(() => {
+        app.get('/', (req, res) => {
+            res.send(
+                '<html><head><title>Hello!</title><script type="text/javascript" src="/bundle.js"></script></head>Hello World!</html>');
+        });
+        
+        app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+    });
 

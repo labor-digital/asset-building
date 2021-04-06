@@ -16,7 +16,8 @@
  * Last modified: 2019.10.05 at 20:06
  */
 
-import {asArray, inflectToUnderscore, md5} from '@labor-digital/helferlein';
+import {inflectToUnderscore, md5} from '@labor-digital/helferlein';
+import {IncludePathRegistry} from '../../../Core/IncludePathRegistry';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import type {IConfigurator} from '../types';
 
@@ -30,10 +31,11 @@ export class BaseConfigurator implements IConfigurator
         const jsonPName = 'labor_webpack_' + md5(
                           context.parentContext.paths.source +
                           (context.isProd ? Math.random() : '') +
-                          context.appId +
-                          JSON.stringify(context.app)) + '_' + inflectToUnderscore(context.app.appName!);
+                          context.appId
+        ) + '_' + inflectToUnderscore(context.app.appName!);
         
         // Populate the basic webpack configuration
+        const paths = IncludePathRegistry.getResolvePaths();
         context.webpackConfig = {
             name: context.app.appName + '',
             mode: context.isProd ? 'production' : 'development',
@@ -49,11 +51,11 @@ export class BaseConfigurator implements IConfigurator
                 hints: false
             },
             resolve: {
-                modules: asArray(context.parentContext.paths.additionalResolverPaths),
+                modules: paths,
                 extensions: resolveFileExtensions
             },
             resolveLoader: {
-                modules: asArray(context.parentContext.paths.additionalResolverPaths)
+                modules: paths
             },
             output: {
                 chunkLoadingGlobal: jsonPName

@@ -91,6 +91,7 @@ export class StorybookFactory
      */
     protected getEnhancerOptions(): IMakeEnhancedConfigActionOptions
     {
+        let hasDefinePlugin = false;
         return {
             disable: [
                 ConfiguratorIdentifier.APP_PATHS,
@@ -112,7 +113,17 @@ export class StorybookFactory
                 
                        ].indexOf(test) === -1;
             },
-            pluginFilter: test => {
+            pluginFilter: (test) => {
+                
+                // Somehow Storybook registers the DefinePlugin twice :/ Therefore we will
+                // remove the second one, to prevent warnings.
+                if (test === 'DefinePlugin') {
+                    if (hasDefinePlugin) {
+                        return false;
+                    }
+                    hasDefinePlugin = true;
+                }
+                
                 return [
                            'ProgressPlugin',
                            'VueLoaderPlugin'

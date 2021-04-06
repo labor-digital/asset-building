@@ -16,14 +16,12 @@
  * Last modified: 2019.02.18 at 20:58
  */
 
-import {isString} from '@labor-digital/helferlein';
+import {isString, PlainObject} from '@labor-digital/helferlein';
 import fs from 'fs';
 import path from 'path';
-// @ts-ignore
-import type {Loader} from 'webpack';
 import {FileHelpers} from '../../../Helpers/FileHelpers';
 
-const resourceLoader = function (this: Loader, source: string) {
+const resourceLoader = function (this: PlainObject, source: string) {
     // Make this loader async
     const callback = this.async();
     

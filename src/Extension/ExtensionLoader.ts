@@ -21,6 +21,7 @@ import {forEach, isArray, isFunction, isNull, isPlainObject, isUndefined} from '
 import fs from 'fs';
 import path from 'path';
 import type {CoreContext} from '../Core/CoreContext';
+import {IncludePathRegistry} from '../Core/IncludePathRegistry';
 import type {WorkerContext} from '../Core/WorkerContext';
 import {EventList} from '../EventList';
 import type {AbstractExtension} from './AbstractExtension';
@@ -104,7 +105,7 @@ export class ExtensionLoader
             // Add configured resolver paths to the context
             if (isArray(definition.additionalResolverPaths)) {
                 forEach(definition.additionalResolverPaths, path => {
-                    context.paths.additionalResolverPaths.add(path);
+                    IncludePathRegistry.appendFallbackPath(path);
                 });
             }
             
@@ -141,7 +142,7 @@ export class ExtensionLoader
                     while (parts.length > 0) {
                         const pl = parts.join(path.sep) + path.sep + 'node_modules' + path.sep;
                         if (fs.existsSync(pl)) {
-                            paths.additionalResolverPaths.add(pl);
+                            IncludePathRegistry.appendFallbackPath(pl);
                             break;
                         }
                         parts.pop();

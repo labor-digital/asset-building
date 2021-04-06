@@ -16,7 +16,7 @@
  * Last modified: 2021.03.29 at 20:28
  */
 
-const {interop} = require('@labor-digital/asset-building');
+const assets = require('@labor-digital/asset-building/interop/express');
 const express = require('express');
 const {vue} = require('@labor-digital/asset-building-env-vuejs');
 
@@ -29,19 +29,19 @@ if (process.argv[2] === 'development') {
 }
 
 // Create the express asset builder context
-interop.express(app, {verbose: true})
-       .then(context => {
-    
-           // Register your custom routes, those will not reach the expressSsrPlugin!
-           context.expressApp.get('/test', (req, res) => {
-               res.send('Not served by dev server!');
-           });
-    
-           // This is the magic that registers the vue ecosystem to your app
-           // Mind the "Return" statement, please!
-           return vue.express(context);
-    
-       })
-       .then(context => {
-           context.expressApp.listen(port, () => console.log(`Example app listening on port ${port}!`));
-       });
+assets(app, {verbose: true})
+    .then(context => {
+        
+        // Register your custom routes, those will not reach the expressSsrPlugin!
+        context.expressApp.get('/test', (req, res) => {
+            res.send('Not served by dev server!');
+        });
+        
+        // This is the magic that registers the vue ecosystem to your app
+        // Mind the "Return" statement, please!
+        return vue.express(context);
+        
+    })
+    .then(context => {
+        context.expressApp.listen(port, () => console.log(`Example app listening on port ${port}!`));
+    });

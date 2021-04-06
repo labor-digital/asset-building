@@ -17,8 +17,7 @@
  */
 
 import {isArray, isString, map} from '@labor-digital/helferlein';
-// @ts-ignore
-import WebpackFilterWarningsPlugin from 'webpack-filter-warnings-plugin';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
 import {PluginIdentifier} from '../../../Identifier';
@@ -48,6 +47,6 @@ export class FilterWarningsConfigurator implements IConfigurator
             context
         });
         await ConfigGenUtil.addPlugin(PluginIdentifier.FILTER_WARNINGS, context, {exclude: args.patterns},
-            config => new WebpackFilterWarningsPlugin(config));
+            config => new Dependencies.filterWarningsPlugin(config));
     }
 }

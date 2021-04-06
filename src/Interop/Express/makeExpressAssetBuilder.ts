@@ -17,11 +17,11 @@
  */
 
 import type {Application} from 'express';
-import path from 'path';
-import {CoreFixes} from '../../Core/CoreFixes';
+import {Dependencies} from '../../Core/Dependencies';
+import {IncludePathRegistry} from '../../Core/IncludePathRegistry';
 import type {IBuilderOptions} from '../../Core/types';
 import {GeneralHelper} from '../../Helpers/GeneralHelper';
-import {ExpressContext} from './ExpressContext';
+import type {ExpressContext} from './ExpressContext';
 
 /**
  * Use this function to create an express context object that can be used by asset-builder extensions to run
@@ -35,10 +35,11 @@ export default async function makeExpressAssetBuilder(
     options?: IBuilderOptions
 ): Promise<ExpressContext> {
     GeneralHelper.renderFancyIntro();
-    CoreFixes.resolveFilenameFix([process.cwd(), path.resolve(__dirname, '../../')]);
+    IncludePathRegistry.register();
+    Dependencies.inheritFromOptions(options);
     
     try {
-        const context = new ExpressContext(expressApp, options);
+        const context: ExpressContext = new (require('./ExpressContext').ExpressContext as any)(expressApp, options);
         
         if (options && options.devServer) {
             await context.registerDevServerMiddleware();

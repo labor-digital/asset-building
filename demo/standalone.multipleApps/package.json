@@ -27,13 +27,17 @@
 				"output": "./frontend/dist2/bundle.js",
 				"publicPath": "/",
 				"webpackConfig": true,
-				"htmlTemplate": true
+				"htmlTemplate": {
+					"bodyHtmlSnippet": "<h1>Hello world (App 2)</h1><p>Look in your browser console, to see the js output</p>"
+				}
 			},
 			{
 				"entry": "./frontend/src/app.js",
 				"output": "./frontend/dist3/bundle.js",
 				"publicPath": "/",
-				"htmlTemplate": true,
+				"htmlTemplate": {
+					"bodyHtmlSnippet": "<h1>Hello world (App 3)</h1><p>Look in your browser console, to see the js output</p>"
+				},
 				"devServer": {
 					"port": 7500
 				}

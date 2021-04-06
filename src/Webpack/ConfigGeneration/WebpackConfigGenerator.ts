@@ -42,7 +42,6 @@ import {LessConfigurator} from './Configurators/LessConfigurator';
 import {MinChunkSizeConfigurator} from './Configurators/MinChunkSizeConfigurator';
 import {PolyfillConfigurator} from './Configurators/PolyfillConfigurator';
 import {ProdOnlyConfigurator} from './Configurators/ProdOnlyConfigurator';
-import {ProgressBarConfigurator} from './Configurators/ProgressBarConfigurator';
 import {ProvideConfigurator} from './Configurators/ProvideConfigurator';
 import {SassConfigurator} from './Configurators/SassConfigurator';
 import {TypescriptConfigurator} from './Configurators/TypescriptConfigurator';
@@ -63,7 +62,6 @@ export class WebpackConfigGenerator
         await w(Id.BASE, context, new BaseConfigurator());
         await w(Id.APP_PATHS, context, new AppPathConfigurator());
         await w(Id.POLYFILL, context, new PolyfillConfigurator());
-        await w(Id.PROGRESS_BAR, context, new ProgressBarConfigurator());
         await w(Id.HTML, context, new HtmlConfigurator());
         await w(Id.IMAGES, context, new ImageConfigurator());
         await w(Id.FONTS, context, new FontConfigurator());

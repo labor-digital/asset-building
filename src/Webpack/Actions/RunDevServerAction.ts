@@ -20,7 +20,8 @@ import {isArray, isString} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 import {createServer, Server} from 'http';
 import portfinder from 'portfinder';
-import WebpackDevServer from 'webpack-dev-server';
+import type WebpackDevServer from 'webpack-dev-server';
+import {Dependencies} from '../../Core/Dependencies';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {PluginIdentifier} from '../../Identifier';
 import type {IRunDevServerOptions, IWorkerAction} from './types';
@@ -50,16 +51,21 @@ export class RunDevServerAction implements IWorkerAction
         }
         
         const devServerOptions: WebpackDevServer.Configuration = {
+            ...((config as any).devServer ?? {}),
             noInfo: true,
             hot: true,
-            publicPath: publicPath,
-            ...options?.devServer
+            ...(publicPath ? {publicPath} : {}),
+            ...options?.devServer,
+            host, port
         };
         
-        WebpackDevServer.addDevServerEntrypoints(config as any, devServerOptions);
+        // Provide the calculated configuration back to webpack
+        (config as any).devServer = devServerOptions;
+        
+        Dependencies.devServer.addDevServerEntrypoints(config as any, devServerOptions);
         
         const compiler = await context.do.makeCompiler({config});
-        const server = new WebpackDevServer(compiler as any, devServerOptions);
+        const server = new Dependencies.devServer(compiler as any, devServerOptions);
         
         let rendered = false;
         compiler.hooks.afterDone.tap('DevServerOutput', function () {
@@ -68,10 +74,12 @@ export class RunDevServerAction implements IWorkerAction
             }
             rendered = true;
             
-            console.log(`[DEV SERVER]: ${Chalk.greenBright('started')}
+            setTimeout(() => {
+                console.log(`[DEV SERVER]: ${Chalk.greenBright('started')}
 Running on: http://${host}:${port}
-Public path: http://${host}:${port}${publicPath}
+Public path: http://${host}:${port}${publicPath ?? ''}
 `);
+            }, 1000);
         });
         
         // Destroy our temporary server
@@ -144,6 +152,7 @@ Public path: http://${host}:${port}${publicPath}
             }
         }
         
+        console.log('RESOLVED PORT', port);
         return {port, host, tempServer};
     }
 }

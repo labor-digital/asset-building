@@ -17,18 +17,13 @@
  */
 
 import fs from 'fs';
-// @ts-ignore
-import sass from 'node-sass';
 import path from 'path';
-// @ts-ignore
-import * as webpack from 'webpack';
+import {Dependencies} from '../../../Core/Dependencies';
 import {FileHelpers} from '../../../Helpers/FileHelpers';
 import {SassFileResolverContext} from './Entities/SassFileResolverContext';
 import {SassFileResolver} from './SassFileResolver';
-// @ts-ignore
-import Loader = webpack.loader.Loader;
 
-const customSassLoader = function (this: Loader, source: string) {
+const customSassLoader = function (this: any, source: string) {
     const callback = this.async();
     const that = this;
     const errorHandler = function (e: any) {
@@ -66,6 +61,7 @@ const customSassLoader = function (this: Loader, source: string) {
             // Defines the path to use when resolving files
             context.path.push(file.filename);
             let importError = false;
+            const sass = Dependencies.sass;
             const result = sass.renderSync({
                 'data': file.content,
                 'sourceComments': true,

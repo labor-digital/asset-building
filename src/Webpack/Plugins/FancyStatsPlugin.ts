@@ -18,13 +18,10 @@
 
 import {forEach, isString, PlainObject} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
-// @ts-ignore
-import webpack, {Compiler} from 'webpack';
+import type {Compiler, StatsCompilation} from 'webpack';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {FileHelpers} from '../../Helpers/FileHelpers';
 import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from './types';
-// @ts-ignore
-import ToJsonOutput = webpack.Stats.ToJsonOutput;
 
 // Define column char lengths
 const assetColLength = 70;
@@ -84,9 +81,9 @@ export const FancyStatsPlugin: IAssetBuilderPluginStatic = class implements IAss
      * @param stats
      * @protected
      */
-    protected renderAssetList(output: Array<string>, stats: ToJsonOutput): void
+    protected renderAssetList(output: Array<string>, stats: StatsCompilation): void
     {
-        let time = stats.time > 5000 ? Math.round(stats.time / 100) / 10 + 's' : stats.time + 'ms';
+        let time = stats.time! > 5000 ? Math.round(stats.time! / 100) / 10 + 's' : stats.time + 'ms';
         
         output.push(this.drawLine());
         output.push(this._context!.app.appName +
@@ -101,49 +98,51 @@ export const FancyStatsPlugin: IAssetBuilderPluginStatic = class implements IAss
         let ignoredChunks = 0;
         let ignoredSize = 0;
         
-        stats.assets.forEach((asset: PlainObject) => {
-            const isMap = asset.name.match(/\.map$/);
-            const isHotUpdate = asset.name.match(/\.hot-update\./);
-            const chunkIsMain = typeof asset.chunks[0] === 'string' &&
-                                (asset.chunks[0] as string).indexOf('main') === 0;
-            const chunkNameIsMain = typeof asset.chunkNames[0] === 'string' &&
-                                    asset.chunkNames[0].indexOf('main') === 0;
-            
-            const useAsset = (!isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain)) ||
-                             this._context?.parentContext.options.verbose;
-            
-            if (!useAsset) {
-                ignoredChunks++;
-                ignoredSize += asset.size;
-                return;
-            }
-            
-            let realAssetName = (stats.outputPath + '/' + asset.name).replace(/[\\\/]/g, '/');
-            
-            const lines = [];
-            const parts = realAssetName.split('/').reverse();
-            let line: Array<string> = [];
-            let first = true;
-            let lineLength = 1; // 1 for the trailing slash
-            forEach(parts, part => {
-                let newLineLength = lineLength + (part.length + 1);
-                if (newLineLength > assetColLength) {
-                    lines.push((line.reverse().join('/') + (!first ? '/...' : '')).padStart(assetColLength));
-                    first = false;
-                    line = [];
-                    lineLength = 1;
+        if (stats.assets) {
+            stats.assets.forEach((asset: PlainObject) => {
+                const isMap = asset.name.match(/\.map$/);
+                const isHotUpdate = asset.name.match(/\.hot-update\./);
+                const chunkIsMain = typeof asset.chunks[0] === 'string' &&
+                                    (asset.chunks[0] as string).indexOf('main') === 0;
+                const chunkNameIsMain = typeof asset.chunkNames[0] === 'string' &&
+                                        asset.chunkNames[0].indexOf('main') === 0;
+                
+                const useAsset = (!isMap && !isHotUpdate && (chunkIsMain || chunkNameIsMain)) ||
+                                 this._context?.parentContext.options.verbose;
+                
+                if (!useAsset) {
+                    ignoredChunks++;
+                    ignoredSize += asset.size;
+                    return;
                 }
-                lineLength += part.length + 1;
-                line.push(part);
+                
+                let realAssetName = (stats.outputPath + '/' + asset.name).replace(/[\\\/]/g, '/');
+                
+                const lines = [];
+                const parts = realAssetName.split('/').reverse();
+                let line: Array<string> = [];
+                let first = true;
+                let lineLength = 1; // 1 for the trailing slash
+                forEach(parts, part => {
+                    let newLineLength = lineLength + (part.length + 1);
+                    if (newLineLength > assetColLength) {
+                        lines.push((line.reverse().join('/') + (!first ? '/...' : '')).padStart(assetColLength));
+                        first = false;
+                        line = [];
+                        lineLength = 1;
+                    }
+                    lineLength += part.length + 1;
+                    line.push(part);
+                });
+                
+                lines.push((line.reverse().join('/') + (!first ? '/...' : '')).padStart(assetColLength));
+                const outputAssetName = lines.reverse().join('\n');
+                
+                output.push(
+                    Chalk.greenBright(outputAssetName) + '  '
+                    + FileHelpers.humanFileSize(asset.size).padStart(sizeColLength));
             });
-            
-            lines.push((line.reverse().join('/') + (!first ? '/...' : '')).padStart(assetColLength));
-            const outputAssetName = lines.reverse().join('\n');
-            
-            output.push(
-                Chalk.greenBright(outputAssetName) + '  '
-                + FileHelpers.humanFileSize(asset.size).padStart(sizeColLength));
-        });
+        }
         
         if (ignoredChunks !== 0) {
             output.push(('  + ' + ignoredChunks + ' hidden files (maps, chunks, assets, and so on)').padStart(
@@ -159,9 +158,9 @@ export const FancyStatsPlugin: IAssetBuilderPluginStatic = class implements IAss
      * @param stats
      * @protected
      */
-    protected renderWarnings(output: Array<string>, stats: ToJsonOutput): void
+    protected renderWarnings(output: Array<string>, stats: StatsCompilation): void
     {
-        if (stats.warnings.length > 0) {
+        if (stats.warnings && stats.warnings.length > 0) {
             this._numberOfWarnings += stats.warnings.length;
             output.push(this.drawLine('.'));
             output.push('');
@@ -182,9 +181,9 @@ export const FancyStatsPlugin: IAssetBuilderPluginStatic = class implements IAss
      * @param stats
      * @protected
      */
-    protected renderErrors(output: Array<string>, stats: ToJsonOutput): void
+    protected renderErrors(output: Array<string>, stats: StatsCompilation): void
     {
-        if (stats.errors.length > 0) {
+        if (stats.errors && stats.errors.length > 0) {
             this._numberOfErrors += stats.errors.length;
             output.push(this.drawLine('.'));
             output.push('');

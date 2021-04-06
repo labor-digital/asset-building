@@ -18,10 +18,8 @@
 
 import Chalk from 'chalk';
 import type {Compiler} from 'webpack';
-// @ts-ignore
-import {WorkerContext} from '../../Core/WorkerContext';
+import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
-// @ts-ignore
 import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from './types';
 
 export const GitAddPlugin: IAssetBuilderPluginStatic = class implements IAssetBuilderPlugin

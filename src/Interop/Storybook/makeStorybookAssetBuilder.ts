@@ -15,17 +15,43 @@
  *
  * Last modified: 2020.04.23 at 20:03
  */
+import path from 'path';
 import type {Configuration} from 'webpack';
+import {Dependencies} from '../../Core/Dependencies';
+import {IncludePathRegistry} from '../../Core/IncludePathRegistry';
 import type {IBuilderOptions} from '../../Core/types';
 import {GeneralHelper} from '../../Helpers/GeneralHelper';
-import {StorybookFactory} from './StorybookFactory';
+import type {StorybookFactory} from './StorybookFactory';
 
 export default function makeStorybookAssetBuilder(options?: IBuilderOptions) {
     GeneralHelper.renderFancyIntro();
-    const factory = new StorybookFactory(options ?? {});
-    factory.initializeCoreContext();
+    IncludePathRegistry.register();
     
-    return function (webpackConfig: Configuration = {}): Promise<Configuration> {
+    Dependencies.setDefinitionFromPath('webpack', 'node_modules/@storybook/builder-webpack5', 'webpack');
+    Dependencies.inheritFromOptions(options);
+    
+    // We wrap the node logger package, so it does not break our nice loading bar
+    const nodeLogger = require(path.join(process.cwd(), 'node_modules/@storybook/node-logger'));
+    const logWrapper = (msg: any, type: string) => {
+        if (type === 'INFO' && !options?.verbose) {
+            return;
+        }
+        if (msg !== '') {
+            console.log('[' + type + ']:', msg);
+        }
+    };
+    nodeLogger.instance.info = (m: any) => logWrapper(m, 'INFO');
+    nodeLogger.instance.warn = (m: any) => logWrapper(m, 'WARN');
+    nodeLogger.instance.error = (m: any) => logWrapper(m, 'ERROR');
+    
+    const StorybookFactory: StorybookFactory = require('./StorybookFactory').StorybookFactory;
+    
+    const factory: StorybookFactory = new (StorybookFactory as any)({
+        ...(options ?? {})
+    });
+    
+    return async function (webpackConfig: Configuration = {}): Promise<Configuration> {
+        await factory.initializeCoreContext();
         return factory
             .enhanceWebpackConfig(webpackConfig)
             .catch(err => GeneralHelper.renderError(err) as never);

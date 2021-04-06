@@ -17,8 +17,8 @@
  */
 
 import {isNull} from '@labor-digital/helferlein';
-import HtmlWebpackPlugin from 'html-webpack-plugin';
 import path from 'path';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
 import {LoaderIdentifier, PluginIdentifier, RuleIdentifier} from '../../../Identifier';
@@ -88,6 +88,6 @@ export class HtmlConfigurator implements IConfigurator
         });
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.HTML_TEMPLATE, context, args.template,
-            config => new HtmlWebpackPlugin(config));
+            config => new Dependencies.htmlPlugin(config));
     }
 }

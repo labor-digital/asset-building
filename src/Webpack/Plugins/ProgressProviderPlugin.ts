@@ -17,12 +17,12 @@
  */
 
 import type {Compiler} from 'webpack';
-import {ProgressPlugin} from 'webpack';
+import {Dependencies} from '../../Core/Dependencies';
 import type {IReporter} from '../../Core/Progress/types';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import type {IAssetBuilderPlugin, IAssetBuilderPluginStatic} from './types';
 
-export const ProgressProviderPlugin: IAssetBuilderPluginStatic = class extends ProgressPlugin
+export const ProgressProviderPlugin: IAssetBuilderPluginStatic = class extends Dependencies.webpack.ProgressPlugin
     implements IAssetBuilderPlugin
 {
     /**
@@ -33,9 +33,9 @@ export const ProgressProviderPlugin: IAssetBuilderPluginStatic = class extends P
     
     protected _reporter?: IReporter;
     
-    constructor()
+    constructor(args?: any)
     {
-        super({activeModules: true});
+        super(args ?? {activeModules: true});
         // @ts-ignore
         this.handler = (percentage: number, message: string, ...additional: string[]) => {
             if (!this._reporter) {
@@ -70,6 +70,13 @@ export const ProgressProviderPlugin: IAssetBuilderPluginStatic = class extends P
         compiler.hooks.done.tap('ProgressProvider:done', () => {
             this._reporter?.update({percent: 1, message: 'Done'});
         });
+        
+        compiler.hooks.infrastructureLog.tap('ProgressProvider:infrastructureLog', (_, type, args) => {
+            if (!this._context?.parentContext.options.verbose) {
+                return true;
+            }
+            console.log('[' + type.toUpperCase() + ']', ...args);
+            return true;
+        });
     }
-    
 };

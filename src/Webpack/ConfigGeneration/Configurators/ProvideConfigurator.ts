@@ -16,7 +16,7 @@
  * Last modified: 2019.10.06 at 15:29
  */
 
-import webpack from 'webpack';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
 import {PluginIdentifier} from '../../../Identifier';
@@ -31,7 +31,7 @@ export class ProvideConfigurator implements IConfigurator
             EventList.GET_JS_PROVIDES, {provides: {}, context});
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.PROVIDE, context, args.provides,
-            config => new webpack.ProvidePlugin(config));
+            config => new Dependencies.webpack.ProvidePlugin(config));
     }
     
 }

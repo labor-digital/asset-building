@@ -16,9 +16,10 @@
  * Last modified: 2019.10.05 at 17:26
  */
 
-import {asArray, EventBus, EventEmitter, forEach, isString, PlainObject} from '@labor-digital/helferlein';
+import {EventBus, EventEmitter, forEach, isString, PlainObject} from '@labor-digital/helferlein';
 import * as path from 'path';
 import {ExtensionLoader} from '../Extension/ExtensionLoader';
+import {IncludePathRegistry} from './IncludePathRegistry';
 import {IO} from './IO';
 import {Logger} from './Logger';
 import {ProcessManager} from './ProcessManager';
@@ -114,11 +115,6 @@ export class CoreContext
     protected hydrateFromJson(jsonData?: PlainObject): void
     {
         forEach(jsonData as PlainObject, (v, k) => {
-            if (k === 'paths') {
-                const paths: IPathList = v;
-                paths.additionalResolverPaths = new Set(paths.additionalResolverPaths);
-            }
-            
             this[k] = v;
         });
     }
@@ -127,21 +123,18 @@ export class CoreContext
     {
         const sourcePath = path.normalize(options.cwd ?? process.cwd());
         const assetBuilderPath = path.dirname(__dirname);
-        const additionalResolverPaths = new Set<string>();
         
         this.paths = {
             source: sourcePath,
             assetBuilder: assetBuilderPath,
             nodeModules: path.resolve(sourcePath, 'node_modules'),
-            buildingNodeModules: path.resolve(assetBuilderPath, '..', 'node_modules'),
-            additionalResolverPaths
+            buildingNodeModules: path.resolve(assetBuilderPath, '..', 'node_modules')
         };
         
-        additionalResolverPaths.add(this.paths.nodeModules);
-        additionalResolverPaths.add(this.paths.buildingNodeModules);
-        additionalResolverPaths.add('node_modules' + path.sep);
-        additionalResolverPaths.add(path.sep);
-        additionalResolverPaths.add('.' + path.sep);
+        IncludePathRegistry.prependFallbackPath(this.paths.buildingNodeModules);
+        IncludePathRegistry.prependFallbackPath(this.paths.assetBuilder);
+        IncludePathRegistry.prependFallbackPath(this.paths.source);
+        IncludePathRegistry.prependFallbackPath(this.paths.nodeModules);
         
         this.options = options;
         this.process = 'main';
@@ -154,7 +147,7 @@ export class CoreContext
     {
         if (cloneBase) {
             // Just inherit the services from the original core context, instead of creating new instances
-            forEach(['logger', 'eventEmitter', 'extensionLoader', 'io', 'progressManager'], el => {
+            forEach(['dependencies', 'logger', 'eventEmitter', 'extensionLoader', 'io', 'progressManager'], el => {
                 this[el] = cloneBase[el];
             });
         } else {
@@ -172,8 +165,6 @@ export class CoreContext
      */
     public toJson(): string
     {
-        const paths = {...this.paths, additionalResolverPaths: asArray(this.paths.additionalResolverPaths)};
-        
         return JSON.stringify({
             options: this.options,
             type: this.type,
@@ -182,7 +173,7 @@ export class CoreContext
             isProd: this.isProd,
             environment: this.environment,
             mode: this.mode,
-            paths: paths
+            paths: this.paths
         });
     }
     

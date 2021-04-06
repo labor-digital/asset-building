@@ -16,8 +16,7 @@
  * Last modified: 2019.10.06 at 15:18
  */
 
-// @ts-ignore
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {FileHelpers} from '../../../Helpers/FileHelpers';
 import {PluginIdentifier} from '../../../Identifier';
@@ -39,6 +38,6 @@ export class CssExtractConfigurator implements IConfigurator
             chunkFilename: 'css/' + outputFileWithoutExtension +
                            (context.isProd ? '-[id]-[fullhash].css' : '-[id].css'),
             ignoreOrder: true
-        }, config => new MiniCssExtractPlugin(config));
+        }, config => new Dependencies.cssExtractPlugin(config));
     }
 }

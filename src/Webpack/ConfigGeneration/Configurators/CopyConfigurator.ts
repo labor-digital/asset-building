@@ -17,10 +17,9 @@
  */
 
 import {forEach, isArray, PlainObject} from '@labor-digital/helferlein';
-// @ts-ignore
-import CopyWebpackPlugin from 'copy-webpack-plugin';
 import fs from 'fs';
 import path from 'path';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {IAppCopyDefinition} from '../../../Core/types';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
@@ -50,7 +49,7 @@ export class CopyConfigurator implements IConfigurator
             return;
         }
         
-        // Fix legacy "ignore" by convertig it to "globOptions"
+        // Fix legacy "ignore" by converting it to "globOptions"
         copyToAdd.forEach((config: PlainObject) => {
             if (typeof config.ignore === 'undefined') {
                 return;
@@ -111,6 +110,6 @@ export class CopyConfigurator implements IConfigurator
         
         // Allow filtering
         await ConfigGenUtil.addPlugin(PluginIdentifier.COPY, context, {patterns: copyToAdd},
-            config => new CopyWebpackPlugin(config));
+            config => new Dependencies.copyPlugin(config));
     }
 }

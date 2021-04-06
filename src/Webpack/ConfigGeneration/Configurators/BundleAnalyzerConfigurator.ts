@@ -16,8 +16,7 @@
  * Last modified: 2019.10.06 at 16:18
  */
 
-// @ts-ignore
-import {BundleAnalyzerPlugin} from 'webpack-bundle-analyzer';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
@@ -32,7 +31,7 @@ export class BundleAnalyzerConfigurator implements IConfigurator
         }
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.BUNDLE_ANALYZER, context, {},
-            config => new BundleAnalyzerPlugin(config));
+            config => new Dependencies.analyzerPlugin(config));
         
         context.webpackConfig.profile = true;
         

@@ -17,9 +17,9 @@
  */
 
 import {isString} from '@labor-digital/helferlein';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import * as fs from 'fs';
 import path from 'path';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {LoaderIdentifier, PluginIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
@@ -62,7 +62,7 @@ export class TypescriptConfigurator implements IConfigurator
                         configFile: configFilePath
                     }
                 },
-                config => new ForkTsCheckerWebpackPlugin(config));
+                config => new (Dependencies.tsCheckerPlugin)(config));
         }
     }
     

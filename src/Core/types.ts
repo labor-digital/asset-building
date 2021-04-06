@@ -108,6 +108,11 @@ export interface IBuilderOptions
      * This can be useful if you create the builder for services that already create their own entry point
      */
     appEntryOutputValidation?: boolean;
+    
+    /**
+     * A list of dependency paths to handle edge cases like interop where webpack is already installed
+     */
+    dependencies?: IDependencyDefinition;
 }
 
 export interface IPathList
@@ -131,12 +136,6 @@ export interface IPathList
      * The absolute path to the asset-building's node modules
      */
     buildingNodeModules: string;
-    
-    /**
-     * Is used to store additional paths that should be used for node and webpack file resolution
-     * in addition to the default node_modules directory
-     */
-    additionalResolverPaths: Set<string>;
 }
 
 export interface IAppCopyDefinition
@@ -308,4 +307,20 @@ export interface IProcessMessageListener
 export interface IIOLogWriter
 {
     (...args: Array<string>): void
+}
+
+export interface IDependencyDefinition
+{
+    webpack?: string
+    tsCheckerPlugin?: string
+    sass?: string
+    terserPlugin?: string
+    cssMinimizerPlugin?: string
+    htmlPlugin?: string
+    filterWarningsPlugin?: string
+    cssExtractPlugin?: string
+    copyPlugin?: string
+    cleanOutputPlugin?: string
+    analyzerPlugin?: string,
+    devServer?: string
 }

@@ -18,7 +18,8 @@
  */
 
 import {Command} from 'commander';
-import {Bootstrap} from './Core/Bootstrap';
+import type {Bootstrap} from './Core/Bootstrap';
+import {IncludePathRegistry} from './Core/IncludePathRegistry';
 import {GeneralHelper} from './Helpers/GeneralHelper';
 
 const program = new Command();
@@ -33,7 +34,9 @@ program.arguments('[mode]');
 
 program.action(async function (mode, args) {
     try {
-        const bootstrap = new Bootstrap();
+        IncludePathRegistry.register();
+        
+        const bootstrap: Bootstrap = new (require('./Core/Bootstrap').Bootstrap as any)();
         
         const context = await bootstrap.initMainProcess({
             watch: args.watch ?? false,

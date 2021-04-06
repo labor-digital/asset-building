@@ -16,8 +16,8 @@
  * Last modified: 2019.10.06 at 15:44
  */
 
-import {CleanWebpackPlugin} from 'clean-webpack-plugin';
 import path from 'path';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
@@ -48,6 +48,6 @@ export class CleanOutputDirConfigurator implements IConfigurator
             verbose: context.parentContext.options.verbose,
             cleanStaleWebpackAssets: false,
             cleanOnceBeforeBuildPatterns: cleanOnceBeforeBuildPatterns
-        }, config => new CleanWebpackPlugin(config));
+        }, config => new Dependencies.cleanOutputPlugin.CleanWebpackPlugin(config));
     }
 }

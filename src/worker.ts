@@ -16,8 +16,11 @@
  * Last modified: 2019.10.05 at 17:02
  */
 
-import {EventBus, PlainObject} from '@labor-digital/helferlein';
-import {Bootstrap} from './Core/Bootstrap';
+import {EventBus, isArray, PlainObject} from '@labor-digital/helferlein';
+import {isPlainObject} from 'webpack-merge/dist/utils';
+import type {Bootstrap} from './Core/Bootstrap';
+import {Dependencies} from './Core/Dependencies';
+import {IncludePathRegistry} from './Core/IncludePathRegistry';
 import {EventList} from './EventList';
 import {GeneralHelper} from './Helpers/GeneralHelper';
 
@@ -26,7 +29,15 @@ let isRunning = false;
 async function init(message: PlainObject)
 {
     try {
-        const bootstrap = new Bootstrap();
+        if (message.paths && isArray(message.paths)) {
+            IncludePathRegistry.import(message.paths);
+        }
+        
+        if (message.dependencies && isPlainObject(message.dependencies)) {
+            Dependencies.import(message.dependencies);
+        }
+        
+        const bootstrap: Bootstrap = new (require('./Core/Bootstrap').Bootstrap as any)();
         const context = await bootstrap.initWorkerProcess(message);
         
         if (context.parentContext.options.devServer) {

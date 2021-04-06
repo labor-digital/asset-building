@@ -127,7 +127,6 @@ export class NuxtFactory
         return {
             disable: [
                 ConfiguratorIdentifier.APP_PATHS,
-                ConfiguratorIdentifier.PROGRESS_BAR,
                 ConfiguratorIdentifier.CLEAN_OUTPUT_DIR,
                 ConfiguratorIdentifier.MIN_CHUNK_SIZE,
                 ConfiguratorIdentifier.BUNDLE_ANALYZER,

@@ -19,6 +19,7 @@
 import {cloneList, forEach, isArray, makeOptions} from '@labor-digital/helferlein';
 import {EventList} from '../../EventList';
 import type {CoreContext} from '../CoreContext';
+import {IncludePathRegistry} from '../IncludePathRegistry';
 import AppDefinitionSchema from '../Schema/AppDefinitionSchema';
 import type {IAppDefinition} from '../types';
 import {WorkerContext} from '../WorkerContext';
@@ -110,7 +111,7 @@ export class WorkerContextFactory
     {
         if (isArray(context.app.additionalResolverPaths)) {
             forEach(context.app.additionalResolverPaths, path => {
-                context.parentContext.paths.additionalResolverPaths.add(path);
+                IncludePathRegistry.appendFallbackPath(path);
             });
         }
     }

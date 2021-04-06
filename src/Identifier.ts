@@ -23,7 +23,6 @@ export enum ConfiguratorIdentifier
     POLYFILL = 'conf:polyfill',
     DEV_ONLY = 'conf:devOnly',
     PROD_ONLY = 'conf:prodOnly',
-    PROGRESS_BAR = 'conf:progressBar',
     HTML = 'conf:html',
     IMAGES = 'conf:images',
     FONTS = 'conf:fonts',

@@ -16,11 +16,8 @@
  * Last modified: 2019.10.06 at 16:10
  */
 
-// @ts-ignore
-import CssMinimizerPlugin from 'css-minimizer-webpack-plugin';
-// @ts-ignore
-import TerserPlugin from 'terser-webpack-plugin';
 import {merge} from 'webpack-merge';
+import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
@@ -38,7 +35,7 @@ export class ProdOnlyConfigurator implements IConfigurator
             optimization: {
                 minimize: true,
                 minimizer: [
-                    new TerserPlugin(
+                    new Dependencies.terserPlugin(
                         await ConfigGenUtil.emitPluginFilter(PluginIdentifier.JS_UGLIFY, context, {
                             parallel: true,
                             extractComments: true,
@@ -51,7 +48,7 @@ export class ProdOnlyConfigurator implements IConfigurator
                             }
                         })
                     ),
-                    new CssMinimizerPlugin(
+                    new Dependencies.cssMinimizerPlugin(
                         await ConfigGenUtil.emitPluginFilter(PluginIdentifier.CSS_UGLIFY, context, {}))
                 ]
             }

@@ -20,12 +20,9 @@ import {isPlainObject, isUndefined, PlainObject} from '@labor-digital/helferlein
 import {EventList} from '../EventList';
 import {GeneralHelper} from '../Helpers/GeneralHelper';
 import {CoreContext} from './CoreContext';
-import {CoreFixes} from './CoreFixes';
 import {Factory} from './Factory';
 import type {IAppDefinition, IBuilderOptions} from './types';
 import type {WorkerContext} from './WorkerContext';
-
-let fixesApplied = false;
 
 export class Bootstrap
 {
@@ -55,7 +52,6 @@ export class Bootstrap
         GeneralHelper.renderFancyIntro();
         
         const context = await this._factory.makeCoreContext(options);
-        this.applyEnvironmentFixes();
         this.bindMainProcessEventHandlers(context);
         
         return context;
@@ -80,7 +76,6 @@ export class Bootstrap
         const coreContext = CoreContext.fromJson(message.context, 'worker');
         const app: IAppDefinition = JSON.parse(message.app);
         coreContext.io.setAppName(app.appName ?? 'LIMBO:App - ' + app.id);
-        this.applyEnvironmentFixes();
         
         // Create the worker context using the factory
         this.bindWorkerProcessEventHandlers(coreContext);
@@ -89,19 +84,6 @@ export class Bootstrap
         
         
         return worker;
-    }
-    
-    /**
-     * Applies some environment fixes that are required to run our package
-     */
-    protected applyEnvironmentFixes(): void
-    {
-        if (fixesApplied) {
-            return;
-        }
-        
-        fixesApplied = true;
-        CoreFixes.eventsJsUncaughtErrorFix();
     }
     
     /**

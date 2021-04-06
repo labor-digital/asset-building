@@ -27,8 +27,7 @@ import {
     isUndefined
 } from '@labor-digital/helferlein';
 import type {Configuration} from 'webpack';
-// @ts-ignore
-import {Options} from 'webpack';
+import {IncludePathRegistry} from '../../Core/IncludePathRegistry';
 import type {WorkerContext} from '../../Core/WorkerContext';
 import {EventList} from '../../EventList';
 import {ConfiguratorIdentifier} from '../../Identifier';
@@ -78,7 +77,7 @@ export class MakeEnhancedConfigAction implements IWorkerAction
             config.performance = {};
         }
         if (isPlainObject(config.performance)) {
-            (config.performance as Options.Performance).hints = false;
+            (config.performance as any).hints = false;
         }
         
         // Merge the resolver paths
@@ -95,7 +94,7 @@ export class MakeEnhancedConfigAction implements IWorkerAction
             config.resolveLoader.modules = [];
         }
         config.resolveLoader.modules.unshift(context.parentContext.paths.buildingNodeModules);
-        forEach(context.parentContext.paths.additionalResolverPaths, (path: string) => {
+        forEach(IncludePathRegistry.getResolvePaths(), (path: string) => {
             if (config.resolve!.modules!.indexOf(path) === -1) {
                 config.resolve!.modules!.push(path);
             }

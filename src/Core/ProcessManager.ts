@@ -21,6 +21,8 @@ import childProcess from 'child_process';
 import path from 'path';
 import {EventList} from '../EventList';
 import type {CoreContext} from './CoreContext';
+import {Dependencies} from './Dependencies';
+import {IncludePathRegistry} from './IncludePathRegistry';
 import type {IAppDefinition, IProcessMessageListener, ISingleWorkerOptions} from './types';
 
 export class ProcessManager
@@ -159,7 +161,9 @@ export class ProcessManager
             // Start the work process
             worker.send({
                 context: this.context.toJson(),
-                app: JSON.stringify(app)
+                app: JSON.stringify(app),
+                paths: IncludePathRegistry.export(),
+                dependencies: Dependencies.export()
             });
             
             // Resolve the promise if the child was closed
