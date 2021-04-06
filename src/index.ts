@@ -18,8 +18,12 @@
 
 export * from './Identifier';
 export * from './EventList';
+export * from './Helpers/GeneralHelper';
+export * from './Helpers/FileHelpers';
 export * from './Core/types';
 export * from './Core/Factory';
+export * from './Core/Dependencies';
+export * from './Core/IncludePathRegistry';
 export * from './Core/Factory/CoreContextFactory';
 export * from './Core/Factory/WorkerContextFactory';
 export * from './Core/CoreContext';
@@ -32,5 +36,3 @@ export * from './Webpack/ConfigGeneration/ConfigGenUtil';
 export * from './Webpack/ConfigGeneration/types';
 export * from './Webpack/Actions/types';
 export * from './Webpack/Plugins/types';
-// export * from './Interop/Nuxt/NuxtFactory';
-export * from './Interop/Storybook/StorybookFactory';

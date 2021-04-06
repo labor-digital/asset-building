@@ -17,6 +17,7 @@
  */
 
 import type {ExpressContext, ICompilerResult, WorkerContext} from '@labor-digital/asset-building';
+import {GeneralHelper} from '@labor-digital/asset-building';
 import type {PlainObject} from '@labor-digital/helferlein';
 import {forEach, isArray, isPlainObject, isString, isUndefined} from '@labor-digital/helferlein';
 import fs from 'fs';
@@ -25,7 +26,6 @@ import LRU from 'lru-cache';
 import path from 'path';
 import {BundleRenderer, BundleRendererOptions, createBundleRenderer} from 'vue-server-renderer';
 import type {Configuration} from 'webpack';
-import {GeneralHelper} from '../../../../../dist/Helpers/GeneralHelper';
 import {VueEventList} from '../../types';
 import {ResponseHandler} from './ResponseHandler';
 import type {IExpressSsrOptions} from './types';
