@@ -60,9 +60,8 @@ export class GeneralHelper
             err = (err as any).stack;
         }
         
-        console.error('');
-        console.error(Chalk.redBright(title ?? 'A FATAL ERROR OCCURRED!\r\nSadly I could not recover :(\r\n'));
-        console.error(Chalk.redBright(err));
+        console.error(Chalk.redBright(title ?? 'A FATAL ERROR OCCURRED!\r\nSadly I could not recover :(') + '\r\n' +
+                      Chalk.redBright(err));
         
         if (kill !== false) {
             process.exit(1);

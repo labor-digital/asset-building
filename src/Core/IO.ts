@@ -119,7 +119,7 @@ export class IO
         this._backup = {
             log: console.log,
             warn: console.warn,
-            err: console.error,
+            error: console.error,
             info: console.info
         };
         

@@ -22,7 +22,6 @@ import type {Bootstrap} from './Core/Bootstrap';
 import {Dependencies} from './Core/Dependencies';
 import {IncludePathRegistry} from './Core/IncludePathRegistry';
 import {EventList} from './EventList';
-import {GeneralHelper} from './Helpers/GeneralHelper';
 
 let isRunning = false;
 
@@ -47,7 +46,10 @@ async function init(message: PlainObject)
             process.exit(await res.promise);
         }
     } catch (e) {
-        GeneralHelper.renderError(e, 'ERROR IN WORKER PROCESS:');
+        process.send!({
+            assetFatalError: true,
+            error: e.stack
+        });
     }
 }
 

@@ -46,7 +46,11 @@ program.action(async function (mode, args) {
             mode
         });
         
-        await context.processManager.startWorkers();
+        try {
+            await context.processManager.startWorkers();
+        } catch (e) {
+            GeneralHelper.renderError(e);
+        }
         
         process.exit(0);
     } catch (e) {

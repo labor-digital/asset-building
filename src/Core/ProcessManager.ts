@@ -16,10 +16,11 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {filter, forEach, isFunction} from '@labor-digital/helferlein';
+import {filter, forEach, isFunction, isPlainObject} from '@labor-digital/helferlein';
 import childProcess from 'child_process';
 import path from 'path';
 import {EventList} from '../EventList';
+import {GeneralHelper} from '../Helpers/GeneralHelper';
 import type {CoreContext} from './CoreContext';
 import {Dependencies} from './Dependencies';
 import {IncludePathRegistry} from './IncludePathRegistry';
@@ -138,24 +139,28 @@ export class ProcessManager
             });
             
             // Register message listeners
-            worker.on('message', (msg: string) => {
-                msg = msg + '';
-                
-                if (msg.indexOf('ASSET_MSG::') !== 0) {
+            worker.on('message', async (msg: any) => {
+                if (!isPlainObject(msg)) {
                     return;
                 }
                 
-                msg = msg.substr(11);
-                const nsEndPos = msg.indexOf('::');
-                const ns = msg.substr(0, nsEndPos);
-                const data = JSON.parse(msg.substr(nsEndPos + 2));
-                forEach(this.listeners, listener => {
-                    if (listener.namespace !== ns) {
-                        return;
-                    }
-                    
-                    listener.listener(data, ns, worker);
-                });
+                // Handle fatal errors
+                if (msg.assetFatalError) {
+                    await this.context.eventEmitter.emitHook(EventList.SHUTDOWN, {});
+                    GeneralHelper.renderError(msg.error,
+                        'FATAL ERROR IN WORKER PROCESS: ' + app.id + ' (' + worker.pid + ')');
+                    return;
+                }
+                
+                // Handle data messages
+                if (msg.assetMessage) {
+                    forEach(this.listeners, listener => {
+                        if (listener.namespace !== msg.namespace) {
+                            return;
+                        }
+                        listener.listener(msg.data, msg.namespace, worker);
+                    });
+                }
             });
             
             // Start the work process
@@ -200,7 +205,11 @@ export class ProcessManager
         if (!process.send) {
             throw new Error('Can\'t send a message to the parent process, because we are already in the core process!');
         }
-        process.send('ASSET_MSG::' + namespace + '::' + JSON.stringify(data));
+        
+        process.send({
+            assetMessage: true,
+            namespace, data
+        });
     }
     
     /**
