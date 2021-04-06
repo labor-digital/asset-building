@@ -16,6 +16,7 @@
  * Last modified: 2019.10.06 at 15:29
  */
 
+import path from 'path';
 import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
@@ -28,7 +29,11 @@ export class ProvideConfigurator implements IConfigurator
     public async apply(context: WorkerContext): Promise<void>
     {
         const args = await context.eventEmitter.emitHook(
-            EventList.GET_JS_PROVIDES, {provides: {}, context});
+            EventList.GET_JS_PROVIDES, {
+                provides: {
+                    process: path.resolve(context.parentContext.paths.assetBuilder, '../static/ProcessPolyfill.js')
+                }, context
+            });
         
         await ConfigGenUtil.addPlugin(PluginIdentifier.PROVIDE, context, args.provides,
             config => new Dependencies.webpack.ProvidePlugin(config));

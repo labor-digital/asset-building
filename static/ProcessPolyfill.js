@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 LABOR.digital
+ * Copyright 2021 LABOR.digital
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2018.09.20 at 19:27
+ * Last modified: 2021.04.07 at 00:50
  */
-import './Components/Components.js';
-import './Globals/Globals.sass';
 
-console.log('Hello World! This is the javascript, speaking');
-
-console.log('The Asset builder provides a minimal polyfill for "process", so your apps won\'t crash', process);
+module.exports = {
+    env: {}
+};
