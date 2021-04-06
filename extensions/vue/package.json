@@ -1,6 +1,6 @@
 {
 	"name": "@labor-digital/asset-building-env-vuejs",
-	"version": "4.1.1",
+	"version": "5.0.0-rc.1",
 	"description": "An Extension for the LABOR.digital asset-builder to build vue.js apps with zero config",
 	"main": "./dist/index.js",
 	"repository": {
