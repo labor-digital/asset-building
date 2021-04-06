@@ -134,8 +134,9 @@ export class ExtensionLoader
         const paths = coreContext.paths;
         forEach([paths.source, paths.buildingNodeModules, paths.nodeModules],
             (basePath: string) => {
+                const absPath = path.resolve(basePath, extensionPath);
                 try {
-                    extension = require(path.resolve(basePath, extensionPath));
+                    extension = require(absPath);
                     
                     // Add additional lookup path for all plugin sources
                     let parts = path.resolve(basePath, extensionPath).split(path.sep);
@@ -150,7 +151,7 @@ export class ExtensionLoader
                     
                     return false;
                 } catch (e) {
-                    if (e.toString().indexOf('find module') === -1 || e.toString().indexOf(extensionBaseName) === -1) {
+                    if (e.toString().indexOf('Cannot find module \'' + absPath + '\'') === -1) {
                         throw new Error('Error while loading extension: "' + extensionPath + '" | ' + e.toString());
                     }
                 }
