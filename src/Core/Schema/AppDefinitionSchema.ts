@@ -65,6 +65,10 @@ export default {
             return !(v < 0);
         }
     },
+    copy: {
+        type: 'array',
+        default: () => []
+    },
     jsCompat: {
         type: ['array', 'null'],
         default: null
