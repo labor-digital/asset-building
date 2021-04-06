@@ -4,7 +4,7 @@
 	"description": "A demoproject to show how the buildprocess works",
 	"scripts": {
 		"build": "assets",
-		"prod": "cross-env NODE_ENV=production node ./index.js",
+		"prod": "npm run build && node ./index.js",
 		"dev": "cross-env NODE_ENV=development node ./index.js",
 		"analyze": "assets analyze"
 	},
@@ -18,7 +18,11 @@
 		"apps": [
 			{
 				"entry": "./frontend/src/app.js",
-				"output": "./frontend/dist/bundle.js"
+				"output": "./frontend/dist/bundle.js",
+				"htmlTemplate": {
+					"title": "Hello there!",
+					"bodySnippets": "<h1>Hello World!</h1>"
+				}
 			}
 		]
 	},

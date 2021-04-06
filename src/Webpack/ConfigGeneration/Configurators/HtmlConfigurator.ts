@@ -55,6 +55,12 @@ export class HtmlConfigurator implements IConfigurator
         // Apply a basic configuration
         let template = context.app.htmlTemplate;
         
+        // If no dedicated public path was given and the htmlTemplate is used,
+        // we rewrite it to "/" to prevent issues for single page apps
+        if (!context.app.publicPath && context.app.htmlTemplate) {
+            context.webpackConfig.output!.publicPath = '/';
+        }
+        
         if (template === true) {
             template = {};
         }

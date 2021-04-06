@@ -16,7 +16,7 @@
  * Last modified: 2019.10.05 at 17:26
  */
 
-import {EventBus, EventEmitter, forEach, isString, PlainObject} from '@labor-digital/helferlein';
+import {EventEmitter, forEach, isString, PlainObject} from '@labor-digital/helferlein';
 import * as path from 'path';
 import {ExtensionLoader} from '../Extension/ExtensionLoader';
 import {IncludePathRegistry} from './IncludePathRegistry';
@@ -151,12 +151,13 @@ export class CoreContext
                 this[el] = cloneBase[el];
             });
         } else {
-            this.eventEmitter = EventBus.getEmitter();
+            this.eventEmitter = new EventEmitter();
             this.extensionLoader = new ExtensionLoader();
             this.processManager = new ProcessManager(this);
             this.io = new IO(this);
             this.logger = new Logger(this.io, this.options?.verbose ?? false);
             this.progressManager = new ProgressManager(this);
+            return;
         }
     }
     

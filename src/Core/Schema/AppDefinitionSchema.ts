@@ -22,6 +22,10 @@ let fallbackAppCounter = 0;
 const chars = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 
 export default {
+    id: {
+        type: 'number',
+        default: 0
+    },
     disabled: {
         type: 'bool',
         default: false

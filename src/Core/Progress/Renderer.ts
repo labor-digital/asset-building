@@ -141,6 +141,7 @@ export class Renderer
             if (!this._bottomBar) {
                 return;
             }
+            
             // @ts-ignore
             this._bottomBar.close();
             // @ts-ignore

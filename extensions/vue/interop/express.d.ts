@@ -13,30 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * Last modified: 2021.03.26 at 09:47
+ * Last modified: 2021.04.06 at 15:35
  */
-import 'app.css';
-import 'sub.js';
 
-console.log('Build for environment', process.env.NODE_ENV);
+import bridge from '../dist/Interop/Express/bridge';
 
-let el = document.createElement('div');
-
-if (module.hot) {
-    module.hot.accept();
-    
-    module.hot.dispose((data) => {
-        data.el = el;
-    });
-    
-    if (module.hot.data && module.hot.data.el) {
-        el = module.hot.data.el;
-    }
-}
-
-if (!el.parentElement) {
-    setTimeout(() => document.body.appendChild(el));
-}
-
-// Change this, wile running a dev server, to see it hot-reload
-el.innerText = 'This is a javascript text!';
+export const vue = bridge;

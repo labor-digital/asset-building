@@ -16,9 +16,9 @@
  * Last modified: 2021.03.29 at 20:28
  */
 
-const assets = require('@labor-digital/asset-building/interop/express');
 const express = require('express');
-const {vue} = require('@labor-digital/asset-building-env-vuejs');
+const {assets} = require('@labor-digital/asset-building/interop/express');
+const {vue} = require('@labor-digital/asset-building-env-vuejs/interop/express');
 
 const app = express();
 const port = 8000;
@@ -39,7 +39,7 @@ assets(app, {verbose: true})
         
         // This is the magic that registers the vue ecosystem to your app
         // Mind the "Return" statement, please!
-        return vue.express(context);
+        return vue(context);
         
     })
     .then(context => {

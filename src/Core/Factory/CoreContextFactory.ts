@@ -51,6 +51,7 @@ export class CoreContextFactory
         Dependencies.inheritFromOptions(options);
         
         const context = CoreContext.new(options);
+        return context;
         await this.loadExtensions(context);
         await this.findMode(context);
         await context.eventEmitter.emitHook(EventList.AFTER_MAIN_INIT_DONE, {context});

@@ -15,7 +15,7 @@
  *
  * Last modified: 2021.03.26 at 09:48
  */
-const assets = require('@labor-digital/asset-building/interop/express');
+const {assets} = require('@labor-digital/asset-building/interop/express');
 const express = require('express');
 
 const app = express();

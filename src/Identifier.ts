@@ -88,7 +88,8 @@ export enum PluginIdentifier
     FANCY_STATS = 'plugin:fancyStats',
     PROMISE_SHIM = 'plugin:promiseShim',
     GIT_ADD = 'plugin:gitAdd',
-    PROGRESS_PROVIDER = 'plugin:progressProvider'
+    PROGRESS_PROVIDER = 'plugin:progressProvider',
+    EVENT_PROVIDER = 'plugin:eventProvider'
 }
 
 export type Identifier = ConfiguratorIdentifier | RuleIdentifier | PluginIdentifier | string;

@@ -19,6 +19,7 @@
 export enum EventList
 {
     // Events for global extensions
+    
     SHUTDOWN = 'assetBuilder__shutdown',
     GET_MODES = 'assetBuilder__getModes',
     GET_MODE = 'assetBuilder__getMode',
@@ -51,7 +52,6 @@ export enum EventList
     FILTER_WEBPACK_COMPILER = 'assetBuilder__filterWebpackCompiler',
     COMPILING_DONE = 'assetBuilder__compilingDone',
     BEFORE_GIT_ADD = 'assetBuilder__beforeGitAdd',
-    CALLBACK_DONE = 'assetBuilder__callbackDone',
     PROCESS_CREATED = 'assetBuilder__processManager--processCreated',
     CHECK_IDENTIFIER_STATE = 'assetBuilder__checkIdentifierState',
     

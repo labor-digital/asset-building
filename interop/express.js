@@ -16,4 +16,4 @@
  * Last modified: 2021.04.06 at 13:35
  */
 
-module.exports = require('../dist/Interop/Express/makeExpressAssetBuilder').default;
+module.exports.assets = require('../dist/Interop/Express/makeExpressAssetBuilder').default;

@@ -15,20 +15,19 @@
  *
  * Last modified: 2021.03.26 at 09:48
  */
-const {expressAssetBuildingPlugin} = require('@labor-digital/asset-building');
+const {assets} = require('@labor-digital/asset-building/interop/express');
 const express = require('express');
 
 const app = express();
 const port = 8000;
 
-// Apply the dev server plugin to the app
-expressAssetBuildingPlugin(app, {devServer: true})
+// Using the devServer option the asset builder will automatically inject the webpack dev middleware
+// into your application, so you don't have to do anything. If you are running the script in a "production" environment,
+// the output directory will be served automatically
+assets(app, {devServer: true, verbose: true})
     .then(() => {
-        app.get('/', (req, res) => {
-            res.send(
-                '<html><head><title>Hello!</title><script type="text/javascript" src="/frontend/dist/bundle.js"></script></head>Hello World!</html>');
-        });
         
         app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+        
     });
 

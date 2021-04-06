@@ -19,7 +19,6 @@
 console.log('Hello World :D');
 
 setTimeout(() => {
-    console.log('here');
     const el = document.createElement('div');
     el.innerText = 'This is a javascript text!';
     document.body.appendChild(el);

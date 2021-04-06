@@ -16,4 +16,4 @@
  * Last modified: 2021.04.01 at 15:14
  */
 
-module.exports = require('../dist/Interop/Storybook/makeStorybookAssetBuilder').default;
+module.exports.assets = require('../dist/Interop/Storybook/makeStorybookAssetBuilder').default;

@@ -99,7 +99,7 @@ export class WorkerContextFactory
             delete args.schema.output;
         }
         
-        context.app = makeOptions(context.app, args.schema, {allowUnknown: true});
+        context.app = makeOptions(context.app, args.schema);
     }
     
     /**

@@ -60,6 +60,23 @@ export class WorkerContext
     public progressReporter?: IReporter;
     
     /**
+     * Internal flags that define how we should handle the shutdown of the script
+     */
+    public shutdown: {
+        // The numeric exit code to return when the script stopped
+        exitCode: number
+        // As long as this is set to true, the script will be shut down
+        // when the EventProviderPlugin emits the COMPILING_DONE event.
+        // This is disabled when the runWebpackCompiler action is executed, as it handles the shutdown internally.
+        // Note: This is an additional switch to disable the shutdown! Note, that "watch" must be either undefined
+        // or set to false in order for the script to even try a shutdown!
+        doShutdownWhenCompilingIsDone: boolean
+    } = {
+        exitCode: 0,
+        doShutdownWhenCompilingIsDone: true
+    };
+    
+    /**
      * Injects the basic configuration
      * @param parentContext
      * @param app

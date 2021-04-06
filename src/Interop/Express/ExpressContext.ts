@@ -18,10 +18,12 @@
 
 import {EventBus, EventEmitter, isArray} from '@labor-digital/helferlein';
 import type {Application} from 'express';
-import WebpackDevServer from 'webpack-dev-server';
+import type WebpackDevServer from 'webpack-dev-server';
+import {Dependencies} from '../../Core/Dependencies';
 import {Factory} from '../../Core/Factory';
 import type {IBuilderOptions} from '../../Core/types';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {PluginIdentifier} from '../../Identifier';
 
 export class ExpressContext
 {
@@ -118,10 +120,6 @@ export class ExpressContext
      */
     public async registerDevServerMiddleware(): Promise<void>
     {
-        if (this.isProd) {
-            return;
-        }
-        
         // Avoid double configuration
         if (this._devServerRegistered) {
             return;
@@ -130,22 +128,43 @@ export class ExpressContext
         
         this.options.watch = false;
         const worker = await this.getWorker();
-        const config = await worker.do.makeConfig();
+        const config = await worker.do.makeConfig({disable: [PluginIdentifier.GIT_ADD]});
+        
+        worker.progressReporter?.update({percent: 0.5, message: 'Booting the server...'});
+        
+        if (this.isProd) {
+            if (this.options.verbose) {
+                console.log('Production mode enabled! Serving output directory as document root: "' +
+                            config.output!.path! + '"');
+            }
+            this.registerPublicAssets(config.output!.path!, '/');
+            worker.progressReporter?.update({percent: 1});
+            return;
+        }
+        
+        
+        this.expressApp.on('listening', () => {
+            worker.progressReporter?.update({percent: 1});
+        });
         
         if (!isArray(config.entry)) {
             config.entry = [config.entry as any];
         }
         
         config.entry.unshift('webpack-hot-middleware/client?path=/__webpack_hmr&reload=true');
-        config.plugins!.push(new (require('webpack')).HotModuleReplacementPlugin());
+        config.plugins!.push(new Dependencies.webpack.HotModuleReplacementPlugin());
         
         const devServerOptions: WebpackDevServer.Configuration = {
-            noInfo: true,
+            noInfo: !this.options.verbose,
             hot: true
         };
-        WebpackDevServer.addDevServerEntrypoints(config as any, devServerOptions);
+        Dependencies.devServer.addDevServerEntrypoints(config as any, devServerOptions);
         
         const compiler = await worker.do.makeCompiler({config});
+        
+        if (this.options.verbose) {
+            console.log('Registering webpack-dev-middleware into express app!');
+        }
         
         this.expressApp.use(require('webpack-dev-middleware')(compiler, {
             stats: false,
@@ -158,7 +177,6 @@ export class ExpressContext
         }));
         
         this.expressApp.use(require('webpack-hot-middleware')(compiler, {
-            // log: false,
             path: '/__webpack_hmr',
             heartbeat: 10 * 1000
         }));

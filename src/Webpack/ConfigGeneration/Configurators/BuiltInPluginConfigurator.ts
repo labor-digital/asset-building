@@ -19,6 +19,7 @@
 import {isFunction} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {PluginIdentifier} from '../../../Identifier';
+import {EventProviderPlugin} from '../../Plugins/EventProviderPlugin';
 import {FancyStatsPlugin} from '../../Plugins/FancyStatsPlugin';
 import {GitAddPlugin} from '../../Plugins/GitAddPlugin';
 import {ProgressProviderPlugin} from '../../Plugins/ProgressProviderPlugin';
@@ -34,6 +35,7 @@ export class BuiltInPluginConfigurator implements IConfigurator
     {
         const w = this.registerPluginWrapper;
         await w(PluginIdentifier.PROGRESS_PROVIDER, context, ProgressProviderPlugin);
+        await w(PluginIdentifier.EVENT_PROVIDER, context, EventProviderPlugin);
         await w(PluginIdentifier.GIT_ADD, context, GitAddPlugin);
         await w(PluginIdentifier.FANCY_STATS, context, FancyStatsPlugin);
         await w(PluginIdentifier.PROMISE_SHIM, context, WebpackPromiseShimPlugin);

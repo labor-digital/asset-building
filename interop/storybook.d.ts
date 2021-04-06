@@ -18,4 +18,4 @@
 
 import makeStorybookAssetBuilder from '../dist/Interop/Storybook/makeStorybookAssetBuilder';
 
-export default makeStorybookAssetBuilder;
+export const assets = makeStorybookAssetBuilder;

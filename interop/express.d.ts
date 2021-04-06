@@ -18,4 +18,4 @@
 
 import makeExpressAssetBuilder from '../src/Interop/Express/makeExpressAssetBuilder';
 
-export default makeExpressAssetBuilder;
+export const assets = makeExpressAssetBuilder;

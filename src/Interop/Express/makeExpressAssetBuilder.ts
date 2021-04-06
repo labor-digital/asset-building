@@ -29,6 +29,7 @@ import type {ExpressContext} from './ExpressContext';
  *
  * @param expressApp
  * @param options
+ * @returns {Promise<ExpressContext>}
  */
 export default async function makeExpressAssetBuilder(
     expressApp: Application,
