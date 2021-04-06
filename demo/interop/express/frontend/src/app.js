@@ -16,7 +16,7 @@
  * Last modified: 2021.03.26 at 09:47
  */
 
-console.log('Hello World :D');
+console.log('[DEMO: Node environment]', process.env.NODE_ENV);
 
 setTimeout(() => {
     const el = document.createElement('div');

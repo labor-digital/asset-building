@@ -12,7 +12,8 @@
 	},
 	"devDependencies": {
 		"@labor-digital/asset-building": "file:../../../",
-		"@labor-digital/asset-building-env-vuejs": "file:../../../extensions/vue"
+		"@labor-digital/asset-building-env-vuejs": "file:../../../extensions/vue",
+		"vue": "^2.6.12"
 	},
 	"labor": {
 		"builderVersion": 2,

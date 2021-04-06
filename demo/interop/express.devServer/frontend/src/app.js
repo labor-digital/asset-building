@@ -18,7 +18,7 @@
 import 'app.css';
 import 'sub.js';
 
-console.log('Build for environment', process.env.NODE_ENV);
+console.log('[DEMO: Node environment]', process.env.NODE_ENV);
 
 let el = document.createElement('div');
 

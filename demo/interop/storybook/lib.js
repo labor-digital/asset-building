@@ -19,3 +19,5 @@
 export * from 'stories/Button';
 export * from 'stories/Header';
 export * from 'stories/Page';
+
+console.log('[DEMO: Node environment]', process.env.NODE_ENV);
