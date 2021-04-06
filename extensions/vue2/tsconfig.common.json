@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		// Output settings.
+		"outDir": "dist",
+		"charset": "utf-8",
+		"newLine": "LF",
+		// Transpilation settings.
+		"module": "commonjs",
+		"target": "es6",
+		"pretty": true,
+		// Module settings.
+		"allowSyntheticDefaultImports": true,
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"moduleResolution": "node",
+		"resolveJsonModule": true,
+		// Strictness and quality settings.
+		"alwaysStrict": true,
+		"forceConsistentCasingInFileNames": true,
+		"importsNotUsedAsValues": "error",
+		"noFallthroughCasesInSwitch": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"strict": true,
+		"suppressImplicitAnyIndexErrors": true,
+		// Type-checking settings.
+		"skipDefaultLibCheck": true,
+		"skipLibCheck": true,
+		// Type declaration settings.
+		"declaration": true,
+		"declarationMap": false
+	},
+	"include": [
+		"src/**/*"
+	],
+	"exclude": [
+		"node_modules",
+		"dist"
+	]
+}

@@ -1,0 +1,59 @@
+<% var item, key %><%
+htmlWebpackPlugin.options.appMountIds = htmlWebpackPlugin.options.appMountIds || [] %><%
+htmlWebpackPlugin.options.lang = htmlWebpackPlugin.options.lang || "en" %><%
+htmlWebpackPlugin.options.links = htmlWebpackPlugin.options.links || [] %><%
+htmlWebpackPlugin.options.meta = htmlWebpackPlugin.options.meta || [] %><%
+htmlWebpackPlugin.options.scripts = htmlWebpackPlugin.options.scripts || []
+%><!DOCTYPE html>
+<html data-vue-template-html
+<% if (htmlWebpackPlugin.files.manifest) { %> manifest="<%= htmlWebpackPlugin.files.manifest %>"
+        <% } %>
+>
+<head data-vue-template-head>
+    <meta charset="utf-8">
+    <meta content="ie=edge" http-equiv="x-ua-compatible">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <%
+    for (key in htmlWebpackPlugin.files.css) { %><%
+    if (htmlWebpackPlugin.files.cssIntegrity) { %>
+        <link
+                href="<%= htmlWebpackPlugin.files.css[key] %>"
+                rel="stylesheet"
+                integrity="<%= htmlWebpackPlugin.files.cssIntegrity[key] %>"
+                crossorigin="<%= webpackConfig.output.crossOriginLoading %>"/><%
+    } else { %>
+        <link href="<%= htmlWebpackPlugin.files.css[key] %>" rel="stylesheet"/><%
+    } %>
+    <%
+    } %>
+    <!--vue-head-outlet-->
+    <!--vue-renderer-head-outlet-->
+</head>
+<body data-vue-template-body>
+<!--vue-pbody-outlet-->
+<div id="app"><!--vue-ssr-outlet--></div>
+<!--vue-body-outlet-->
+<%
+if (htmlWebpackPlugin.options.window) { %>
+    <script type="text/javascript"><%
+        for (key in htmlWebpackPlugin.options.window) { %>
+		window['<%= key %>'] = <%= JSON.stringify(htmlWebpackPlugin.options.window[key]) %>;<%
+        } %>
+    </script>
+<%
+} %>
+<%
+if (htmlWebpackPlugin.options.inlineManifestWebpackName) { %>
+    <%= htmlWebpackPlugin.files[htmlWebpackPlugin.options.inlineManifestWebpackName] %>
+<%
+} %>
+<%
+for (item of htmlWebpackPlugin.options.scripts) { %><%
+    if (typeof item === 'string' || item instanceof String) {
+        item = {src: item, type: 'text/javascript'}
+    } %>
+<script<% for (key in item) { %> <%= key %>="<%= item[key] %>"<% } %>></script>
+<%
+} %>
+</body>
+</html>
