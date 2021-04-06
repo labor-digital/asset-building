@@ -16,9 +16,7 @@
 		"watch": "npm run clean && tsc --project ./tsconfig.watch.json --watch"
 	},
 	"dependencies": {
-		"@labor-digital/helferlein": "^4.0.0",
-		"@types/express": "4.17.11",
-		"@types/memory-fs": "0.3.2",
+		"@labor-digital/helferlein": "^4.0.5",
 		"@types/vue": "2.0.0",
 		"lru-cache": "^6.0.0",
 		"patch-package": "^6.4.7",
@@ -34,6 +32,8 @@
 	},
 	"devDependencies": {
 		"@labor-digital/asset-building": "file:../../",
+		"@types/express": "4.17.11",
+		"@types/memory-fs": "0.3.3",
 		"typescript": "4.2.3"
 	},
 	"peerDependencies": {
