@@ -25,9 +25,7 @@ export const ClientRendererProviderPlugin: IAssetBuilderPluginStatic = class imp
 {
     public apply(compiler: Compiler): any
     {
-        console.log('register DONE hook');
         compiler.hooks.done.tap('ClientRendererProviderPlugin', () => {
-            console.log('COMPILER DONE!');
             const mfs: MemoryFileSystem = compiler.outputFileSystem as any;
             
             // Update the client manifest

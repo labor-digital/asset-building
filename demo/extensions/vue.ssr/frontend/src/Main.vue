@@ -1,10 +1,16 @@
 <template>
-  <h1>Hello World 2 :)</h1>
+  <h1>Hello World :)</h1>
 </template>
 
 <script lang="ts">
+
 export default {
-  name: 'Main'
+  name: 'Main',
+  created()
+  {
+    console.log('[DEMO: Vue environment]', process.env.VUE_ENV);
+    console.log('[DEMO: Node environment]', process.env.NODE_ENV);
+  }
 };
 </script>
 

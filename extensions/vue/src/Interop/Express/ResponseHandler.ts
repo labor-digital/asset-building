@@ -61,7 +61,7 @@ export class ResponseHandler
         }
         
         try {
-            let result = await this.renderer.renderToString();
+            let result = await this.renderer.renderToString(vueContext);
             
             if (isFunction(options.afterRendering)) {
                 const tmp = await options.afterRendering(result, vueContext, res, req);

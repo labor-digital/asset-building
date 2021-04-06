@@ -105,7 +105,7 @@ export default {
         default: () => []
     },
     devServer: {
-        type: 'plainObject',
+        type: ['plainObject'],
         default: {},
         children: {
             port: {

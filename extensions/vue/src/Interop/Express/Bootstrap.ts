@@ -61,15 +61,19 @@ export class Bootstrap
             this._config = await this.initializeConfiguration();
             
             // No watching for us -> Vue will do this alone
+            this._workerContext.parentContext.options.watch = undefined;
             this._config.watch = undefined;
+            this._workerContext.progressReporter?.update({percent: 0.5, message: 'Booting the server...'});
             
             if (this.isProd) {
                 // PROD
                 this._renderer = this.initializeProductionRenderer();
+                this._workerContext.progressReporter?.update({percent: 1});
             } else {
                 // DEV
                 this.registerGlobalRendererUpdate();
                 await this.startClientCompiler();
+                await this._context.registerDevServerMiddleware();
             }
             
             this.registerAssetRoute();

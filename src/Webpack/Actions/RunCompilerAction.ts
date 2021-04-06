@@ -43,9 +43,6 @@ export class RunCompilerAction implements IWorkerAction
         
         let compiler = await context.do.makeCompiler(options);
         
-        // Nobody except our handler will be able to shut down the script
-        context.shutdown.doShutdownWhenCompilingIsDone = false;
-        
         const args = await context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_COMPILER, {
             callback: (context: any, stats: any, resolve: any, reject: any): void => {
                 this.webpackCallback(context, stats, resolve, reject);

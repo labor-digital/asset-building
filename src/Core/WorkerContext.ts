@@ -73,7 +73,7 @@ export class WorkerContext
         doShutdownWhenCompilingIsDone: boolean
     } = {
         exitCode: 0,
-        doShutdownWhenCompilingIsDone: true
+        doShutdownWhenCompilingIsDone: false
     };
     
     /**

@@ -82,6 +82,7 @@ export class StorybookFactory
         coreContext.mode = coreContext.isProd ? 'production' : 'dev';
         
         const worker = await this._factory.makeWorkerContext(coreContext, coreContext.options!.apps![0]);
+        worker.shutdown.doShutdownWhenCompilingIsDone = coreContext.isProd;
         return await worker.do.makeEnhancedConfig(config, this.getEnhancerOptions());
     }
     

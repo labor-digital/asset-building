@@ -240,11 +240,10 @@ export class VueExtension extends AbstractExtension
             }
         }, 1000);
         
-        this.addListener(EventList.AFTER_WORKER_INIT_DONE, () => {
+        this.addListener(EventList.AFTER_WORKER_INIT_DONE, async () => {
             // Split off the server configuration into a separate worker process
-            if (this.app.ssrWorker === 'client'
-                && !(this.coreContext.environment === 'express' && this.coreContext.isProd)) {
-                this.launchSsrServerWorker();
+            if (this.app.ssrWorker === 'client') {
+                await this.launchSsrServerWorker();
             }
         });
     }
@@ -265,9 +264,9 @@ export class VueExtension extends AbstractExtension
         ) as any;
     }
     
-    protected launchSsrServerWorker(): void
+    protected launchSsrServerWorker(): Promise<void>
     {
-        this.coreContext.processManager.startSingleWorker(
+        return this.coreContext.processManager.startSingleWorker(
             this.makeSsrServerApp(), {
                 onCreate: (process) => {
                     process.on('message', (message: any) => {
@@ -358,7 +357,7 @@ export class VueExtension extends AbstractExtension
         await ConfigGenUtil.addPlugin('vue:client:define', this.workerContext!, {
                 'process.env.NODE_ENV': JSON.stringify(
                     process.env.NODE_ENV === 'production' || this.coreContext.isProd ? 'production' : 'development'),
-                'process.env.VUE_ENV': '"server"'
+                'process.env.VUE_ENV': '"client"'
             },
             c => new (require('webpack')).DefinePlugin(c));
         

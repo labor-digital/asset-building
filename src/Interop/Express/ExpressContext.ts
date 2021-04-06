@@ -99,10 +99,12 @@ export class ExpressContext
     public async getWorker(): Promise<WorkerContext>
     {
         const coreContext = await this.factory.makeCoreContext({
-            watch: true,
+            watch: !this.isProd,
             mode: this.isProd ? 'production' : 'dev',
             ...this.options
         });
+        
+        coreContext.isProd = this.isProd;
         
         if (coreContext.options.apps?.length !== 1) {
             throw new Error(
@@ -141,7 +143,6 @@ export class ExpressContext
             worker.progressReporter?.update({percent: 1});
             return;
         }
-        
         
         this.expressApp.on('listening', () => {
             worker.progressReporter?.update({percent: 1});
