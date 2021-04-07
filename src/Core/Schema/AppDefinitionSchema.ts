@@ -58,6 +58,10 @@ export default {
         type: 'bool',
         default: false
     },
+    warningsIgnorePattern: {
+        type: ['array', 'string'],
+        default: () => []
+    },
     minChunkSize: {
         type: 'number',
         default: 10000,
