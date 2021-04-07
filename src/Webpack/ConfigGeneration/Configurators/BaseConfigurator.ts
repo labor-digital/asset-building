@@ -41,7 +41,7 @@ export class BaseConfigurator implements IConfigurator
             mode: context.isProd ? 'production' : 'development',
             target: ['web', 'es5'],
             watch: context.parentContext.options.watch ?? false,
-            devtool: context.isProd ? 'source-map' : 'eval',
+            devtool: context.isProd ? 'source-map' : 'eval-source-map',
             entry: {},
             plugins: [],
             module: {

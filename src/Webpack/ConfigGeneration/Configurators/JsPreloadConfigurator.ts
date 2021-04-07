@@ -18,7 +18,7 @@
 
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
-import {RuleIdentifier} from '../../../Identifier';
+import {LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {IConfigurator} from '../types';
 
@@ -26,6 +26,18 @@ export class JsPreloadConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
+        // The "source-map" loader is technically a pre-loader but does not apply to the default js rules,
+        // as it does include ALL javascript files, including those in node_modules
+        await ConfigGenUtil.addRule(RuleIdentifier.JS_SOURCE_MAP, context, /\.js$/, {
+            enforce: 'pre',
+            use: await ConfigGenUtil
+                .makeRuleUseChain(RuleIdentifier.JS_SOURCE_MAP, context)
+                .addLoader(LoaderIdentifier.JS_SOURCE_MAP, {
+                    loader: 'source-map-loader'
+                })
+                .finish()
+        });
+        
         let args = await context.eventEmitter.emitHook(EventList.FILTER_JS_PRE_LOADERS, {
             loaders: [], context
         });
