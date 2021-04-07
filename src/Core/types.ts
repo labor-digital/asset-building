@@ -285,7 +285,7 @@ export interface IAppDefinition
          * By default "localhost", can be set to any other url that resolves to localhost, too.
          */
         host?: string;
-    }
+    } | false
 }
 
 export interface ISingleWorkerOptions

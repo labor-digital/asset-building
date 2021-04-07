@@ -16,7 +16,7 @@
  * Last modified: 2021.03.26 at 15:03
  */
 
-import {isArray, isString} from '@labor-digital/helferlein';
+import {isArray, isPlainObject, isString} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
 import {createServer, Server} from 'http';
 import portfinder from 'portfinder';
@@ -108,8 +108,14 @@ Public path: http://${host}:${port}${publicPath ?? ''}
      */
     protected async resolvePort(context: WorkerContext): Promise<{ port: number, host: string, tempServer?: Server }>
     {
-        const host = context.app.devServer?.host ?? 'localhost';
-        let port = context.app.devServer?.port;
+        const devServer = context.app.devServer!;
+        if (!isPlainObject(devServer)) {
+            throw new Error(
+                'Can\'t start a dev server for app, because it was actively disabled using "devServer": false in the app configuration!');
+        }
+        
+        const host = devServer.host ?? 'localhost';
+        let port = devServer.port;
         
         let tempServer: Server | undefined;
         if (!port) {

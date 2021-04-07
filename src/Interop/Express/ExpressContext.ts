@@ -130,6 +130,12 @@ export class ExpressContext
         
         this.options.watch = false;
         const worker = await this.getWorker();
+        
+        if (worker.app.devServer === false) {
+            console.log(
+                'Please note: The app definition has the dev-server disabled, this has no effect on the express dev server middleware, tho!');
+        }
+        
         const config = await worker.do.makeConfig({disable: [PluginIdentifier.GIT_ADD]});
         
         worker.progressReporter?.update({percent: 0.5, message: 'Booting the server...'});

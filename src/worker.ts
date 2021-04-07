@@ -39,7 +39,7 @@ async function init(message: PlainObject)
         const bootstrap: Bootstrap = new (require('./Core/Bootstrap').Bootstrap as any)();
         const context = await bootstrap.initWorkerProcess(message);
         
-        if (context.parentContext.options.devServer) {
+        if (context.parentContext.options.devServer && context.app.devServer !== false) {
             await context.do.runDevServer();
         } else {
             const res = await context.do.runCompiler();
