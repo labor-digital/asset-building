@@ -16,9 +16,8 @@
  * Last modified: 2019.10.05 at 20:41
  */
 
-import {md5} from '@labor-digital/helferlein';
 import type {WorkerContext} from '../../../Core/WorkerContext';
-import {LoaderIdentifier, RuleIdentifier} from '../../../Identifier';
+import {RuleIdentifier} from '../../../Identifier';
 import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {IConfigurator} from '../types';
 
@@ -27,22 +26,10 @@ export class FontConfigurator implements IConfigurator
     public async apply(context: WorkerContext): Promise<void>
     {
         await ConfigGenUtil.addRule(RuleIdentifier.FONT, context, /\.(woff(2)?|ttf|eot|otf)(\?v=\d+\.\d+\.\d+)?$/, {
-            use: await ConfigGenUtil
-                .makeRuleUseChain(RuleIdentifier.FONT, context)
-                .addLoader(LoaderIdentifier.FILE, {
-                    loader: 'file-loader',
-                    options: {
-                        name: (file: string) => {
-                            if (context.isProd) {
-                                return '[name]-[fullhash].[ext]';
-                            }
-                            // Use a weak hash -> https://www.bountysource.com/issues/30111085-process-out-of-memory-webpack
-                            return '[name]-' + md5(file) + '.[ext]';
-                        },
-                        outputPath: 'assets/'
-                    }
-                })
-                .finish()
+            type: 'asset/resource',
+            generator: {
+                filename: 'assets/[name]-[hash][ext][query]'
+            }
         });
     }
 }
