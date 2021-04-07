@@ -37,6 +37,10 @@ export class FilterWarningsConfigurator implements IConfigurator
         // Ignore all source-map loader related warnings
         warningsToIgnore.push(/Failed to parse source map/);
         
+        // Temporary fix to ignore warnings from a cssnano issue when svg tags are used in font declarations
+        // @todo keep track if this was fixed: https://github.com/cssnano/cssnano/issues/1040
+        warningsToIgnore.push(/Css Minimizer Plugin: cssnano:/);
+        
         // Make sure everything is a regex
         warningsToIgnore = map(warningsToIgnore, (v) => {
             if (isString(v)) {
