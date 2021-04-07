@@ -35,7 +35,7 @@ export class FilterWarningsConfigurator implements IConfigurator
             )) as Array<any>;
         
         // Ignore all source-map loader related warnings
-        // warningsToIgnore.push(/Failed to parse source map/);
+        warningsToIgnore.push(/Failed to parse source map/);
         
         // Make sure everything is a regex
         warningsToIgnore = map(warningsToIgnore, (v) => {
