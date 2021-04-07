@@ -52,12 +52,16 @@ export class RunDevServerAction implements IWorkerAction
         
         const devServerOptions: WebpackDevServer.Configuration = {
             ...((config as any).devServer ?? {}),
-            noInfo: true,
             hot: true,
             ...(publicPath ? {publicPath} : {}),
             ...options?.devServer,
             host, port
         };
+        
+        if (!context.parentContext.options.verbose) {
+            devServerOptions.noInfo = true;
+            devServerOptions.stats = false;
+        }
         
         // Provide the calculated configuration back to webpack
         (config as any).devServer = devServerOptions;

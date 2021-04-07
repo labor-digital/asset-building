@@ -174,7 +174,7 @@ export class ExpressContext
         }
         
         this.expressApp.use(require('webpack-dev-middleware')(compiler, {
-            stats: false,
+            stats: this.options.verbose,
             publicPath: (compiler.options.output.publicPath! as string).replace(/^\./, ''),
             headers: {
                 etag: null,
