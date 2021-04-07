@@ -25,7 +25,7 @@ export class ImageConfigurator implements IConfigurator
 {
     public async apply(context: WorkerContext): Promise<void>
     {
-        await ConfigGenUtil.addRule(RuleIdentifier.IMAGE, context, /\.(png|jpe?g|gif|webp|avif)$/,
+        await ConfigGenUtil.addRule(RuleIdentifier.IMAGE, context, /\.(png|jpe?g|gif|webp|avif|svg)$/,
             {
                 use: await ConfigGenUtil
                     .makeRuleUseChain(RuleIdentifier.IMAGE, context)
