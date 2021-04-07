@@ -78,7 +78,6 @@ export enum PluginIdentifier
     COPY = 'plugin:copy',
     CLEAN_OUTPUT_DIR = 'plugin:cleanOutputDir',
     MIN_CHUNK_SIZE = 'plugin:minChunkSize',
-    FILTER_WARNINGS = 'plugin:filterWarnings',
     CSS_UGLIFY = 'plugin:js:uglify',
     JS_UGLIFY = 'plugin:css:uglify',
     HTML_TEMPLATE = 'plugin:html:template',

@@ -17,11 +17,8 @@
  */
 
 import {isArray, isString, map} from '@labor-digital/helferlein';
-import {Dependencies} from '../../../Core/Dependencies';
 import type {WorkerContext} from '../../../Core/WorkerContext';
 import {EventList} from '../../../EventList';
-import {PluginIdentifier} from '../../../Identifier';
-import {ConfigGenUtil} from '../ConfigGenUtil';
 import type {IConfigurator} from '../types';
 
 export class FilterWarningsConfigurator implements IConfigurator
@@ -53,7 +50,24 @@ export class FilterWarningsConfigurator implements IConfigurator
             patterns: warningsToIgnore,
             context
         });
-        await ConfigGenUtil.addPlugin(PluginIdentifier.FILTER_WARNINGS, context, {exclude: args.patterns},
-            config => new Dependencies.filterWarningsPlugin(config));
+        
+        warningsToIgnore = args.patterns;
+        
+        // Initialize the webpack configuration to allow us to handle warnings
+        if (!context.webpackConfig.ignoreWarnings) {
+            context.webpackConfig.ignoreWarnings = [];
+        } else if (!isArray(context.webpackConfig.ignoreWarnings)) {
+            context.webpackConfig.ignoreWarnings = [context.webpackConfig.ignoreWarnings];
+        }
+        
+        // Create hook function to filter our patterns (It seems, that using patterns directly, is a bit unreliable)
+        context.webpackConfig.ignoreWarnings.push(function (warning: string): boolean {
+            for (let i = 0; i < warningsToIgnore.length; i++) {
+                if ((warningsToIgnore[i] as RegExp).test(warning)) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 }
