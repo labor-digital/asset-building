@@ -20,7 +20,6 @@
 		"@types/vue": "2.0.0",
 		"lru-cache": "^6.0.0",
 		"patch-package": "^6.4.7",
-		"rimraf": "^3.0.2",
 		"vue": "2.6.12",
 		"vue-loader": "15.9.6",
 		"vue-property-decorator": "9.1.2",
@@ -32,6 +31,7 @@
 	},
 	"devDependencies": {
 		"@labor-digital/asset-building": "file:../../",
+		"rimraf": "^3.0.2",
 		"@types/express": "4.17.11",
 		"@types/memory-fs": "0.3.3",
 		"typescript": "4.2.3"
