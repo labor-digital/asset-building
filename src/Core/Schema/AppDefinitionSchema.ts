@@ -120,6 +120,10 @@ export default {
                 type: ['number', 'undefined'],
                 default: undefined
             },
+            publicPath: {
+                type: ['string', 'undefined'],
+                default: undefined
+            },
             host: {
                 type: 'string',
                 default: 'localhost'
