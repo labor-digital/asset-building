@@ -67,6 +67,8 @@ export class RunDevServerAction implements IWorkerAction
         const args = await context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_DEV_SERVER_CONFIG, {
             config: {
                 ...((config as any).devServer ?? {}),
+                noInfo: !context.parentContext.options.verbose,
+                stats: !!context.parentContext.options.verbose,
                 https: {
                     key: fs.readFileSync(
                         require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.key')),
@@ -74,23 +76,17 @@ export class RunDevServerAction implements IWorkerAction
                         require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.crt')),
                     ca: fs.readFileSync(require.resolve('@labor-digital/ssl-certs/rootca/LaborRootCa.pem'))
                 },
+                disableHostCheck: true,
                 hot: true,
                 ...(publicPath ? {publicPath} : {}),
-                ...options?.devServer,
                 ...(context.app.devServer ? context.app.devServer.raw : {}),
+                ...options?.devServer,
                 host, port
             } as WebpackDevServer.Configuration,
             context
         });
         
         const devServerOptions: WebpackDevServer.Configuration = args.config;
-        
-        if (!context.parentContext.options.verbose) {
-            devServerOptions.noInfo = true;
-            devServerOptions.stats = false;
-        }
-        
-        // Provide the calculated configuration back to webpack
         (config as any).devServer = devServerOptions;
         
         Dependencies.devServer.addDevServerEntrypoints(config as any, devServerOptions);
