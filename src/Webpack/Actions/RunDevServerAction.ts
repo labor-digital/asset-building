@@ -46,8 +46,10 @@ export class RunDevServerAction implements IWorkerAction
         config.entry.unshift('webpack-dev-server/client?http://' + host + ':' + port);
         
         let publicPath = context.webpackConfig.output.publicPath ?? undefined;
-        if (isString(publicPath) && publicPath.charAt(0) !== '/') {
-            publicPath = '/' + publicPath;
+        if (context.app.devServer && context.app.devServer.publicPath) {
+            if (isString(publicPath) && publicPath.charAt(0) !== '/') {
+                publicPath = '/' + publicPath;
+            }
         }
         
         const devServerOptions: WebpackDevServer.Configuration = {

@@ -285,6 +285,12 @@ export interface IAppDefinition
          * By default "localhost", can be set to any other url that resolves to localhost, too.
          */
         host?: string;
+        
+        /**
+         * Allows to override the public path while running the dev server. This allows to shorten dev server urls
+         * by providing a / instead of a long publicPath
+         */
+        publicPath?: string;
     } | false
 }
 
