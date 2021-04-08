@@ -47,9 +47,10 @@ export class RunDevServerAction implements IWorkerAction
         
         let publicPath = context.webpackConfig.output.publicPath ?? undefined;
         if (context.app.devServer && context.app.devServer.publicPath) {
-            if (isString(publicPath) && publicPath.charAt(0) !== '/') {
-                publicPath = '/' + publicPath;
-            }
+            publicPath = context.app.devServer.publicPath;
+        }
+        if (isString(publicPath) && publicPath.charAt(0) !== '/') {
+            publicPath = '/' + publicPath;
         }
         
         const devServerOptions: WebpackDevServer.Configuration = {
@@ -164,7 +165,6 @@ Public path: http://${host}:${port}${publicPath ?? ''}
             }
         }
         
-        console.log('RESOLVED PORT', port);
         return {port, host, tempServer};
     }
 }
