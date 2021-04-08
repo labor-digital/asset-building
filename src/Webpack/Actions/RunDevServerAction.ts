@@ -76,6 +76,11 @@ export class RunDevServerAction implements IWorkerAction
                         require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.crt')),
                     ca: fs.readFileSync(require.resolve('@labor-digital/ssl-certs/rootca/LaborRootCa.pem'))
                 },
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+                    'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
+                },
                 disableHostCheck: true,
                 hot: true,
                 ...(publicPath ? {publicPath} : {}),
