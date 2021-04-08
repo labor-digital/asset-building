@@ -124,9 +124,17 @@ export default {
                 type: ['string', 'undefined'],
                 default: undefined
             },
+            publicPathAbsolute: {
+                type: 'bool',
+                default: false
+            },
             host: {
-                type: 'string',
-                default: 'localhost'
+                type: ['string', 'undefined'],
+                default: undefined
+            },
+            raw: {
+                type: ['plainObject', 'undefined'],
+                default: {}
             }
         }
     },

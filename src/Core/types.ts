@@ -19,6 +19,7 @@
 import type {PlainObject} from '@labor-digital/helferlein';
 import type {ChildProcess} from 'child_process';
 import type {RuleSetRule} from 'webpack';
+import type WebpackDevServer from 'webpack-dev-server';
 
 export type TBuilderMode = 'production' | 'dev' | 'analyze' | string;
 export type TBuilderEnvironment = 'standalone' | 'nuxt' | 'express' | 'storybook' | string;
@@ -291,6 +292,19 @@ export interface IAppDefinition
          * by providing a / instead of a long publicPath
          */
         publicPath?: string;
+        
+        /**
+         * By default the public path is set with a leading /, but for using the output in an external environment
+         * it can be important that all paths are absolute, including the host and the port. If you set this to
+         * true webpack will handle this automatically for you.
+         */
+        publicPathAbsolute?: boolean;
+        
+        /**
+         * Allows you to supply the raw dev server configuration object.
+         * NOTE: Be careful with this, as it will overwrite our generated config!
+         */
+        raw?: WebpackDevServer.Configuration;
     } | false
 }
 

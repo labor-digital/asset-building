@@ -54,6 +54,7 @@ export enum EventList
     BEFORE_GIT_ADD = 'assetBuilder__beforeGitAdd',
     PROCESS_CREATED = 'assetBuilder__processManager--processCreated',
     CHECK_IDENTIFIER_STATE = 'assetBuilder__checkIdentifierState',
+    FILTER_WEBPACK_DEV_SERVER_CONFIG = 'assetBuilder__filterWebpackDevServerConfig',
     
     // Special Interop events
     /**

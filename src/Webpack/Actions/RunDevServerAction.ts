@@ -18,11 +18,13 @@
 
 import {isArray, isPlainObject, isString} from '@labor-digital/helferlein';
 import Chalk from 'chalk';
+import * as fs from 'fs';
 import {createServer, Server} from 'http';
 import portfinder from 'portfinder';
 import type WebpackDevServer from 'webpack-dev-server';
 import {Dependencies} from '../../Core/Dependencies';
 import type {WorkerContext} from '../../Core/WorkerContext';
+import {EventList} from '../../EventList';
 import {PluginIdentifier} from '../../Identifier';
 import type {IRunDevServerOptions, IWorkerAction} from './types';
 
@@ -43,23 +45,45 @@ export class RunDevServerAction implements IWorkerAction
             config.entry = [config.entry as any];
         }
         
-        config.entry.unshift('webpack-dev-server/client?http://' + host + ':' + port);
+        config.entry.unshift('webpack-dev-server/client?https://' + host + ':' + port);
         
-        let publicPath = context.webpackConfig.output.publicPath ?? undefined;
-        if (context.app.devServer && context.app.devServer.publicPath) {
-            publicPath = context.app.devServer.publicPath;
-        }
-        if (isString(publicPath) && publicPath.charAt(0) !== '/') {
-            publicPath = '/' + publicPath;
-        }
-        
-        const devServerOptions: WebpackDevServer.Configuration = {
-            ...((config as any).devServer ?? {}),
-            hot: true,
-            ...(publicPath ? {publicPath} : {}),
-            ...options?.devServer,
-            host, port
+        const enforceLeadingSlash = function (publicPath?: string): string | undefined {
+            if (isString(publicPath) && publicPath.charAt(0) !== '/') {
+                publicPath = '/' + publicPath;
+            }
+            return publicPath;
         };
+        let publicPath = enforceLeadingSlash(context.webpackConfig.output.publicPath ?? undefined);
+        
+        if (context.app.devServer && context.app.devServer.publicPath) {
+            publicPath = enforceLeadingSlash(context.app.devServer.publicPath);
+            if (context.app.devServer.publicPathAbsolute) {
+                context.webpackConfig.output.publicPath = `https://${host}:${port}` + publicPath;
+            } else {
+                context.webpackConfig.output.publicPath = publicPath;
+            }
+        }
+        
+        const args = await context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_DEV_SERVER_CONFIG, {
+            config: {
+                ...((config as any).devServer ?? {}),
+                https: {
+                    key: fs.readFileSync(
+                        require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.key')),
+                    cert: fs.readFileSync(
+                        require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.crt')),
+                    ca: fs.readFileSync(require.resolve('@labor-digital/ssl-certs/rootca/LaborRootCa.pem'))
+                },
+                hot: true,
+                ...(publicPath ? {publicPath} : {}),
+                ...options?.devServer,
+                ...(context.app.devServer ? context.app.devServer.raw : {}),
+                host, port
+            } as WebpackDevServer.Configuration,
+            context
+        });
+        
+        const devServerOptions: WebpackDevServer.Configuration = args.config;
         
         if (!context.parentContext.options.verbose) {
             devServerOptions.noInfo = true;
@@ -83,8 +107,8 @@ export class RunDevServerAction implements IWorkerAction
             
             setTimeout(() => {
                 console.log(`[DEV SERVER]: ${Chalk.greenBright('started')}
-Running on: http://${host}:${port}
-Public path: http://${host}:${port}${publicPath ?? ''}
+Running on: https://${host}:${port}
+Public path: https://${host}:${port}${publicPath ?? ''}
 `);
             }, 1000);
         });
@@ -121,7 +145,7 @@ Public path: http://${host}:${port}${publicPath ?? ''}
                 'Can\'t start a dev server for app, because it was actively disabled using "devServer": false in the app configuration!');
         }
         
-        const host = devServer.host ?? 'localhost';
+        const host = devServer.host ?? 'js.localmachine.space';
         let port = devServer.port;
         
         let tempServer: Server | undefined;

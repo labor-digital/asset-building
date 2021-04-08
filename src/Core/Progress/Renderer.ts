@@ -17,7 +17,7 @@
  */
 
 import {EventEmitter, forEach, isUndefined} from '@labor-digital/helferlein';
-import Inquirer from 'Inquirer';
+import Inquirer from 'inquirer';
 import type BottomBar from 'inquirer/lib/ui/bottom-bar';
 import {debounce} from 'throttle-debounce';
 import {EventList} from '../../EventList';

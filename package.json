@@ -51,6 +51,7 @@
 	"license": "Apache-2.0",
 	"dependencies": {
 		"@labor-digital/helferlein": "4.0.6",
+		"@labor-digital/ssl-certs": "^1.1.1",
 		"autoprefixer": "10.2.5",
 		"chalk": "4.1.0",
 		"ci-info": "^3.1.1",
