@@ -73,6 +73,7 @@
 		"less": "4.1.1",
 		"less-loader": "8.0.0",
 		"mini-css-extract-plugin": "1.4.1",
+		"mini-svg-data-uri": "^1.2.3",
 		"multi-progress-bars": "^3.2.3",
 		"node-sass": "5.0.0",
 		"portfinder": "^1.0.28",

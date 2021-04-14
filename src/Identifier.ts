@@ -45,6 +45,7 @@ export enum RuleIdentifier
 {
     HTML = 'rule:html',
     IMAGE = 'rule:image',
+    IMAGE_SVG = 'rule:image:svg',
     FONT = 'rule:font',
     JS_PRE = 'rule:js:pre',
     JS_SOURCE_MAP = 'rule:js:sourceMap',
