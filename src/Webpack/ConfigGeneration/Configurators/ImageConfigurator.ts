@@ -104,7 +104,7 @@ export class ImageConfigurator implements IConfigurator
                         return true;
                     }
                     
-                    return (new Blob([source]).size) < maxInlineSize;
+                    return Buffer.byteLength(source, 'utf8') < maxInlineSize;
                 }
             }
         });
