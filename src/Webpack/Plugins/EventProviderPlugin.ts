@@ -33,7 +33,10 @@ export const EventProviderPlugin: IAssetBuilderPluginStatic = class implements I
     
     public apply(compiler: Compiler): any
     {
-        compiler.hooks.afterDone.tap('EventProviderPlugin', async statsRaw => {
+        compiler.hooks.done.tapAsync({
+            name: 'EventProviderPlugin',
+            stage: 8888
+        }, async (statsRaw, callback) => {
             let stats = statsRaw.toJson({
                 assets: true,
                 errorDetails: false,
@@ -41,7 +44,7 @@ export const EventProviderPlugin: IAssetBuilderPluginStatic = class implements I
             });
             
             let exitCode = stats.warnings && stats.warnings.length > 0 ||
-                           stats.errors && stats.errors.length > 0 ? 1 : 0;
+                           stats.errors && stats.errors.length > 0 ? 2 : 0;
             
             let args = await this._context!.eventEmitter.emitHook(EventList.COMPILING_DONE, {
                 stats, statsRaw, context: this._context!, exitCode
@@ -58,6 +61,8 @@ export const EventProviderPlugin: IAssetBuilderPluginStatic = class implements I
                     process.exit(args.exitCode);
                 }, 500);
             }
+            
+            callback();
         });
     }
 };

@@ -47,7 +47,10 @@ export const FancyStatsPlugin: IAssetBuilderPluginStatic = class implements IAss
     
     public apply(compiler: Compiler)
     {
-        compiler.hooks.done.tap('FancyStatsPlugin', (statsRaw) => {
+        compiler.hooks.done.tapAsync({
+            name: 'FancyStatsPlugin',
+            stage: 9999
+        }, (statsRaw, callback) => {
             let stats = statsRaw.toJson({
                 assets: true,
                 errorDetails: false,
@@ -72,6 +75,8 @@ export const FancyStatsPlugin: IAssetBuilderPluginStatic = class implements IAss
             } else {
                 render();
             }
+            
+            callback();
         });
     }
     

@@ -16,7 +16,7 @@
  * Last modified: 2019.10.05 at 17:25
  */
 
-import {filter, forEach, isFunction, isPlainObject} from '@labor-digital/helferlein';
+import {filter, forEach, isFunction, isPlainObject, reduce} from '@labor-digital/helferlein';
 import childProcess from 'child_process';
 import path from 'path';
 import {EventList} from '../EventList';
@@ -64,8 +64,9 @@ export class ProcessManager
     
     /**
      * Forks a new worker process for each app that is defined in the core context
+     * Returns the highest exit code of the executed worker processes
      */
-    public startWorkers(): Promise<any | void>
+    public async startWorkers(): Promise<number>
     {
         this.context.logger.debug('Beginning to spawn worker processes...');
         const processes: Array<Promise<any | void>> = [];
@@ -74,7 +75,10 @@ export class ProcessManager
             processes.push(this.startSingleWorker(app));
         });
         
-        return Promise.all(processes);
+        const results = await Promise.all(processes);
+        const exitCode = reduce(results, (v, l) => Math.max(v, l), 0);
+        this.context.logger.debug('All processes have finished, exit code: ' + exitCode);
+        return exitCode;
     }
     
     /**
@@ -82,12 +86,12 @@ export class ProcessManager
      * @param app
      * @param options
      */
-    public startSingleWorker(app: IAppDefinition, options?: ISingleWorkerOptions): Promise<void>
+    public startSingleWorker(app: IAppDefinition, options?: ISingleWorkerOptions): Promise<number>
     {
         options = options ?? {};
         
         // Start the process
-        return new Promise<void>(async (resolve, reject) => {
+        return new Promise<number>(async (resolve, reject) => {
             
             // Create a new fork
             let worker = childProcess.fork(
@@ -174,23 +178,30 @@ export class ProcessManager
             // Resolve the promise if the child was closed
             worker.on('exit', (code) => {
                 if (stopped) {
-                    resolve();
+                    resolve(code ?? 0);
                     return;
                 }
                 stopped = true;
                 
                 // Check if we got an error
                 if (code !== 0 && code !== null) {
-                    this.context.eventEmitter.emitHook(EventList.SHUTDOWN, {})
-                        .then(() => {
-                            reject(new Error(
-                                'The worker process no. ' + app.id + ' was closed with a non-zero exit code!'));
-                        });
-                    return;
+                    // Webpack ended successfully, but had errors or warnings -> leads to exit code 2
+                    if (code === 2) {
+                        this.context.logger.info(
+                            'The worker process no. ' + app.id + ' was closed with a non-zero exit code!');
+                        return resolve(1);
+                    } else {
+                        this.context.eventEmitter.emitHook(EventList.SHUTDOWN, {})
+                            .then(() => {
+                                reject(new Error(
+                                    'The worker process no. ' + app.id + ' was closed with a non-zero exit code!'));
+                            });
+                        return;
+                    }
                 }
                 
                 this.context.logger.debug('Worker process no. ' + app.id + ' finished');
-                resolve();
+                resolve(code ?? 0);
             });
         });
     }

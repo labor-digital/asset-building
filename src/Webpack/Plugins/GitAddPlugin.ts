@@ -41,7 +41,7 @@ export const GitAddPlugin: IAssetBuilderPluginStatic = class implements IAssetBu
             return;
         }
         
-        compiler.hooks.done.tap('GitAddPlugin', (statsRaw) => {
+        compiler.hooks.afterDone.tap('GitAddPlugin', (statsRaw) => {
             let stats = statsRaw.toJson({
                 assets: true,
                 errorDetails: false,
