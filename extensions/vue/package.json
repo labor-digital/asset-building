@@ -8,7 +8,7 @@
 		"url": "git+ssh://git@github.com:labor-digital/asset-building-env-vuejs.git"
 	},
 	"scripts": {
-		"postinstall": "patch-package",
+		"postinstall": "patch-package || exit 0",
 		"clean": "rimraf ./dist",
 		"install-dev:compile": "cd ../../ && npm run build",
 		"install-dev": "npm run install-dev:compile && npm i",
