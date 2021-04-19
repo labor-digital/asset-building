@@ -8,7 +8,7 @@
 		"type": "git",
 		"url": "git+ssh://git@github.com:labor-digital/asset-building.git"
 	},
-	"version": "9.0.0-rc.10",
+	"version": "9.0.0-rc.11",
 	"description": "A package that provides you with the whole suitcase of modern asset building for the web, powered by webpack",
 	"main": "./dist/index.js",
 	"keywords": [
