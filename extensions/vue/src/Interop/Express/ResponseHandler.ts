@@ -73,6 +73,8 @@ export class ResponseHandler
             result = this.applyMetaData(vueContext, result);
             result = this.applyRendererMetaData(vueContext, result);
             
+            // @todo a filter of result would be nice here.
+            // Both from the app and the plugin options?
             res.write(result);
             
             if (isFunction(vueContext.afterRendering)) {
@@ -96,7 +98,7 @@ export class ResponseHandler
                 options.onError(e, res, req, vueContext);
             }
             
-            if (!this._bootstrap.isProd && !this._bootstrap.workerContext.parentContext.options.verbose) {
+            if (this._bootstrap.isProd && !this._bootstrap.workerContext.parentContext.options.verbose) {
                 // Make the error conform to log collectors
                 console.error(`Error during render : ${req.url} | ${e}`.replace(/[\r\n]/g, ' -> '));
             } else {
