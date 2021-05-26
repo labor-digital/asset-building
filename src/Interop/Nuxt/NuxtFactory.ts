@@ -102,7 +102,7 @@ export class NuxtFactory {
 		});
 
 		if (config === null || key === null) {
-			return Promise.reject(new Error("Could not find " + type + " configuration!"));
+			return Promise.resolve();
 		}
 
 		// Build the enhanced configuration
