@@ -261,7 +261,7 @@ export class NuxtFactory {
 		forEach(isArray((config.entry as any).app)
 			? (config.entry as any).app
 			: config.entry as any, entryFile => {
-			if (entryFile.match(new RegExp(".*?[\\\\/].nuxt[\\\\/]" + type + ".js$"))) {
+			if (entryFile.match(new RegExp(".*?[\\\\/]\.?nuxt[\\\\/]" + type + ".js$"))) {
 				app.entry = entryFile;
 				return false;
 			}
