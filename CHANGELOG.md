@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.4](https://github.com/labor-digital/asset-building/compare/v8.1.3...v8.1.4) (2021-05-26)
+
+
+### Bug Fixes
+
+* **Nuxt:** Allow missing configuration types ([18c1c6f](https://github.com/labor-digital/asset-building/commit/18c1c6f41bf1be233cbe8b361c81f364289398ac))
+
 ### [8.1.3](https://github.com/labor-digital/asset-building/compare/v8.1.2...v8.1.3) (2021-03-15)
 
 ### [8.1.2](https://github.com/labor-digital/asset-building/compare/v8.1.1...v8.1.2) (2021-03-03)
