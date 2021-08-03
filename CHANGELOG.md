@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.2.0](https://github.com/labor-digital/asset-building/compare/v8.1.5...v8.2.0) (2021-08-03)
+
+
+### Features
+
+* **ExpressContext:** implement support for pre-compressed files in registerPublicAssets() ([36c2cca](https://github.com/labor-digital/asset-building/commit/36c2cca0767fff3b886dd6a531be2618a0063972))
+
 ### [8.1.5](https://github.com/labor-digital/asset-building/compare/v8.1.4...v8.1.5) (2021-05-26)
 
 
