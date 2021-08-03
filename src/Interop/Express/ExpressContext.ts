@@ -18,9 +18,11 @@
 
 import {EventBus} from "@labor-digital/helferlein/lib/Events/EventBus";
 import {EventEmitter} from "@labor-digital/helferlein/lib/Events/EventEmitter";
-import express, {Application} from "express";
+import {Application} from "express";
+import expressStaticGzip from "express-static-gzip";
 import {Compiler} from "webpack";
 import {WorkerContext} from "../../Core/WorkerContext";
+import {IExpressRegisterPublicAssetsOptions} from "../../Express/types";
 import ExpressFactory from "./ExpressFactory";
 
 export default class ExpressContext {
@@ -84,11 +86,18 @@ export default class ExpressContext {
 	 * Helper function to register public assets using the static express middleware!
 	 * @param directory The directory you want to make public, relative to the project root
 	 * @param route An optional route that is used to provide the static files
+	 * @param options Optional options for the registered middleware
 	 */
-	public registerPublicAssets(directory: string, route?: string) {
-		const stat = express.static(directory, {
-			etag: false,
-			maxAge: 15 * 60 * 1000
+	public registerPublicAssets(directory: string, route?: string, options?: IExpressRegisterPublicAssetsOptions) {
+		options = options ?? {};
+		const stat = expressStaticGzip(directory, {
+			enableBrotli: true,
+			serveStatic: {
+				etag: false,
+				maxAge: 15 * 60 * 1000,
+				...options.static
+			},
+			...options.compression
 		});
 		if (typeof route === "string")
 			this.expressApp.use(route, stat);
