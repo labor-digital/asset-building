@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.1.5](https://github.com/labor-digital/asset-building/compare/v8.1.4...v8.1.5) (2021-05-26)
+
+
+### Bug Fixes
+
+* **Nuxt:** Make NuxtFactory more resiliant on windows os ([0d2f563](https://github.com/labor-digital/asset-building/commit/0d2f5635721d5337f10a4b1badc73070165fb87f))
+
 ### [8.1.4](https://github.com/labor-digital/asset-building/compare/v8.1.3...v8.1.4) (2021-05-26)
 
 
