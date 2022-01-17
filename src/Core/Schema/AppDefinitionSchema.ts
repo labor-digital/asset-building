@@ -112,6 +112,10 @@ export default {
         type: 'array',
         default: () => []
     },
+    watch: {
+        type: ['boolean', 'null'],
+        default: null
+    },
     devServer: {
         type: ['plainObject', 'false'],
         default: {},

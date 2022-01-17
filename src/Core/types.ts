@@ -67,7 +67,7 @@ export interface IBuilderOptions
      * If the file does not exist, the script will fail. If set to false, the asset builder will not try
      * to find a package.json
      */
-    packageJsonPath?: string | false
+    packageJsonPath?: string | false;
     
     /**
      * The list of apps that is used in the configuration builder
@@ -236,7 +236,7 @@ export interface IAppDefinition
     /**
      * Additional definitions for the imports-loader
      */
-    jsCompat?: Array<{ rule: string, fix?: string, options?: RuleSetRule }>
+    jsCompat?: Array<{ rule: string, fix?: string, options?: RuleSetRule }>;
     
     /**
      * If this is set to true we will keep the output directory of this app when we build the sources
@@ -273,6 +273,13 @@ export interface IAppDefinition
     additionalResolverPaths?: Array<string>;
     
     /**
+     * Can be set to true to enable watching for file-changes on a per-app basis
+     * This can become useful if some apps use the dev-server others the watch command.
+     * NOTE: This option is only available in "dev" mode
+     */
+    watch?: boolean;
+    
+    /**
      * Options for the dev server specific to this app
      */
     devServer?: {
@@ -305,7 +312,7 @@ export interface IAppDefinition
          * NOTE: Be careful with this, as it will overwrite our generated config!
          */
         raw?: WebpackDevServer.Configuration;
-    } | false
+    } | false;
 }
 
 export interface ISingleWorkerOptions
@@ -316,17 +323,17 @@ export interface ISingleWorkerOptions
      * @param process
      * @param app
      */
-    onCreate?: (process: ChildProcess, app: IAppDefinition) => Promise<ChildProcess>
+    onCreate?: (process: ChildProcess, app: IAppDefinition) => Promise<ChildProcess>;
 }
 
 export interface IProcessMessageListener
 {
-    (data: any, namespace: string, worker: ChildProcess): void
+    (data: any, namespace: string, worker: ChildProcess): void;
 }
 
 export interface IIOLogWriter
 {
-    (...args: Array<string>): void
+    (...args: Array<string>): void;
 }
 
 export interface IDependencyDefinition

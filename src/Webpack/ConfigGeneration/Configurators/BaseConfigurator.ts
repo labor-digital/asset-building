@@ -34,13 +34,21 @@ export class BaseConfigurator implements IConfigurator
                           context.appId
         ) + '_' + inflectToUnderscore(context.app.appName!);
         
+        // Determine if we can use "watch"
+        let watch = false;
+        if (context.parentContext.options.devServer || context.parentContext.options.watch) {
+            if (context.app.watch || context.parentContext.options.watch) {
+                watch = true;
+            }
+        }
+        
         // Populate the basic webpack configuration
         const paths = IncludePathRegistry.getResolvePaths();
         context.webpackConfig = {
             name: context.app.appName + '',
             mode: context.isProd ? 'production' : 'development',
             target: ['web', 'es5'],
-            watch: context.parentContext.options.watch ?? false,
+            watch: watch,
             devtool: context.isProd ? 'source-map' : 'eval-source-map',
             entry: {},
             plugins: [],
