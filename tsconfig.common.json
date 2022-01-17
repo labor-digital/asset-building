@@ -23,6 +23,7 @@
 		"noUnusedParameters": true,
 		"strict": true,
 		"suppressImplicitAnyIndexErrors": true,
+		"useUnknownInCatchVariables": false,
 		// Type-checking settings.
 		"skipDefaultLibCheck": true,
 		"skipLibCheck": true,
