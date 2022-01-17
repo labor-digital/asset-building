@@ -40,6 +40,7 @@
 					"bodyHtmlSnippet": "<h1>Hello world (App 3)</h1><p>Look in your browser console, to see the js output</p>"
 				},
 				"devServer": {
+					"host": "localhost",
 					"port": 7500
 				}
 			}

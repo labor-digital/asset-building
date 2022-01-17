@@ -64,18 +64,32 @@ export class RunDevServerAction implements IWorkerAction
             }
         }
         
+        let certDomain: string | null = null;
+        if (host.indexOf('localhost') !== -1) {
+            certDomain = 'localhost';
+        } else if (host.indexOf('localmachine.space') !== -1) {
+            certDomain = 'localmachine.space';
+        }
+        
+        let httpsOptions = {};
+        if (isString(certDomain)) {
+            httpsOptions = {
+                key: fs.readFileSync(
+                    require.resolve('@labor-digital/ssl-certs/' + certDomain + '/' + certDomain + '.key')
+                ),
+                cert: fs.readFileSync(
+                    require.resolve('@labor-digital/ssl-certs/' + certDomain + '/' + certDomain + '.crt')
+                ),
+                ca: fs.readFileSync(require.resolve('@labor-digital/ssl-certs/rootca/LaborRootCa.pem'))
+            };
+        }
+        
         const args = await context.eventEmitter.emitHook(EventList.FILTER_WEBPACK_DEV_SERVER_CONFIG, {
             config: {
                 ...((config as any).devServer ?? {}),
                 noInfo: !context.parentContext.options.verbose,
                 stats: !!context.parentContext.options.verbose,
-                https: {
-                    key: fs.readFileSync(
-                        require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.key')),
-                    cert: fs.readFileSync(
-                        require.resolve('@labor-digital/ssl-certs/localmachine.space/localmachine.space.crt')),
-                    ca: fs.readFileSync(require.resolve('@labor-digital/ssl-certs/rootca/LaborRootCa.pem'))
-                },
+                https: httpsOptions,
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
