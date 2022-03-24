@@ -37,7 +37,7 @@
 		"typescript": "4.2.3"
 	},
 	"peerDependencies": {
-		"@labor-digital/asset-building": "^9.0.0"
+		"@labor-digital/asset-building": "^9.0.0 || ^9.0.0-rc.X"
 	},
 	"author": {
 		"name": "LABOR.digital",
