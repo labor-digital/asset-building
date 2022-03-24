@@ -1,6 +1,6 @@
 {
 	"name": "@labor-digital/asset-building-env-vuejs",
-	"version": "5.0.0-rc.4",
+	"version": "5.0.0-rc.5",
 	"description": "An Extension for the LABOR.digital asset-builder to build vue.js apps with zero config",
 	"main": "./dist/index.js",
 	"repository": {
@@ -37,7 +37,7 @@
 		"typescript": "4.2.3"
 	},
 	"peerDependencies": {
-		"@labor-digital/asset-building": "^9.0.0 || ^9.0.0-rc.X"
+		"@labor-digital/asset-building": "^9.0.0 || ^9.0.0-rc"
 	},
 	"author": {
 		"name": "LABOR.digital",
