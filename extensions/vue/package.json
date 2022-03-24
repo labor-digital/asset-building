@@ -21,7 +21,7 @@
 		"lru-cache": "^6.0.0",
 		"patch-package": "^6.4.7",
 		"vue": "2.6.12",
-		"vue-loader": "15.9.6",
+		"vue-loader": "15.9.8",
 		"vue-property-decorator": "9.1.2",
 		"vue-router": "3.5.1",
 		"vue-server-renderer": "2.6.12",
