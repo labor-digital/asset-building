@@ -224,7 +224,7 @@ But in some instances, we only need to set or overwrite some webpack config sett
 ```
 
 ### app.warningsIgnorePattern
-You now have the option to suppress warnings during the build via the warningIgnorePattern, which is a RegExp. 
+You now have the option to suppress warnings during the build via the warningsIgnorePattern, which is a RegExp. 
 This is especially useful if you have specific warnings raising in a build, and you don´t want the asset-building to exit with code 1.
 
 This can be either a string or an array of strings. If you set this using an extension script, you can also set it to an array of regex expressions!
@@ -233,7 +233,7 @@ This can be either a string or an array of strings. If you set this using an ext
   "apps": [
     {
       [...]
-      "warningIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
+      "warningsIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
    }
   ]
 }
