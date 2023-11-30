@@ -10,6 +10,8 @@ If the base distribution does not meet your requirements, it is possible to exte
 ```
 npm install --save-dev @labor-digital/asset-building
 ```
+*This package works in Node.js ^14.21.0.*
+
 * Add the following part to your package.json:
 ```
   "scripts": {
