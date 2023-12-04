@@ -49,7 +49,7 @@ when it comes to webpack, you can extend this library using its lightweight
 ```
 npm install --save-dev @labor-digital/asset-building
 ```
-*This package works in Node.js ^14.21.0.*
+*This package works in Node.js ^16.20.0*
 
 * Add the following part to your package.json:
 ```

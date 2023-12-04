@@ -20,7 +20,7 @@ Source maps of your files will automatically be created at OUTPUT_FILE.map.
 
 Additionally, you can add a custom webpackConfig here as well. See the root webpackConfig for further details.
 
-Furthermore, you now have the option to suppress warnings during the build via the warningIgnorePattern, which is a RegExp. 
+Furthermore, you now have the option to suppress warnings during the build via the warningsIgnorePattern, which is a RegExp. 
 This is especially useful if you have certain warnings raising in a build, and you don't want the asset-building to exit with code 1.
 ```
 "labor": {
@@ -32,7 +32,7 @@ This is especially useful if you have certain warnings raising in a build, and y
       "webpackConfig": {
         "target": "node"
       },
-      "warningIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
+      "warningsIgnorePattern": "Pattern to check against the warnings to ignore them as RegEXP"
     }
   ]
 }
