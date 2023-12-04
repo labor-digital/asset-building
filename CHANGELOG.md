@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [8.3.0](https://github.com/labor-digital/asset-building/compare/v8.2.1...v8.3.0) (2023-12-04)
+
+
+### Features
+
+* node version in docs and function-name fix ([3257590](https://github.com/labor-digital/asset-building/commit/3257590de38c8d3b360b235fc88d34b8647fd9d5))
+
 ### [8.2.1](https://github.com/labor-digital/asset-building/compare/v8.2.0...v8.2.1) (2023-11-30)
 
 ## [8.2.0](https://github.com/labor-digital/asset-building/compare/v8.1.5...v8.2.0) (2021-08-03)
