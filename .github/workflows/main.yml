@@ -7,12 +7,17 @@ on:
     paths-ignore:
       - 'package.json'
       - 'CHANGELOG.md'
+
+permissions:
+  id-token: write
+  contents: write
+
 jobs:
   documentation:
     runs-on: ubuntu-latest
     steps:
       -
-        uses: actions/checkout@v1
+        uses: actions/checkout@v6
       -
         name: vuepress-deploy
         uses: jenkey2011/vuepress-deploy@master
@@ -26,11 +31,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        uses: actions/checkout@v1
+        uses: actions/checkout@v6
       -
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v6
         with:
-          node-version: 10
+          node-version: 16
           registry-url: https://registry.npmjs.org/
       -
         name: Installing npm modules
@@ -45,7 +50,5 @@ jobs:
           github-token: ${{ secrets.github_token }}
       -
         name: Publish library on npm
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
+        run: npm publish --provenance --access public
 
