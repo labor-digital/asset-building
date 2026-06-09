@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.3.7](https://github.com/labor-digital/asset-building/compare/v8.3.6...v8.3.7) (2026-06-09)
+
+
+### Bug Fixes
+
+* dummy commit ([e66d3ff](https://github.com/labor-digital/asset-building/commit/e66d3ff3fe49dd74d38355a711b8acc28c3e641d))
+
 ### [8.3.6](https://github.com/labor-digital/asset-building/compare/v8.3.5...v8.3.6) (2026-06-09)
 
 ### [8.3.5](https://github.com/labor-digital/asset-building/compare/v8.3.4...v8.3.5) (2026-06-09)
