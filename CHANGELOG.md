@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.3.4](https://github.com/labor-digital/asset-building/compare/v8.3.3...v8.3.4) (2026-06-09)
+
+
+### Bug Fixes
+
+* Downgrade GitHub Actions versions and adjust permissions/licenses handling ([d4513d3](https://github.com/labor-digital/asset-building/commit/d4513d306bd781ec2a8a3a2305308e69d7c63b69))
+* Update GitHub Actions workflow - upgrade actions and dependencies. ([eaeb8a9](https://github.com/labor-digital/asset-building/commit/eaeb8a9006581a6dd0d7b6c139260619f4055eee))
+
 ### [8.3.3](https://github.com/labor-digital/asset-building/compare/v8.3.2...v8.3.3) (2023-12-04)
 
 ### [8.3.2](https://github.com/labor-digital/asset-building/compare/v8.3.1...v8.3.2) (2023-12-04)
