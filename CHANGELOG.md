@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [8.3.5](https://github.com/labor-digital/asset-building/compare/v8.3.4...v8.3.5) (2026-06-09)
+
+
+### Bug Fixes
+
+* Update GitHub Actions workflow to support OpenSSL legacy provider ([49b99af](https://github.com/labor-digital/asset-building/commit/49b99afe5060d64f8380585fac9b6b79d4b00702))
+
 ### [8.3.4](https://github.com/labor-digital/asset-building/compare/v8.3.3...v8.3.4) (2026-06-09)
 
 
