@@ -68,3 +68,5 @@ You're free to use this package, but if it makes it to your production environme
 Our address is: LABOR.digital - Fischtorplatz 21 - 55116 Mainz, Germany
 
 We publish all received postcards on our [company website](https://labor.digital). 
+
+.
